@@ -1,0 +1,91 @@
+---
+title: "Regresión, modelos y métodos"
+subtitle: "Prueba de evaluación continua 2"
+author: "Jorge Vallejo Ortega"
+date: '`r format(Sys.Date(),"%e de %B, %Y")`'
+output:
+  html_document:
+     toc: true
+     toc_depth: 1
+# pdf_document:
+#   number_sections: true
+# toc: true
+# extra_dependencies: ["float"]
+# urlcolor: blue
+# header-includes:
+#   - \renewcommand{\contentsname}{Índice}
+# - \usepackage{float}
+
+# Next code for knitting both types of documents automatically comes from https://stackoverflow.com/questions/39662365/knit-one-markdown-file-to-two-output-files/53280491#53280491
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding,
+                    output_format = NULL,
+                    output_dir = "results",
+                    output_file = "vallejo_jorge_Reg_PEC2.html") })
+# And:
+# https://stackoverflow.com/a/46007686/10647267
+
+# bibliography: references.bib
+---
+  
+```{r setup, include=FALSE}
+# knitr options
+
+# Do not display code in output document
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.align = "center")
+```
+
+```{r estructura de directorios, results='hide', include=FALSE}
+# 'data' contains raw source data.
+# 'intermediateData' contains .RData objects with processed data.
+# 'results' stores the final report files.
+
+directories <- c("data", "results", "intermediateData", "images")
+
+# Create directories
+lapply(directories, function(x){
+  if (!(dir.exists(x))){
+    dir.create(x)
+  }
+})
+```
+
+```{r delete results files, eval= FALSE, include=FALSE}
+# Run this chunk ONLY if you want to re-do
+# the complete the report FROM THE ORIGINAL DATA.
+# Remember that the .RData files are there to
+# avoid unnecesarily redoing of long data processing.
+
+directories <- c("results/", "intermediateData/", "images/")
+
+file.remove(
+  # Create a character vector of relative paths
+  # to all files in the variable directories
+  list.files(path = directories,
+             all.files = TRUE,
+             full.names = TRUE,
+             recursive = TRUE)
+)
+```
+
+```{r libraries, include=FALSE}
+# Load packages
+library(knitr)
+```
+
+
+# Apéndice A: Código
+
+El documento original en formato .Rmd, que incluye el código completo en lenguaje R usado para generar este informe, se puede consultar y descargar en el siguiente repositorio de Github:
+[jorgevallejo/](https://github.com/jorgevallejo/)
+
+# Apéndice B: Reproducibilidad {#apendiceB}
+```{r session_info, include=TRUE, echo=TRUE, results='markup'}
+sessionInfo() # For better reproducibility
+```
+
+
+# Referencias
