@@ -1,12 +1,12 @@
 ---
-title: "Regresión, modelos y métodos"
-subtitle: "Prueba de evaluación continua 2"
+title: "Endo-Mining: herramienta web para la búsqueda automatizada de genes potencialmente relacionados con la endometriosis a través de minería de textos en PubMed"
+subtitle: "Reproducibilidad, revisionabilidad y facilidad de uso potenciadas a través del lenguaje de programación R"
 author: "Jorge Vallejo Ortega"
 date: '`r format(Sys.Date(),"%e de %B, %Y")`'
 output:
-  # html_document:
-  #    toc: true
-  #    toc_depth: 1
+# html_document:
+#    toc: true
+#    toc_depth: 1
 pdf_document:
   number_sections: true
 toc: true
@@ -62,8 +62,8 @@ lapply(directories, function(x){
 directories <- c("results/", "intermediateData/", "images/")
 
 file.remove(
-  # Create a character vector of relative paths
-  # to all files in the variable directories
+# Create a character vector of relative paths
+# to all files in the variable directories
   list.files(path = directories,
              all.files = TRUE,
              full.names = TRUE,
@@ -76,6 +76,24 @@ file.remove(
 library(knitr)
 ```
 
+# Palabras clave
+
+Endometriosis, Text mining, Shiny.
+
+# Temática escogida
+
+La endometriosis es una enfermedad del sistema reproductor femenino que afecta alrededor del 10% de mujeres en edad reproductora. Aunque es una enfermedad benigna, supone una importante disminución en la calidad de vida de las personas que la sufren. Los síntomas más habituales son infertilidad, dolor pélvico crónico y neuroangiogénesis. Los tratamientos más habituales consisten en el alivio de síntomas mediante medicación, y en la excisión quirúrgica de las lesiones. Debido a que no se conocen biomarcadores claros de la enfermedad el diagnóstico de la misma suele ser tardío, y no existe consenso sobre factores de riesgo ambientales o genéticos.
+
+Una de las causas que complican la investigación de nuevos tratamientos, biomarcadores y factores de riesgo es la dificultad para modelizar esta enfermedad in vivo. La endometriosis se produce de forma natural sólo en animales con ciclo menstrual, lo que deja fuera de esta aproximación los animales más usados en laboratorio (ratones, ratas y conejos). Los primates no humanos, como los macacos, sí desarrollan endometriosis pero en un porcentaje muy escaso. Como consecuencia, los modelos en uso se limitan principalmente a estudios in silico, cultivos celulares, y animales transgénicos en los que está afectado algún gen supuestamente implicado en el desarrollo de la endometriosis.
+
+# Problemática a resolver
+
+La generación de modelos animales transgénicos, el estudio de biomarcadores, y la investigación de nuevas dianas terapéuticas dependen en gran medida de la propuesta de genes implicados en los mecanismos del desarrollo de la endometriosis, gravedad de la enfermedad y respuesta a tratamientos. Existen varias estrategias complementarias para encontrar genes implicados en enfermedades o procesos biológicos en general: ensayos de expresión diferencial (mediante estudios de exomas o paneles de genes específicos), estudios de asociación del genoma completo (GWAS, _genome wide association study_) y minería de texto a partir de estudios previos relacionados (artículos científicos, tesis, patentes).
+
+
+
+# Objetivos
+# Bibliografía
 
 # Apéndice A: Código
 
