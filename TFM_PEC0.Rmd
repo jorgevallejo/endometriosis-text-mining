@@ -25,7 +25,7 @@ knit: (function(inputFile, encoding) {
 # And:
 # https://stackoverflow.com/a/46007686/10647267
 
-# bibliography: references.bib
+bibliography: bibliography.bib
 ---
   
 ```{r setup, include=FALSE}
@@ -82,13 +82,13 @@ Endometriosis, Text mining, Shiny.
 
 # Temática escogida
 
-La endometriosis es una enfermedad del sistema reproductor femenino que afecta alrededor del 10% de mujeres en edad reproductora XXXnecesita citaXXX. Sus principales síntomas son infertilidad y dolor [rolla] por lo que, sin ser una enfermedad que amenace directamente la vida del paciente, sí supone una importante disminución en su calidad de vida.
+La endometriosis es una enfermedad del sistema reproductor femenino que afecta alrededor del 10% de mujeres en edad reproductora XXXnecesita citaXXX. Sus principales síntomas son infertilidad y dolor [@rolla_endometriosis_2019] por lo que, sin ser una enfermedad que amenace directamente la vida del paciente, sí supone una importante disminución en su calidad de vida.
 
-El origen y patogénesis de esta enfermedad son desconocidos, y aunque existen varias teorías sobre su causa, ninguna ha sido probada de forma concluyente. El método de diagnóstico de referencia es la laparoscopia. Los métodos de diagnóstico por imagen (ultrasonidos, resonancia magnética) son menos invasivos pero no son capaces de alcanzar un diagnóstico en todos los casos. No se le conocen biomarcadores confiables, ni existe consenso sobre posibles factores de riesgo ambientales o genéticos[rolla]. 
+El origen y patogénesis de esta enfermedad son desconocidos, y aunque existen varias teorías sobre su causa, ninguna ha sido probada de forma concluyente. El método de diagnóstico de referencia es la laparoscopia. Los métodos de diagnóstico por imagen (ultrasonidos, resonancia magnética) son menos invasivos pero no son capaces de alcanzar un diagnóstico en todos los casos. No se le conocen biomarcadores confiables, ni existe consenso sobre posibles factores de riesgo ambientales o genéticos[@rolla_endometriosis_2019]. 
 
-El tratamiento medicamentoso de la endometriosis involucra el uso de analgésicos, hormonas y reguladores hormonales. De esta forma se tratan el dolor y la progresión de la enfermedad. La única forma de tratar las lesiones producidas por la enfermedad es mediante cirugía[rolla].
+El tratamiento medicamentoso de la endometriosis involucra el uso de analgésicos, hormonas y reguladores hormonales. De esta forma se tratan el dolor y la progresión de la enfermedad. La única forma de tratar las lesiones producidas por la enfermedad es mediante cirugía[@rolla_endometriosis_2019].
 
-Una de las causas que complican la investigación de nuevos tratamientos, biomarcadores y factores de riesgo es la dificultad para modelizar esta enfermedad in vivo. La endometriosis se produce de forma natural sólo en animales con ciclo menstrual, lo que deja fuera de esta aproximación los animales más usados en laboratorio (ratones, ratas y conejos). Los primates no humanos, como los macacos, sí desarrollan endometriosis pero en un porcentaje muy escaso. Como consecuencia, los modelos en uso se limitan principalmente a estudios in silico, cultivos celulares, y animales transgénicos en los que está afectado algún gen supuestamente implicado en el desarrollo de la endometriosis.
+Una de las causas que complican la investigación de nuevos tratamientos, biomarcadores y factores de riesgo es la dificultad para modelizar esta enfermedad in vivo. La endometriosis se produce de forma natural sólo en animales con ciclo menstrual, lo que deja fuera de esta aproximación los animales más usados en laboratorio (ratones, ratas y conejos). Los primates no humanos, como los macacos, sí desarrollan endometriosis pero en un porcentaje muy escaso. Como consecuencia, los modelos en uso se limitan principalmente a estudios in silico, cultivos celulares, y animales transgénicos en los que está afectado algún gen supuestamente implicado en el desarrollo de la endometriosis.XXX nedds citation XXX
 
 # Problemática a resolver
 
@@ -112,19 +112,15 @@ Este trabajo pretende alcanzar tres objetivos:
 
 3. Facilitar la repetición de este estudio a personas sin conocimientos en el lenguaje R, o en general sin grandes conocimientos de programación. Esto se conseguirá generando una interfaz web mediante la herramienta Shiny para usar el script anterior. Se buscará que el uso de la interfaz sea sencillo e intuitivo.
 
+<!-- # Apéndice A: Código -->
 
+<!-- El documento original en formato .Rmd, que incluye el código completo en lenguaje R usado para generar este informe, se puede consultar y descargar en el siguiente repositorio de Github: -->
+<!-- [jorgevallejo/](https://github.com/jorgevallejo/) -->
 
-# Bibliografía
-
-# Apéndice A: Código
-
-El documento original en formato .Rmd, que incluye el código completo en lenguaje R usado para generar este informe, se puede consultar y descargar en el siguiente repositorio de Github:
-[jorgevallejo/](https://github.com/jorgevallejo/)
-
-# Apéndice B: Reproducibilidad {#apendiceB}
-```{r session_info, include=TRUE, echo=TRUE, results='markup'}
-sessionInfo() # For better reproducibility
-```
+<!-- # Apéndice B: Reproducibilidad {#apendiceB} -->
+<!-- ```{r session_info, include=TRUE, echo=TRUE, results='markup'} -->
+<!-- sessionInfo() # For better reproducibility -->
+<!-- ``` -->
 
 
 # Referencias
