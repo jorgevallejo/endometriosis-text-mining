@@ -2,7 +2,7 @@
 title: "Endo-Mining: herramienta web para la búsqueda automatizada de genes potencialmente relacionados con la endometriosis a través de minería de textos en PubMed"
 subtitle: "Reproducibilidad, revisionabilidad y facilidad de uso potenciadas a través del lenguaje de programación R"
 author: "Jorge Vallejo Ortega"
-date: '`r format(Sys.Date(),"%e de %B, %Y")`'
+date: '`r format(Sys.Date(),"%d/%m/%Y")`'
 output:
   pdf_document:
     number_sections: true
