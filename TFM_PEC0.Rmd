@@ -4,24 +4,21 @@ subtitle: "Reproducibilidad, revisionabilidad y facilidad de uso potenciadas a t
 author: "Jorge Vallejo Ortega"
 date: '`r format(Sys.Date(),"%e de %B, %Y")`'
 output:
-# html_document:
-#    toc: true
-#    toc_depth: 1
-pdf_document:
-  number_sections: true
-toc: true
-extra_dependencies: ["float"]
-urlcolor: blue
-header-includes:
-  - \renewcommand{\contentsname}{Índice}
-# - \usepackage{float}
+  pdf_document:
+    number_sections: true
+  toc: true
+  extra_dependencies: ["float"]
+  urlcolor: blue
+  header-includes:
+    - \renewcommand{\contentsname}{Índice}
+  # - \usepackage{float}
 
 # Next code for knitting both types of documents automatically comes from https://stackoverflow.com/questions/39662365/knit-one-markdown-file-to-two-output-files/53280491#53280491
-knit: (function(inputFile, encoding) {
-  rmarkdown::render(inputFile, encoding = encoding,
-                    output_format = NULL,
-                    output_dir = "results",
-                    output_file = "vallejo_jorge_PEC0.pdf") })
+# knit: (function(inputFile, encoding) {
+#   rmarkdown::render(inputFile, encoding = encoding,
+#                     output_format = NULL,
+#                     output_dir = "results",
+#                     output_file = "vallejo_jorge_PEC0.pdf") })
 # And:
 # https://stackoverflow.com/a/46007686/10647267
 
