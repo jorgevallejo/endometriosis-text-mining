@@ -22,6 +22,7 @@ output:
 # https://stackoverflow.com/a/46007686/10647267
 
 bibliography: bibliography.bib
+link-citations: yes
 ---
   
 ```{r setup, include=FALSE}
