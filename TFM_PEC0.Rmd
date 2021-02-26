@@ -1,31 +1,28 @@
 ---
-title: "Regresión, modelos y métodos"
-subtitle: "Prueba de evaluación continua 2"
+title: "Endo-Mining: herramienta web para la búsqueda automatizada de genes potencialmente relacionados con la endometriosis a través de minería de textos en PubMed"
 author: "Jorge Vallejo Ortega"
-date: '`r format(Sys.Date(),"%e de %B, %Y")`'
+date: '`r format(Sys.Date(),"%d/%m/%Y")`'
 output:
-  html_document:
-     toc: true
-     toc_depth: 1
-# pdf_document:
-#   number_sections: true
-# toc: true
-# extra_dependencies: ["float"]
-# urlcolor: blue
-# header-includes:
-#   - \renewcommand{\contentsname}{Índice}
-# - \usepackage{float}
+  pdf_document:
+    number_sections: true
+  toc: true
+  extra_dependencies: ["float"]
+  urlcolor: blue
+  header-includes:
+    - \renewcommand{\contentsname}{Índice}
+  # - \usepackage{float}
 
 # Next code for knitting both types of documents automatically comes from https://stackoverflow.com/questions/39662365/knit-one-markdown-file-to-two-output-files/53280491#53280491
-knit: (function(inputFile, encoding) {
-  rmarkdown::render(inputFile, encoding = encoding,
-                    output_format = NULL,
-                    output_dir = "results",
-                    output_file = "vallejo_jorge_Reg_PEC2.html") })
+# knit: (function(inputFile, encoding) {
+#   rmarkdown::render(inputFile, encoding = encoding,
+#                     output_format = NULL,
+#                     output_dir = "results",
+#                     output_file = "vallejo_jorge_PEC0.pdf") })
 # And:
 # https://stackoverflow.com/a/46007686/10647267
 
-# bibliography: references.bib
+bibliography: bibliography.bib
+link-citations: yes
 ---
   
 ```{r setup, include=FALSE}
@@ -62,8 +59,8 @@ lapply(directories, function(x){
 directories <- c("results/", "intermediateData/", "images/")
 
 file.remove(
-  # Create a character vector of relative paths
-  # to all files in the variable directories
+# Create a character vector of relative paths
+# to all files in the variable directories
   list.files(path = directories,
              all.files = TRUE,
              full.names = TRUE,
@@ -76,16 +73,44 @@ file.remove(
 library(knitr)
 ```
 
+# Palabras clave
 
-# Apéndice A: Código
+Endometriosis, minería de textos, Shiny.
 
-El documento original en formato .Rmd, que incluye el código completo en lenguaje R usado para generar este informe, se puede consultar y descargar en el siguiente repositorio de Github:
-[jorgevallejo/](https://github.com/jorgevallejo/)
+# Temática escogida
 
-# Apéndice B: Reproducibilidad {#apendiceB}
-```{r session_info, include=TRUE, echo=TRUE, results='markup'}
-sessionInfo() # For better reproducibility
-```
+La endometriosis es una enfermedad del sistema reproductor femenino caracterizada por crecimiento de tejido endometrial ectópico fuera del útero. Afecta a alrededor del 10% de mujeres en edad reproductora [@malvezzi_endometriosis_2020]. Sus principales síntomas son infertilidad y dolor [@rolla_endometriosis_2019] por lo que, sin ser una enfermedad que amenace directamente la vida del paciente, sí supone una importante disminución en su calidad de vida.
+
+El tratamiento medicamentoso de la endometriosis involucra el uso de analgésicos, hormonas y reguladores hormonales. De esta forma se tratan el dolor y la progresión de la enfermedad. La única forma de tratar las lesiones producidas por la enfermedad es mediante cirugía[@rolla_endometriosis_2019].
+
+# Problemática a resolver
+
+El origen y patogénesis de la endometriosis son desconocidos y, aunque existen varias teorías sobre su causa, ninguna ha sido probada de forma concluyente. El método de diagnóstico de referencia es la laparoscopia. Los métodos de diagnóstico por imagen (ultrasonidos, resonancia magnética) son menos invasivos pero no son capaces de alcanzar un diagnóstico en todos los casos. No se le conocen biomarcadores confiables, ni existe consenso sobre posibles factores de riesgo ambientales o genéticos[@rolla_endometriosis_2019]. 
+
+Una de las causas que complican la investigación de nuevos tratamientos, biomarcadores y factores de riesgo es la dificultad para modelizar esta enfermedad. Los modelos animales in vivo no consiguen reproducir el desarrollo de la endometriosis (roedores, pollos conejos), o implican mayores dificultades logísticas y éticas (macacos); con el uso de ratones transgénicos intentando salvar la distancia entre ambos tipos de modelos animales. Los modelos in vitro (cultivo de células y tejidos humanos), permiten el estudio rápido de gran cantidad de compuestos terapéuticos, pero sigue siendo necesario el modelo in vivo para estudiar el efecto de esos posibles fármacos en un organismo completo. El uso del análisis bioinformático de los datos aportados por las diferentes áreas "ómicas", los estudios de asociación del genoma completo (GWAS, _genome wide association study_), y la minería de texto son las herramientas que se espera que aporten un mayor avance al estudio de esta enfermedad [@malvezzi_endometriosis_2020].
+
+# Objetivos
+
+## Objetivo general
+
+* Encontrar genes relacionados con la endometriosis aplicando técnicas de minería de textos.
+
+## Objetivos específicos
+
+1. Desarrollar un script que permita realizar un procedimiento de minería de textos automáticamente, desde la recopilación de datos en bruto hasta la presentación de resultados.
+
+2. Desarrollar una aplicación web implementando el script de minería de textos resultante del objetivo anterior. 
+
+
+<!-- # Apéndice A: Código -->
+
+<!-- El documento original en formato .Rmd, que incluye el código completo en lenguaje R usado para generar este informe, se puede consultar y descargar en el siguiente repositorio de Github: -->
+<!-- [jorgevallejo/](https://github.com/jorgevallejo/) -->
+
+<!-- # Apéndice B: Reproducibilidad {#apendiceB} -->
+<!-- ```{r session_info, include=TRUE, echo=TRUE, results='markup'} -->
+<!-- sessionInfo() # For better reproducibility -->
+<!-- ``` -->
 
 
 # Referencias
