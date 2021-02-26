@@ -1,6 +1,5 @@
 ---
 title: "Endo-Mining: herramienta web para la búsqueda automatizada de genes potencialmente relacionados con la endometriosis a través de minería de textos en PubMed"
-subtitle: "Reproducibilidad, revisionabilidad y facilidad de uso potenciadas a través del lenguaje de programación R"
 author: "Jorge Vallejo Ortega"
 date: '`r format(Sys.Date(),"%d/%m/%Y")`'
 output:
@@ -75,39 +74,32 @@ library(knitr)
 
 # Palabras clave
 
-Endometriosis, Text mining, Shiny.
+Endometriosis, minería de textos, Shiny.
 
 # Temática escogida
 
 La endometriosis es una enfermedad del sistema reproductor femenino caracterizada por crecimiento de tejido endometrial ectópico fuera del útero. Afecta a alrededor del 10% de mujeres en edad reproductora [@malvezzi_endometriosis_2020]. Sus principales síntomas son infertilidad y dolor [@rolla_endometriosis_2019] por lo que, sin ser una enfermedad que amenace directamente la vida del paciente, sí supone una importante disminución en su calidad de vida.
 
-El origen y patogénesis de esta enfermedad son desconocidos, y aunque existen varias teorías sobre su causa, ninguna ha sido probada de forma concluyente. El método de diagnóstico de referencia es la laparoscopia. Los métodos de diagnóstico por imagen (ultrasonidos, resonancia magnética) son menos invasivos pero no son capaces de alcanzar un diagnóstico en todos los casos. No se le conocen biomarcadores confiables, ni existe consenso sobre posibles factores de riesgo ambientales o genéticos[@rolla_endometriosis_2019]. 
-
 El tratamiento medicamentoso de la endometriosis involucra el uso de analgésicos, hormonas y reguladores hormonales. De esta forma se tratan el dolor y la progresión de la enfermedad. La única forma de tratar las lesiones producidas por la enfermedad es mediante cirugía[@rolla_endometriosis_2019].
-
-Una de las causas que complican la investigación de nuevos tratamientos, biomarcadores y factores de riesgo es la dificultad para modelizar esta enfermedad. Los modelos animales in vivo no consiguen reproducir el desarrollo de la enfermedad (roedores, pollos conejos), o implican mayores dificultades logísticas y éticas (macacos); con el uso de ratones transgénicos intentando salvar la distancia entre ambos tipos de modelos animales. Los modelos in vitro (cultivo de células y tejidos humanos), permiten el estudio rápido de gran cantidad de compuestos terapéuticos, pero sigue siendo necesario el modelo in vivo para estudiar el efecto de esos posibles fármacos en un organismo completo. El uso del análisis bioinformático de los datos aportados por las diferentes áreas "ómicas", los estudios de asociación del genoma completo (GWAS, _genome wide association study_), y la minería de texto son las herramientas que se espera que aporten un mayor avance al estudio de esta enfermedad [@malvezzi_endometriosis_2020].
 
 # Problemática a resolver
 
-La generación de modelos animales transgénicos, el estudio de biomarcadores, y la investigación de nuevas dianas terapéuticas dependen en gran medida de la propuesta de genes implicados en los mecanismos del desarrollo de la endometriosis, gravedad de la enfermedad y respuesta a tratamientos. Existen varias estrategias complementarias para encontrar genes implicados en enfermedades o procesos biológicos en general: ensayos de expresión diferencial (mediante estudios de exomas o paneles de genes específicos), GWAS, y minería de texto a partir de estudios previos relacionados (artículos científicos, tesis, patentes).
+El origen y patogénesis de la endometriosis son desconocidos y, aunque existen varias teorías sobre su causa, ninguna ha sido probada de forma concluyente. El método de diagnóstico de referencia es la laparoscopia. Los métodos de diagnóstico por imagen (ultrasonidos, resonancia magnética) son menos invasivos pero no son capaces de alcanzar un diagnóstico en todos los casos. No se le conocen biomarcadores confiables, ni existe consenso sobre posibles factores de riesgo ambientales o genéticos[@rolla_endometriosis_2019]. 
 
-La estrategia económicamente más accesible y logísticamente más simple es la minería de texto, ya que aprovecha trabajos científicos ya publicados y permite resaltar los genes más prometedores de entre miles de candidatos. Ya existen artículos publicados que utilizan minería de textos para descubrir genes posiblemente implicados en endometriosis[@bouaziz_how_2018], pero estos utilizan diferentes herramientas informáticas para los diferentes pasos del análisis, con el investigador tomando importantes decisiones entre paso y paso. Este esquema de trabajo, aunque funcional, genera varios problemas:
-
-1. Reproducibilidad. Los pasos concretos seguidos en cada etapa del análisis no están señalados al detalle en las publicaciónes científica, lo que complica la repetición exacta del protocolo original.
-
-2. Dificultad de revisión. Relacionado con el problema anterior. Al no tener un registro de cada paso y cada variable usada en los diferentes programas durante el análisis, es más difícil detectar errores o sesgos en el propio protocolo.
-
-3. Conocimientos especializados. Utilizar diferentes herramientas informáticas para cada paso del análisis implica que quien quiera reproducir el análisis, o adaptarlo a su propia investigación, debe aprender a su vez a usar todas esas herramientas. El problema aumenta de magnitud cuando tenemos en cuenta que no todos los grupos de investigación cuentan con conocimientos básicos en bioinformática, necesitando aprender determinadas técnicas desde cero.
+Una de las causas que complican la investigación de nuevos tratamientos, biomarcadores y factores de riesgo es la dificultad para modelizar esta enfermedad. Los modelos animales in vivo no consiguen reproducir el desarrollo de la endometriosis (roedores, pollos conejos), o implican mayores dificultades logísticas y éticas (macacos); con el uso de ratones transgénicos intentando salvar la distancia entre ambos tipos de modelos animales. Los modelos in vitro (cultivo de células y tejidos humanos), permiten el estudio rápido de gran cantidad de compuestos terapéuticos, pero sigue siendo necesario el modelo in vivo para estudiar el efecto de esos posibles fármacos en un organismo completo. El uso del análisis bioinformático de los datos aportados por las diferentes áreas "ómicas", los estudios de asociación del genoma completo (GWAS, _genome wide association study_), y la minería de texto son las herramientas que se espera que aporten un mayor avance al estudio de esta enfermedad [@malvezzi_endometriosis_2020].
 
 # Objetivos
 
-Este trabajo pretende alcanzar tres objetivos:
+## Objetivo general
 
-1. Reproducir estudios anteriores de minería de textos para la búsqueda de genes relacinados con la endometriosis. Se realizará mediante el desarrollo y uso de una herramienta propia.
+* Encontrar genes relacionados con la endometriosis aplicando técnicas de minería de textos.
 
-2. Mejorar la reproducibilidad y facilitar la revisión de futuros estudios. Esto se realizará generando una herramienta en forma de script en lenguaje que permita reproducir fácilmente y de forma automática todo el proceso de búsqueda de datos, análisis, y presentación de resultados. El código estará disponible públicamente para que cualquier persona interesada pueda revisarlo, mejorarlo, y adaptarlo a sus propios proyectos.
+## Objetivos específicos
 
-3. Facilitar la repetición de este estudio a personas sin conocimientos en el lenguaje R, o en general sin grandes conocimientos de programación. Esto se conseguirá generando una interfaz web mediante la herramienta Shiny para usar el script anterior. Se buscará que el uso de la interfaz sea sencillo e intuitivo.
+1. Desarrollar un script que permita realizar un procedimiento de minería de textos automáticamente, desde la recopilación de datos en bruto hasta la presentación de resultados.
+
+2. Desarrollar una aplicación web implementando el script de minería de textos resultante del objetivo anterior. 
+
 
 <!-- # Apéndice A: Código -->
 
