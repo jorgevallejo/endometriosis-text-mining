@@ -83,6 +83,10 @@ La endometriosis es una enfermedad del sistema reproductor femenino caracterizad
 
 El tratamiento medicamentoso de la endometriosis involucra el uso de analgésicos, hormonas y reguladores hormonales. De esta forma se tratan el dolor y la progresión de la enfermedad. La única forma de tratar las lesiones producidas por la enfermedad es mediante cirugía[@rolla_endometriosis_2019].
 
+A día de hoy no existe ninguna prueba genética que identifique personas con mayor riesgo de desarrollar la enfermedad, aunque sí podemos acceder a una amplia literatura científica que explora la relación entre genes y endometriosis y desvela gran cantidad de genes y regiones génicas que podrían estar involucradas [@rolla_endometriosis_2019]. Entre otros se han identificado loci relacionados en, o cercanos a, genes involucrados en rutas hormonales ( _FN1, CCDC170, ESR1, SYNE1_ y _FSHB_); así como otros genes de funciones diversas ( _CDKN2BAS, WNT4, GREB1, ID4, CDKN2B-AS1, VEZT,  KDR, TTC39B_,  e _IL1A_) [@sapkota_meta-analysis_2017].
+
+Los polimorfismos detectados incluyen tanto  polimorfismos de nucleótido único (SNPs), como variaciones en el número de copias (CVNs). En el caso de los CVNs, los genes afectados más prometedores fueron _SRRM2, LGALS3BP, CABLES2_ y _FCGBP_ [@mafra_copy_2017].
+
 # Problemática a resolver
 
 El origen y patogénesis de la endometriosis son desconocidos y, aunque existen varias teorías sobre su causa, ninguna ha sido probada de forma concluyente. El método de diagnóstico de referencia es la laparoscopia. Los métodos de diagnóstico por imagen (ultrasonidos, resonancia magnética) son menos invasivos pero no son capaces de alcanzar un diagnóstico en todos los casos. No se le conocen biomarcadores confiables, ni existe consenso sobre posibles factores de riesgo ambientales o genéticos[@rolla_endometriosis_2019]. 
