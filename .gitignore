@@ -8,3 +8,8 @@
 # results/
 intermediateData/
 images/
+
+[otros]
+.#*
+.write*
+*~
