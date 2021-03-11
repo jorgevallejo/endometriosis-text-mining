@@ -38,7 +38,7 @@ En resumen, en este trabajo estamos abordando el estudio de una enfermedad - la 
 
 ##3. Enfoque y método a seguir
 
-La herramienta se desarrollará utilizando el lenguaje de programación R. En primer lugar, debido a que dispone una amplia variedad de librerías especialmente enfocadas a la minería de textos en general (lsa, tidytext, tm) y al acceso a datos de PubMed y el NCBI (easyPubmed, pubmed.mineR, bibliometrix, rentrez, RISmed). Y, en segundo lugar, debido a que es el lenguaje mejor conocido por el escritor de este trabajo.
+La herramienta se desarrollará utilizando el lenguaje de programación R. En primer lugar, debido a que dispone una amplia variedad de librerías especialmente enfocadas a la minería de textos en general (lsa, tidytext, tm) y al acceso a datos de PubMed y el NCBI (easyPubmed, pubmed.mineR, bibliometrix, rentrez, RISmed). Y, en segundo lugar, debido a que es el lenguaje mejor conocido por el autor de este trabajo.
 
 El flujo de trabajo se basará en el expuesto en Rani _et al._ (2015) y Liu (2016), y constará de los siguientes pasos:
 
@@ -55,3 +55,7 @@ El flujo de trabajo se basará en el expuesto en Rani _et al._ (2015) y Liu (201
 6. Visualización de la información en forma de tablas y gráficas (nubes de palabras con los genes, diagramas de barras de términos GO).
 
 Finalmente, el flujo de trabajo descrito se integrará en el desarrollo de la aplicación web usando el paquete Shiny de R.
+
+
+##4. Planificación con hitos y temporización
+
