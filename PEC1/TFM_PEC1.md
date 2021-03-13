@@ -44,9 +44,9 @@ El flujo de trabajo se basará en el expuesto en Rani _et al._ (2015) y Liu (201
 
 1. Reducción de la información. En esta fase se descargará un pequeño subgrupo de abstracts de todos los disponibles en la base de datos PubMed. Para seleccionar dichos abstracts de interés se usarán palabras clave apropiadas al tema de este trabajo y se acotará por fechas. Estos abstracts conformarán el corpus primario de documentos sobre los que se realizará la minería de textos.
 
-2. Preprocesado. Durante esta fase procederemos a la itemización de los textos que componen el corpus primario. Ésta consistirá en el desglose de cada abstract en las frases y palabras que lo componen.
+2. Preprocesado. Éste consistirá en el desglose de cada abstract del corpus primario en las frases y palabras que lo componen (tokens).
 
-3. Reconocimiento y normalización de entidades. Identificaremos aquellos ítems correspondientes a nombres de genes; consolidaremos además sinónimos de genes a un identificador único de cada gen. El resultado de este paso es una lista de genes posiblemente asociados con la endometriosis según la literatura biomédica que compone el corpus primario.
+3. Reconocimiento y normalización de entidades. Identificaremos aquellos tokens correspondientes a nombres de genes; consolidaremos además sinónimos de genes a un identificador único de cada gen. El resultado de este paso es una lista de genes posiblemente asociados con la endometriosis según la literatura biomédica que compone el corpus primario.
 
 4. Filtrado estadístico. Se realizará un filtrado de la lista mediante un test frente a la distribución hipergeométrica, para distinguir aquellos genes con menor probabilidad de haber sido recuperados por azar.
 
