@@ -1,0 +1,50 @@
+Se describe la endometriosis como una enfermedad de etiología poco clara, dependiente de factores ambientales y genéticos. La heredabilidad de la enfermedad no sigue un patrón mendeliano, así que su origen es muy probablemente multifactorial dependiendo de un número desconocido de genes. Existen varias estrategias al alcance de los investigadores que permiten el descubrimiento de genes y regiones genómicas asociadas a enfermedades multifactoriales.
+
+Uno de los métodos más antiguos son los diferentes tests de desequilibrio de ligamiento (Spielman, 1996), en los que se estudia la asociación entre la enfermedad y un marcador genético cercano a un gen candidato. Tiene la desventaja de que depende de la existencia de genes candidatos y de marcadores muy cercanos a dichos genes.
+
+Otro método consiste en el uso de microarrays para polimorfismos de nucleótico único (SNPs). Éste permite comparar genotipos de pacientes de la enfermedad en una población frente a sujetos control de la misma población, identificando variantes genómicas asociadas a la enfermedad. Permite el estudio simultáneo de muchas regiones genómicas, aunque limitadas por el espacio físico de la microarray.
+
+Los estudios de asociación de genoma completo (GWAS) se basan en la comparación de genomas secuenciados completos entre individuos que manifiestan la enfermedad e individuos control al igual que en el método de microarrays. A diferencia de aquel, el espacio de búsqueda no se limita a las secuencias que pueden incluirse en una microarray, sino a todo el genoma que ha podido secuenciarse. Tiene la desventaja de que, debido a la enorme cantidad de secuencias que forma un genoma, necesita gran número de  muestras para que la potencia de los tests estadísticos sea aceptable.
+
+Por último, tenemos la minería de textos. Ésta permite estudiar la asociación entre genes y enfermedades midiendo la cantidad de veces que los genes aparecen nombrados junto a la enfermedad en la literatura biomédica. Tiene la desventaja de que necesita la existencia previa de muchos estudios publicados acerca de la enfermedad; pero a cambio es un método muy rápido y de bajo coste que, al menos en ocasiones, puede producir resultados similares a los de los GWAS (Bouaziz, 2018).
+
+
+
+
+
+
+
+
+
+
+Using single-nucleotide polymorphism (SNP) array technol-
+ogy
+
+Large-scale genotyping using SNP microarrays has been
+performed successfully in the discovery of new genomic
+regions that are associated with multifactorial diseases
+[15, 28]. The methodology assesses variation across
+the genome using computational models to compare
+the genotypes of people with and without disease to
+identify variants that are associated with disease.
+Even though the cost of SNP arrays was significantly
+reduced in the last years, it remains prohibitive for nu-
+merous research centers to genotype a large number of
+samples 
+
+
+Another method for improving our understanding of a
+complex disease is to identify the genetic factors that underlie
+the disease risk through genome-wide association studies,
+
+# Why text mining?
+
+Given the large number
+of candidate genes in endometriosis, implementing the stan-
+dard functional validation of these candidate genes using
+experimental methodologies would no longer be possible
+without TM technology. By screening all articles published
+in the literature, TM can build an accurate list of candidate
+genes.
+
+Text mining techniques have been seen to produce results similar than those of GWAs (Bouaziz, 2018), being both cost effective and faster to perform.
