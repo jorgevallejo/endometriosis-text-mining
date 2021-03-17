@@ -1,0 +1,87 @@
+---
+title: "Endo-Mining: herramienta web para la búsqueda automatizada de genes potencialmente relacionados con la endometriosis a través de minería de textos en PubMed"
+author: "Jorge Vallejo Ortega"
+date: '`r format(Sys.Date(),"%d/%m/%Y")`'
+output:
+  pdf_document:
+    number_sections: true
+    # toc: true
+    # extra_dependencies: ["float"]
+    # urlcolor: blue
+    # header-includes:
+    #   - \renewcommand{\contentsname}{Índice}
+    # - \usepackage{float}
+
+# Next code for knitting both types of documents automatically comes from https://stackoverflow.com/questions/39662365/knit-one-markdown-file-to-two-output-files/53280491#53280491
+# knit: (function(inputFile, encoding) {
+#   rmarkdown::render(inputFile, encoding = encoding,
+#                     output_format = NULL,
+#                     output_dir = "results",
+#                     output_file = "vallejo_jorge_PEC2_fase1.pdf") })
+# And:
+# https://stackoverflow.com/a/46007686/10647267
+
+bibliography: ../bibliography.bib
+link-citations: yes
+---
+  
+```{r setup, include=FALSE}
+# knitr options
+
+# Do not display code in output document
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.align = "center")
+```
+
+```{r estructura de directorios, results='hide', include=FALSE}
+# 'data' contains raw source data.
+# 'intermediateData' contains .RData objects with processed data.
+# 'results' stores the final report files.
+
+directories <- c("data", "results", "intermediateData", "images")
+
+# Create directories
+lapply(directories, function(x){
+  if (!(dir.exists(x))){
+    dir.create(x)
+  }
+})
+```
+
+```{r delete results files, eval= FALSE, include=FALSE}
+# Run this chunk ONLY if you want to re-do
+# the complete the report FROM THE ORIGINAL DATA.
+# Remember that the .RData files are there to
+# avoid unnecesarily redoing of long data processing.
+
+directories <- c("results/", "intermediateData/", "images/")
+
+file.remove(
+# Create a character vector of relative paths
+# to all files in the variable directories
+  list.files(path = directories,
+             all.files = TRUE,
+             full.names = TRUE,
+             recursive = TRUE)
+)
+```
+
+```{r libraries, include=FALSE}
+# Load packages
+library(knitr)
+```
+
+# Búsqueda en PubMed
+
+PubMed es un recurso en línea de acceso público y gratuito consistente en una base de datos - en continuo crecimiento - que incluye más de 32 millones de citas y abstracts de literatura biomédica, tanto artículos (_MEDLINE_ y _PubMed Central_) como libros (_Bookshelf_). Esta base de datos - en línea desde 1996 - fue desarrollada y sigue siendo mantenida por el Centro Nacional para la Información Biotecnológica (_National Center for Biotechnology Information_, NCBI), que forma parte de la Biblioteca Nacional de Medicina de los E.E.U.U. (_U.S. National Library of Medicine_, NLM) de los Institutos Nacionales de Salud (_National Institutes of Health_, NIH). Esta base de datos está especializada en publicaciones centradas en campos científicos relacionados con la salud y la biomedicina (@national_library_of_medicine_about_nodate, @national_library_of_medicine_medline_nodate).
+
+```{r, fig.cap="Página principal de PubMed. La barra de búsqueda destaca en medio de la imagen, indicando la finalidad principal de esta página."}
+include_graphics(path = "images/pubmed_homepage.png")
+```
+
+
+Primero de todo pruebo a realizar una búsqueda en PubMed (https://pubmed.ncbi.nlm.nih.gov/). La más básica posible y más general, sin ningún filtro, con la palabra clave "endometriosis". El resultado son 29,343 citas, desde 1927 hasta 2021.
+
+# Exploración de paquetes de minería de textos
