@@ -78,12 +78,51 @@ library(knitr)
 
 PubMed es un recurso en línea de acceso público y gratuito consistente en una base de datos - en continuo crecimiento - que incluye más de 32 millones de citas y abstracts de literatura biomédica, tanto artículos (_MEDLINE_ y _PubMed Central_) como libros (_Bookshelf_). Esta base de datos - en línea desde 1996 - fue desarrollada y sigue siendo mantenida por el Centro Nacional para la Información Biotecnológica (_National Center for Biotechnology Information_, NCBI), que forma parte de la Biblioteca Nacional de Medicina de los E.E.U.U. (_U.S. National Library of Medicine_, NLM) de los Institutos Nacionales de Salud (_National Institutes of Health_, NIH). Esta base de datos está especializada en publicaciones centradas en campos científicos relacionados con la salud y la biomedicina (@national_library_of_medicine_about_nodate, @national_library_of_medicine_medline_nodate).
 
-```{r, fig.cap="Página principal de PubMed. La barra de búsqueda destaca en medio de la imagen, indicando la finalidad principal de esta página.", out.width=200}
+```{r pubmed_homepage, fig.cap="Página principal de PubMed. La barra de búsqueda destaca en medio de la imagen, indicando la finalidad principal de esta página.", out.width=200}
 include_graphics(path = "images/pubmed_homepage.png")
 ```
 
+Para realizar búsquedas es posible utilizar una serie de etiquetas con las que especificar si el término que hemos escrito debe buscarse como parte del título (etiqueta [TI]), el autor ([AU]), la revista ([TA]) o cualquier otro campo dentro de una larga lista que podemos consultar en la sección de ayuda de PubMed[^1]. También es posible usar los operadores booleanos AND, OR y NOT. Sin embargo, no es necesario emplear las etiquetas ni los operadores, ya que el motor de búsqueda de la página puede crear por sí mismo búsquedas complejas a partir de sólo las palabras clave que introducimos en el campo de búsqueda.
 
-Primero de todo pruebo a realizar una búsqueda en PubMed (https://pubmed.ncbi.nlm.nih.gov/). La más básica posible y más general, sin ningún filtro, con la palabra clave "endometriosis". El resultado son 29,343 citas, desde 1927 hasta 2021.
+[^1]: <https://pubmed.ncbi.nlm.nih.gov/help/#search-tags>
+
+El algoritmo que construye las búsquedas a partir de nuestras palabras clave (_Automatic Term Mapping_) contrasta dichas palabras clave contra diferentes tablas de traducción de términos. En este orden: tabla de traducción de temas, tabla de traducción de revistas, índice de autores e índice de investigadores (colaboradores). Cuando se encuentra una coincidencia para el término o la frase, dicha coincidencia se añade a la búsqueda y no se continúa en la siguiente tabla de traducción.
+
+La tabla de temas relaciona - entre otras cosas - las diferentes formas ortográficas del inglés americano y el británico, formas singulares y plurales, sinónimos, términos fuertemente relacionados, nombres de medicamentos genéricos y sus nombres comerciales, y el vocabulario controlado incluido en el tesauro MeSH (_Medical Subject Headings).
+
+La tabla de revistas contiene y relaciona el título completo de las revistas, sus abreviaciones y sus números ISSN.
+
+El índice de autores y el índice de investigadores contienen el nombre, iniciales y nombre completo de los autores incluidos en la base de datos.
+
+
+Primero de todo pruebo a realizar una búsqueda en PubMed (https://pubmed.ncbi.nlm.nih.gov/). La más básica posible y más general, sin ningún filtro, con la palabra clave "endometriosis". El resultado son 29,361 citas, desde 1927 hasta 2021.
+
+```{r pubmed_search, fig.cap="Página de resultados para el término 'endometriosis'. En la parte central se muestran las citas recuperadas por el algoritmo. En el margen izquierdo se nos ofrecen filtros interactivos para refinar la búsqueda.", out.width=200}
+include_graphics(path = "images/pubmed_search.png")
+```
+
+A través del enlace 'Advanced', que se encuentra en la zona superior izquierda, podemos acceder a un constructor de búsquedas que nos facilita hacer búsquedas avanzadas sin necesidad de conocer todas las etiquetas disponibles. En esa misma página podemos consultar nuestro historial de búsquedas recientes y, en éste, cómo el constructor de búsquedas ha traducido nuestra búsqueda simple ('endometriosis') utilizando las tablas de traducción:
+
+```{r pubmed_search_translation, fig.cap="Detalle del historial de búsqueda. De izquierda a derecha muestra la siguiente información: número de la búsqueda en orden cronológico, los términos de búsqueda entrados por el usuario y los términos a los que el algoritmo de mapeo automático los ha traducido, el número de resultados y finalmente la hora a la que se solicitó la búsqueda.", out.width=200}
+include_graphics(path = "images/pubmed_homepage.png")
+```
+
+Asimismo si usamos los filtros para, por ejemplo, limitar la búsqueda a los artículos publicados durante los últimos diez años, también podemos consultar la estructura de dicha búsqueda:
+
+```{r pubmed_search_filtro, fig.cap="Detalle del historial de búsqueda. Misma búsqueda del ejemplo anterior, filtrada para obtener como resultado citas de entre los años 2010 y 2021", out.width=200}
+include_graphics(path = "images/pubmed_search_filtro.png")
+```
+
+
+
+
+
+
+
+
+
+
+
 
 # Exploración de paquetes de minería de textos
 
