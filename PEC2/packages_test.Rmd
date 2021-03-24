@@ -1,0 +1,58 @@
+Búsqueda con easyPubMed:
+```{r}
+library(easyPubMed)
+
+query <- "endometriosis"
+ids <- get_pubmed_ids(query)
+ids$QueryTranslation
+```
+
+Llama la atención que no aparezca el término "endometrioses", que sí forma parte de la búsqueda cuando la hacemos a través de la página web.
+
+Recuperando la información de la búsqueda hecha con get_pubmed_ids:
+```{r}
+endometriosis_papers <- fetch_pubmed_data(ids,
+                                          format = "xml")
+# Save results into an RData file
+save(endometriosis_papers,
+     file = "intermediateData/endometriosis_papers.RData")
+```
+
+Realizando la búsqueda y descargando la información en forma de archivos de texto y formato xml:
+```{r}
+batch_pubmed_download(query,
+                      dest_dir = "intermediateData/",
+                      dest_file_prefix = query,
+                      batch_size = 5000
+                      )
+
+# it is recommended to use a [EDAT] or a [PDAT] filter in the query if you want to ensure reproducible results.
+```
+
+La descarga de todas las citas es muuuuy lenta. Después de todo, son más de 26 000. Debería usar una limitación de fechas.
+
+Una vez tenemos los archivos, concatenamos todos los datos en uno único:
+```{r}
+# List of files to be united
+files_list <- list.files(path = "intermediateData/",
+                         pattern = "endometriosis[0-9].\\.txt",
+                         full.names = TRUE) # include path
+# Create new file
+out_file <- file(description = "intermediateData/whole.txt",
+                 open = "w")
+# Read each downloaded file and write into final file
+for (i in files_list){
+  x <- readLines(i)
+  writeLines(x, out_file)
+}
+
+close(out_file)
+
+
+```
+
+
+
+
+
+

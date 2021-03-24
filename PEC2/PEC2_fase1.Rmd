@@ -72,6 +72,8 @@ file.remove(
 ```{r libraries, include=FALSE}
 # Load packages
 library(knitr)
+library(pubmed.mineR)
+library(easyPubMed)
 ```
 
 # Búsqueda en PubMed
@@ -113,20 +115,19 @@ Asimismo si usamos los filtros para, por ejemplo, limitar la búsqueda a los art
 include_graphics(path = "images/pubmed_search_filtro.png")
 ```
 
-
-
-
-
-
-
-
-
-
-
-
 # Exploración de paquetes de minería de textos
 
-blableblibloblu
+## _pubmed.mineR_
+
+Package with tool for text mining of PubMed abstracts (text and XML).
+
+## _easyPubMed_
+
+El paquete _easyPubMed_ es una interfaz que permite usar R para interactuar con las **Entrez Programming Utilities**, las API[^2] públicas que permiten el acceso programático a las bases de datos Entrez (PubMed, PMC, Gene, Nuccore y Protein). Las funciones de este paquete permiten la descarga por lotes de grandes volúmenes de registros, y el procesado básico del resultado de las búsquedas en PubMed.
+
+[^2]: Siglas en inglés de interfaz de programación de aplicaciones (_application programming interface_), que se refiere al conjunto de funciones y protocolos que un programa ofrece para poder ser usado por otro programa diferente.
+
+Las funciones principales que usaremos de este paquete son `get_pubmed_ids()`, que nos permite realizar una búsqueda en PubMed; `fetch_pubmed_data()`, con la que podemos recuperar registros de PubMed tras una búsqueda con la función anterior y `batch_pubmed_download()`, que permite descargar los resultados de una búsqueda y es la más adecuada cuando se trata de un elevado número de registros. Los resultados se pueden descargar en formato XML o TXT en lotes de hasta 5 000 registros. Estos resultados en formato texto conforman los datos sobre los que usaremos las funciones del paquete _pubmed.mineR_.
 
 # Referencias
 \
