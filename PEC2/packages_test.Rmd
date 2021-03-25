@@ -161,8 +161,26 @@ tdm <- tdm_for_lsa(last_abstracts, c("age", "gender", "woman", "women", " man ",
 tdm[, 1:10]
 ```
 
+25/03/2021
 
+¿Qué pasa si, para fusionar los registros en formato XML en lugar de leer y copiar línea por línea usamos la función file.append?
+```{r}
+file.create("intermediateData/appended_xml.txt")
 
+files_list2 <- list.files(path = "intermediateData/",
+                         pattern = "^endometriosis.*txt$",
+                         full.names = TRUE) # include path
 
+for (i in files_list2){
+   file.append("intermediateData/appended_xml.txt",
+               i)
+}
+```
+
+```{r abstracts xml}
+abstracts_xml <- xmlreadabs("intermediateData/appended_xml.txt")
+```
+
+Nada, que si flores.
 
 
