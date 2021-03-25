@@ -1,0 +1,188 @@
+Búsqueda con easyPubMed:
+```{r}
+library(easyPubMed)
+
+query <- "endometriosis"
+ids <- get_pubmed_ids(query)
+ids$QueryTranslation
+```
+
+Llama la atención que no aparezca el término "endometrioses", que sí forma parte de la búsqueda cuando la hacemos a través de la página web.
+
+Recuperando la información de la búsqueda hecha con get_pubmed_ids:
+```{r}
+endometriosis_papers <- fetch_pubmed_data(ids,
+                                          format = "xml")
+# Save results into an RData file
+save(endometriosis_papers,
+     file = "intermediateData/endometriosis_papers.RData")
+```
+
+Realizando la búsqueda y descargando la información en forma de archivos de texto y formato xml:
+```{r}
+batch_pubmed_download(query,
+                      dest_dir = "intermediateData/",
+                      dest_file_prefix = query,
+                      batch_size = 5000
+                      )
+
+# it is recommended to use a [EDAT] or a [PDAT] filter in the query if you want to ensure reproducible results.
+```
+
+La descarga de todas las citas es muuuuy lenta. Después de todo, son más de 26 000. Debería usar una limitación de fechas.
+
+Una vez tenemos los archivos, concatenamos todos los datos en uno único:
+```{r}
+# List of files to be united
+files_list <- list.files(path = "intermediateData/",
+                         pattern = "endometriosis[0-9].\\.txt",
+                         full.names = TRUE) # include path
+# Create new file
+out_file <- file(description = "intermediateData/whole.txt",
+                 open = "w")
+# Read each downloaded file and write into final file
+for (i in files_list){
+  x <- readLines(i)
+  writeLines(x, out_file)
+}
+
+close(out_file)
+```
+
+Análisis con pubmed.mineR
+
+Generar objeto S4 clase 'Abstract'
+```{r}
+library(pubmed.mineR)
+xmlabs <- xmlreadabs("intermediateData/whole.txt")
+```
+
+Esto da como resultado los errores 'StartTag: invalid element name' y 'Extra content at the end of the document'
+
+El segundo error creo que se debe a que, al juntar el contenido de los archivos descargados por lotes, el nodo raíz se repite; y debería ser único.
+
+El primer error no sé a qué se debe.
+
+Debería probar a descargar la información en formato texto en lugar de xml.
+
+Bueno, primero he probado a modificar el texto en emacs añadiendo un nodo raíz. Pero no ha funcionado, y sigue con el error 'Extra content at the end of the document. Quizá al concatenar los archivos se podría saltar las primeras líneas y la última, o algo así.
+
+Para no volver a tardar una eternidad en descargar la información pondremos una limitación de fechas (ej. los últimos 10 años):
+```{r}
+query <- "endometriosis AND 2020/01/01:3000/12/31[dp]"
+
+batch_pubmed_download(query,
+                      dest_dir = "intermediateData/",
+                      dest_file_prefix = "last_endometriosis",
+                      format = "abstract",
+                      batch_size = 5000
+                      )
+```
+
+Generemos ahora el objeto S4 clase 'Abstracts', el corpus primario:
+```{r}
+abstracts <- readabs("intermediateData/last_endometriosis01.txt")
+
+str(abstracts)
+```
+
+Bueno, ya que estamos, bajemos todos los artículos de endometriosis:
+```{r}
+batch_pubmed_download("endometriosis",
+                      dest_dir = "intermediateData/",
+                      dest_file_prefix = "total_endometriosis",
+                      format = "abstract",
+                      batch_size = 5000
+                      )
+```
+
+Una vez tenemos los archivos, concatenamos todos los datos en uno único:
+```{r}
+# List of files to be united
+files_list <- list.files(path = "intermediateData/",
+                         pattern = "total",
+                         full.names = TRUE) # include path
+# Create new file
+out_file <- file(description = "intermediateData/todos.txt",
+                 open = "w")
+# Read each downloaded file and write into final file
+for (i in files_list){
+  x <- readLines(i)
+  writeLines(x, out_file)
+}
+
+close(out_file)
+```
+
+Genera objeto S4 (corpus primario):
+```{r}
+abstracts <- readabs("intermediateData/todos.txt")
+str(abstracts)
+```
+
+Reconocimiento de entidades:
+
+-genes: la función `gene_atomization()` extrae los símbolos HGNC del texto junto con sus frecuencias.
+```{r}
+genes_endometriosis <- gene_atomization(abstracts)
+head(genes_endometriosis)
+```
+
+Para hacer la exploración más rápida, usaré los ejemplos con sólo los artículos publicados en el último año:
+```{r}
+last_abstracts <- readabs("intermediateData/last_endometriosis01.txt")
+
+last_genes <- gene_atomization(last_abstracts)
+head(last_genes)
+```
+
+Word atomization. Disgrega el texto en palabras y las ordena según su frecuencia. No tiene en cuenta los espacios, la puntuación ni las palabras más comunes del idioma inglés.
+```{r}
+last_words <- word_atomizations(last_abstracts)
+head(last_words)
+```
+
+```{r}
+barplot(last_words[1:12,2], 
+        names.arg = last_words[1:12,1],
+        horiz = TRUE,
+        las = 2,
+        space = 0)
+```
+
+word clusters
+```{r}
+test <- wordscluster()
+```
+
+`tdm_for_lsa()` encuentra la frecuencia de cada término dado en cada abstract, considerando cada abstract como un documento separado, preparando una matriz de términos que puede usarse en un LSA. Esto puede ser útil si reunimos el listado de factores de riesgo no genéticos:
+```{r}
+tdm <- tdm_for_lsa(last_abstracts, c("age", "gender", "woman", "women", " man ", " men ", "smoking", "relationships", "relation"))
+tdm[, 1:10]
+```
+
+25/03/2021
+
+¿Qué pasa si, para fusionar los registros en formato XML en lugar de leer y copiar línea por línea usamos la función file.append?
+```{r}
+file.create("intermediateData/appended_xml.txt")
+
+files_list2 <- list.files(path = "intermediateData/",
+                         pattern = "^endometriosis.*txt$",
+                         full.names = TRUE) # include path
+
+for (i in files_list2){
+   file.append("intermediateData/appended_xml.txt",
+               i)
+}
+```
+
+```{r abstracts xml}
+abstracts_xml <- xmlreadabs("intermediateData/appended_xml.txt")
+```
+
+Nada, que si flores.
+
+
+
+
