@@ -149,7 +149,36 @@ include_graphics(path = "images/batch_pubmed_download.png")
 
 ## _pubmed.mineR_
 
-Package with tool for text mining of PubMed abstracts (text and XML).
+El paquete _pubmed.mineR_, para el lenguage **R**, se ha desarrollado específicamente para facilitar la minería de textos en el ámbito de la investigación biomédica; concretamente, aplicada a los sumarios (*abstracts*) de artículos incluidos en las citas de la base de datos PubMed. Para este fin, incluye multitud de herramientas que implementan algoritmos de minería de textos o que usan herramientas ya existentes en otros paquetes. En esta sección comentaremos, de entre las muchas funciones contenidas en el paquete, tan sólo aquellas que nos resultarán de utilidad en este trabajo.
+
+En primer lugar, para constituir el **corpus primario**, utilizaremos la función `readabs()` sobre el archivo en formato texto que contiene los registros resultado de nuestra búsqueda previa. El resultado es un objeto tipo S4 con tres _slots_ que contienen, respectivamente, la información referente al título de la revista, el texto del sumario y el código PMID del artículo.
+
+```{r ejemplo readbs}
+last_abstracts <- readabs("intermediateData/last_endometriosis01.txt")
+
+str(last_abstracts, vec.len = 1)
+```
+
+Disponemos de dos importantes funciones para el **reconomiento de entidades**. La función `gene_atomization()` reconoce los nombres de los genes (en su codificación como símbolo HGNC) y los extrae del del corpus primario además de calcular sus frecuencias.
+
+```{r}
+last_genes <- gene_atomization(last_abstracts)
+head(last_genes)
+```
+
+Por otro lado, la función `word_atomizations()` es más general. Disgrega el texto en palabras y las ordena según su frecuencia. No tiene en cuenta los espacios, la puntuación ni las palabras más comunes del idioma inglés.
+```{r word atomizations example, eval=FALSE}
+last_words <- word_atomizations(last_abstracts)
+head(last_words)
+```
+
+Finalmente, la función `tdm_for_lsa()`, a partir de un vector de términos, encuentra la frecuencia de cada término en cada uno de los sumarios del corpus primario. Devuelve una **matriz documento-término** con las frecuencias de los términos buscados en la que cada fila representa uno de los términos y cada columna representa un documento (en este caso, un sumario). Esta matriz se puede usar posteriormente para realizar un análisis semántico latente.
+
+```{r term document matrix example, eval=FALSE}
+tdm <- tdm_for_lsa(last_abstracts, c("age", "gender", "woman", "women", " man ", " men ", "smoking", "relationships", "relation"))
+tdm[, 1:10]
+```
+
 
 
 
