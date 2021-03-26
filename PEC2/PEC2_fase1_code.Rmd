@@ -1,0 +1,43 @@
+```{r librerias}
+library(easyPubMed)
+library(pubmed.mineR)
+```
+
+
+Descargando todos los artículos de endometriosis:
+```{r download all endometriosis, eval=FALSE}
+batch_pubmed_download("endometriosis",
+                      dest_dir = "data/",
+                      dest_file_prefix = "total_endometriosis",
+                      format = "abstract",
+                      batch_size = 5000
+                      )
+```
+
+Una vez tenemos los archivos, concatenamos todos los datos en uno único:
+```{r concatenate text files, eval=FALSE}
+# List of files to be added together
+files_list <- list.files(path = "data/",
+                         pattern = "total",
+                         full.names = TRUE) # include path
+# Create new file
+out_file <- file(description = "intermediateData/todos.txt",
+                 open = "w")
+# Read each downloaded file and write into final file
+for (i in files_list){
+  x <- readLines(i)
+  writeLines(x, out_file)
+}
+
+close(out_file)
+```
+
+Genera objeto S4 (corpus primario):
+```{r generate abstract object, eval=FALSE}
+# Generate the object
+abstracts <- readabs("intermediateData/todos.txt")
+# Save object
+save(abstracts, file = "intermediateData/abstracts.RData")
+str(abstracts)
+```
+

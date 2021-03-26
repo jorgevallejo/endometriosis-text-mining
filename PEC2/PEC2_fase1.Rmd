@@ -156,7 +156,9 @@ include_graphics(path = "images/batch_pubmed_download.png")
 
 El paquete _pubmed.mineR_, para el lenguage **R**, se ha desarrollado específicamente para facilitar la minería de textos en el ámbito de la investigación biomédica; concretamente, aplicada a los sumarios (*abstracts*) de artículos incluidos en las citas de la base de datos PubMed. Para este fin, incluye multitud de herramientas que implementan algoritmos de minería de textos o que usan herramientas ya existentes en otros paquetes. En esta sección comentaremos, de entre las muchas funciones contenidas en el paquete, tan sólo aquellas que nos resultarán de utilidad en este trabajo.
 
-En primer lugar, para constituir el **corpus primario**, utilizaremos la función `readabs()` sobre el archivo en formato texto que contiene los registros resultado de nuestra búsqueda previa. El resultado es un objeto tipo S4 con tres _slots_ que contienen, respectivamente, la información referente al título de la revista, el texto del sumario y el código PMID del artículo.
+En primer lugar, para constituir el **corpus primario**, utilizaremos la función `readabs()` sobre el archivo en formato texto que contiene los registros resultado de nuestra búsqueda previa. El resultado es un objeto tipo S4 con tres _slots_ que contienen, respectivamente, la información referente al título de la revista, el texto del sumario y el código PMID[^3] del artículo.
+
+[^3]: PubMed ID; número de identificación único asignado a cada una de las referencias incluidas en la base de datos PubMed.
 
 ```{r ejemplo readbs, eval=FALSE, echo=TRUE}
 last_abstracts <- readabs("intermediateData/last_endometriosis01.txt")
@@ -187,6 +189,61 @@ tdm <- tdm_for_lsa(last_abstracts,
 tdm[, 1:10]
 ```
 
+# Generación del corpus primario
+
+El corpus primario para la actividad de minería de texto consistirá en todos los sumarios recuperados de la base de datos PubMed utilizando como término de búsqueda el término "endometriosis". Los registros resultado de la búsqueda se descargarán por lotes en forma de varios archivos de texto, cuyo contenido se reunirá en un único archivo. A partir de este archivo refundido se generará un objeto S4 de clase 'Abstract' conteniendo - de cada registro recuperado - el título, el texto del sumario y el código PMID. Este objeto será lo que consideraremos como corpus primario y la información que tomaremos de partida en los métodos de minería de textos.
+
+## Solicitud de búsqueda y descarga de los registros
+
+Como señalábamos anteriormente, usaremos la función `batch_pubmed_download()` para enviar nuestra búsqueda a la base de datos, recuperar registros y guardarlos en formato texto repartidos en varios ficheros:
+
+```{r download all endometriosis, eval=FALSE, echo=TRUE}
+batch_pubmed_download("endometriosis",
+                      dest_dir = "data/",
+                      dest_file_prefix = "total_endometriosis",
+                      format = "abstract",
+                      batch_size = 5000
+                      )
+```
+
+Previamente, al hacer la búsqueda de prueba en la página de PubMed ya habíamos visto que se recuperan más de 26 000 registros. Lo que significa que el tiempo de descarga es relativamente largo y, al haber especificado que se generaría un archivo por cada 5 000 registros, tendremos como resultado 6 archivos de texto conteniendo todos los registros:
+
+```{r list data files}
+list.files(path = "data/")
+```
+
+Crearemos un nuevo fichero de texto y copiaremos en él todos los registros, que están repartidos entre los ficheros anteriores:
+
+```{r concatenate text files, eval=FALSE}
+# List of files to be added together
+files_list <- list.files(path = "data/",
+                         pattern = "total",
+                         full.names = TRUE) # include path
+# Create new file
+out_file <- file(description = "intermediateData/todos.txt",
+                 open = "w")
+# Read each downloaded file and write into final file
+for (i in files_list){
+  x <- readLines(i)
+  writeLines(x, out_file)
+}
+
+close(out_file)
+```
+
+El resultado será un fichero llamado `todos.txt` conteniendo todos los registros resultado de la búsqueda, en formato TXT. A partir de la información contenida en este fichero generaremos el objeto de clase 'Abstracts' que pueden manipular las funciones del paquete _pubmed.mineR_:
+
+```{r generate abstract object, eval=FALSE}
+# Generate the object
+abstracts <- readabs("intermediateData/todos.txt")
+```
+
+Si examinamos la estructura del objeto:
+```{r estructura de objeto abstracts}
+str(abstracts, vec.len = 1)
+```
+
+Vemos que consta de 3 _slots_, dos de ellos almacenando datos de tipo cadena de caracteres (título del artículo y su sumario, respectivamente), y un último _slot_ de tipo numérico almacenando el código PMID. Es a la información contenida en este objeto a la que aplicaremos los métodos de minería de textos.
 
 
 
