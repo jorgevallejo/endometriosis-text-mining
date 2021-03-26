@@ -3,6 +3,55 @@ library(easyPubMed)
 library(pubmed.mineR)
 ```
 
+Descargando ejemplo filtrado de articulos de endometriosis posteriores a 2019:
+```{r batch download, eval=FALSE, echo=TRUE}
+query <- "endometriosis AND 2020/01/01:3000/12/31[dp]"
+
+batch_pubmed_download(pubmed_query_string = query,
+                      dest_dir = "intermediateData/",
+                      dest_file_prefix = "last_endometriosis",
+                      format = "abstract",
+                      batch_size = 5000
+                      )
+
+```
+
+Generando objeto clase 'Abstracts':
+```{r ejemplo readbs, eval=FALSE, echo=TRUE}
+last_abstracts <- readabs("intermediateData/last_endometriosis01.txt")
+
+save(last_abstracts,
+     file = "intermediateData/last_abstracts.RData")
+```
+
+Ejemplo extraccion codigos de genes:
+```{r ejemplo gene atomization, eval=FALSE, echo=TRUE}
+last_genes <- gene_atomization(last_abstracts)
+
+save(last_genes,
+     file="intermediateData/last_genes.RData")
+```
+
+Ejemplo extraccion de palabras:
+```{r word atomizations example, eval=FALSE, echo=TRUE}
+last_words <- word_atomizations(last_abstracts)
+
+save(last_words,
+     file = "intermediateData/last_words.RData")
+```
+
+Ejemplo TDM:
+```{r term document matrix example, eval=FALSE, echo=TRUE}
+tdm <- tdm_for_lsa(last_abstracts, 
+                   c("age", "gender", "woman", "women", " man ", 
+                     " men ", "smoking", "relationships", "relation"))
+
+save(tdm,
+     file = "intermediateData/last_tdm.RData")
+```
+
+
+
 
 Descargando todos los artículos de endometriosis:
 ```{r download all endometriosis, eval=FALSE}

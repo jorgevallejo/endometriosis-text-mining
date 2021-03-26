@@ -10,6 +10,7 @@ output:
     # extra_dependencies: ["float"]
 urlcolor: blue
 linkcolor: blue
+indent: true
 header-includes:
  - \renewcommand{\contentsname}{Índice}
  - \usepackage{float}
@@ -95,7 +96,7 @@ Para realizar búsquedas es posible utilizar una serie de etiquetas con las que 
 
 El algoritmo que construye las búsquedas a partir de nuestras palabras clave (_Automatic Term Mapping_) contrasta dichas palabras clave contra diferentes tablas de traducción de términos. En este orden: tabla de traducción de temas, tabla de traducción de revistas, índice de autores e índice de investigadores (colaboradores). Cuando se encuentra una coincidencia para el término o la frase, dicha coincidencia se añade a la búsqueda y no se continúa en la siguiente tabla de traducción.
 
-La tabla de temas relaciona - entre otras cosas - las diferentes formas ortográficas del inglés americano y el británico, formas singulares y plurales, sinónimos, términos fuertemente relacionados, nombres de medicamentos genéricos y sus nombres comerciales, y el vocabulario controlado incluido en el tesauro MeSH (_Medical Subject Headings).
+La tabla de temas relaciona - entre otras cosas - las diferentes formas ortográficas del inglés americano y el británico, formas singulares y plurales, sinónimos, términos fuertemente relacionados, nombres de medicamentos genéricos y sus nombres comerciales, y el vocabulario controlado incluido en el tesauro MeSH (*Medical Subject Headings*).
 
 La tabla de revistas contiene y relaciona el título completo de las revistas, sus abreviaciones y sus números ISSN.
 
@@ -143,12 +144,13 @@ batch_pubmed_download(pubmed_query_string = query,
                       )
 ```
 
-El comporatmiento de la función `batch_pubmed_download()` se puede ajustar mediante diferentes opciones, algunas de las cuales se pueden ver en este ejemplo. Mediante *pubmed_query_string* especificamos los términos con los que se efectuará la búsqueda en PubMed. Puede ser una búsqueda sencilla sólo con los término o, como en el ejemplo, contener etiquetas (ej. [dp], fecha de publicación) y operadores booleanos (ej. AND). El directorio de destino se puede elegir mediante la opción *dest_dir*, y la opción *dest_file_prefix* nos permite elegir el prefijo que se añadirá a cada uno de los ficheros creados para almacenar los resultados. Con la opción *batch_size* podemos elegir el número máximo de registros incluidos en cada fichero (entre 1 y 5 000). Por último, la opción *format* nos da la oportunidad de elegir el formato en el que recibiremos los datos. El formato XML es rico en información y permite un procesado posterior más complejo del corpus primario (p.ej. subdividiéndolo por fecha, por autor, u otras opciones). Nosotros sin embargo hemos elegido una de las opciones en formato texto, ya que no necesitaremos realizar ese tipo de procesado del corpus y además resultará en ficheros que, conteniendo el mismo número de registro, ocuparán menos espacio de memoria.
+El comporatmiento de la función `batch_pubmed_download()` se puede ajustar mediante diferentes opciones, algunas de las cuales se pueden ver en este ejemplo. Mediante *pubmed_query_string* especificamos los términos con los que se efectuará la búsqueda en PubMed. Puede ser una búsqueda sencilla sólo con los término o, como en el ejemplo, contener etiquetas (ej. [dp], fecha de publicación) y operadores booleanos (ej. AND).  
+
+El directorio de destino se puede elegir mediante la opción *dest_dir*, y la opción *dest_file_prefix* nos permite elegir el prefijo que se añadirá a cada uno de los ficheros creados para almacenar los resultados.  
+
+Con la opción *batch_size* podemos elegir el número máximo de registros incluidos en cada fichero (entre 1 y 5.000). Por último, la opción *format* nos da la oportunidad de elegir el formato en el que recibiremos los datos. El formato XML es rico en información y permite un procesado posterior más complejo del corpus primario (p.ej. subdividiéndolo por fecha, por autor, u otras opciones). Nosotros sin embargo hemos elegido una de las opciones en formato texto, ya que no necesitaremos realizar ese tipo de procesado del corpus y además resultará en ficheros que, conteniendo el mismo número de registro, ocuparán menos espacio de memoria.
 
 
-```{r pubmed batch download}
-include_graphics(path = "images/batch_pubmed_download.png")
-```
 
 
 
@@ -162,20 +164,34 @@ En primer lugar, para constituir el **corpus primario**, utilizaremos la funció
 
 ```{r ejemplo readbs, eval=FALSE, echo=TRUE}
 last_abstracts <- readabs("intermediateData/last_endometriosis01.txt")
-
-str(last_abstracts, vec.len = 1)
+```
+```{r load last abstracts object}
+load("intermediateData/last_abstracts.RData")
+```
+```{r last abstracts structure, echo=TRUE}
+str(last_abstracts, vec.len = 1, nchar.max = 50)
 ```
 
 Disponemos de dos importantes funciones para el **reconomiento de entidades**. La función `gene_atomization()` reconoce los nombres de los genes (en su codificación como símbolo HGNC) y los extrae del del corpus primario además de calcular sus frecuencias.
 
 ```{r ejemplo gene atomization, eval=FALSE, echo=TRUE}
 last_genes <- gene_atomization(last_abstracts)
+```
+```{r load last genes}
+load("intermediateData/last_genes.RData")
+```
+```{r ejemplo last genes, echo=TRUE}
 head(last_genes)
 ```
 
 Por otro lado, la función `word_atomizations()` es más general. Disgrega el texto en palabras y las ordena según su frecuencia. No tiene en cuenta los espacios, la puntuación ni las palabras más comunes del idioma inglés.
 ```{r word atomizations example, eval=FALSE, echo=TRUE}
 last_words <- word_atomizations(last_abstracts)
+```
+```{r load word atomizations example}
+load("intermediateData/last_words.RData")
+```
+```{r word atomizations print, echo=TRUE}
 head(last_words)
 ```
 
@@ -185,7 +201,11 @@ Finalmente, la función `tdm_for_lsa()`, a partir de un vector de términos, enc
 tdm <- tdm_for_lsa(last_abstracts, 
                    c("age", "gender", "woman", "women", " man ", 
                      " men ", "smoking", "relationships", "relation"))
-
+```
+```{r load example tdm}
+load("intermediateData/last_tdm.RData")
+```
+```{r tdm example print, echo=TRUE}
 tdm[, 1:10]
 ```
 
@@ -206,10 +226,11 @@ batch_pubmed_download("endometriosis",
                       )
 ```
 
-Previamente, al hacer la búsqueda de prueba en la página de PubMed ya habíamos visto que se recuperan más de 26 000 registros. Lo que significa que el tiempo de descarga es relativamente largo y, al haber especificado que se generaría un archivo por cada 5 000 registros, tendremos como resultado 6 archivos de texto conteniendo todos los registros:
+Previamente, al hacer la búsqueda de prueba en la página de PubMed ya habíamos visto que se recuperan casi 30.000 registros. Lo que significa que el tiempo de descarga será relativamente largo y, al haber especificado que se generaría un archivo por cada 5.000 registros, tendremos como resultado 6 archivos de texto conteniendo todos los registros:
 
-```{r list data files}
-list.files(path = "data/")
+
+```{r pubmed batch download}
+include_graphics(path = "images/batch_pubmed_download.png")
 ```
 
 Crearemos un nuevo fichero de texto y copiaremos en él todos los registros, que están repartidos entre los ficheros anteriores:
@@ -238,9 +259,14 @@ El resultado será un fichero llamado `todos.txt` conteniendo todos los registro
 abstracts <- readabs("intermediateData/todos.txt")
 ```
 
+```{r load abstract object}
+load("intermediateData/abstracts.RData")
+```
+
+
 Si examinamos la estructura del objeto:
 ```{r estructura de objeto abstracts}
-str(abstracts, vec.len = 1)
+str(abstracts, vec.len = 1, nchar.max = 50)
 ```
 
 Vemos que consta de 3 _slots_, dos de ellos almacenando datos de tipo cadena de caracteres (título del artículo y su sumario, respectivamente), y un último _slot_ de tipo numérico almacenando el código PMID. Es a la información contenida en este objeto a la que aplicaremos los métodos de minería de textos.
