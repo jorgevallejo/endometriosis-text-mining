@@ -17,6 +17,7 @@ header-includes:
  - \floatplacement{figure}{H}
  - \usepackage{caption}
  - \captionsetup[figure]{name=Figura}
+ - \usepackage{indentfirst}
 
 # Next code for knitting into another directory with chosen filename comes from: https://stackoverflow.com/questions/39662365/knit-one-markdown-file-to-two-output-files/53280491#53280491
 knit: (function(inputFile, encoding) {
@@ -125,7 +126,7 @@ include_graphics(path = "images/pubmed_search_filtro.png")
 
 ## _easyPubMed_  
 
-El paquete _easyPubMed_ es una interfaz que permite usar R para interactuar con las **Entrez Programming Utilities**, las API[^2] públicas que permiten el acceso programático a las bases de datos Entrez (PubMed, PMC, Gene, Nuccore y Protein). Las funciones de este paquete permiten la descarga por lotes de grandes volúmenes de registros, y el procesado básico del resultado de las búsquedas en PubMed.
+El paquete _easyPubMed_ es una interfaz que permite usar R para interactuar con las **Entrez Programming Utilities**, las API[^2] públicas que permiten el acceso programático a las bases de datos Entrez (PubMed, PMC, Gene, Nuccore y Protein). Las funciones de este paquete permiten la descarga por lotes de grandes volúmenes de registros, y el procesado básico del resultado de las búsquedas en PubMed[@easypubmed].
 
 [^2]: Siglas en inglés de interfaz de programación de aplicaciones (_application programming interface_), que se refiere al conjunto de funciones y protocolos que un programa ofrece para poder ser usado por otro programa diferente.
 
@@ -156,7 +157,7 @@ Con la opción *batch_size* podemos elegir el número máximo de registros inclu
 
 ## _pubmed.mineR_  
 
-El paquete _pubmed.mineR_, para el lenguage **R**, se ha desarrollado específicamente para facilitar la minería de textos en el ámbito de la investigación biomédica; concretamente, aplicada a los sumarios (*abstracts*) de artículos incluidos en las citas de la base de datos PubMed. Para este fin, incluye multitud de herramientas que implementan algoritmos de minería de textos o que usan herramientas ya existentes en otros paquetes. En esta sección comentaremos, de entre las muchas funciones contenidas en el paquete, tan sólo aquellas que nos resultarán de utilidad en este trabajo.
+El paquete _pubmed.mineR_, para el lenguage **R**, se ha desarrollado específicamente para facilitar la minería de textos en el ámbito de la investigación biomédica; concretamente, aplicada a los sumarios (*abstracts*) de artículos incluidos en las citas de la base de datos PubMed. Para este fin, incluye multitud de herramientas que implementan algoritmos de minería de textos o que usan herramientas ya existentes en otros paquetes [@pubmedminer]. En esta sección comentaremos, de entre las muchas funciones contenidas en el paquete, tan sólo aquellas que nos resultarán de utilidad en este trabajo.
 
 En primer lugar, para constituir el **corpus primario**, utilizaremos la función `readabs()` sobre el archivo en formato texto que contiene los registros resultado de nuestra búsqueda previa. El resultado es un objeto tipo S4 con tres _slots_ que contienen, respectivamente, la información referente al título de la revista, el texto del sumario y el código PMID[^3] del artículo.
 
@@ -291,7 +292,22 @@ caption = "Las diez palabras más frecuentes en el corpus primario."
 )
 ```
 
-Entre las palabras más frecuentes encontramos naturalmente la propia palabra clave que hemos usado en la búsqueda (*endometriosis*), términos relacionados con investigación ó tratamiento (*patients, study, treatment, results, group*), con la biología de este trastorno (*women, ovarian, endometrial*) y el síntoma más común (*pain*).
+Entre las palabras más frecuentes encontramos naturalmente la propia palabra clave que hemos usado en la búsqueda (*endometriosis*), términos relacionados con investigación ó tratamiento (*patients, study, treatment, results, group*), con la biología de este trastorno (*women, ovarian, endometrial*) y el síntoma más común (*pain*). El listado completo de palabras, con sus respectivas frecuencias, se puede descargar como fichero de texto desde [este enlace](https://github.com/jorgevallejo/endometriosis-text-mining/raw/master/PEC2/results/words.txt).
+
+
+<!-- # Apéndice A: Código -->
+
+<!-- El documento original en formato .Rmd, que incluye el código completo en lenguaje R usado para generar este informe, se puede consultar y descargar en el siguiente repositorio de Github: -->
+<!-- [jorgevallejo/endometriosis-text-mining](https://github.com/jorgevallejo/endometriosis-text-mining/tree/master/PEC2) -->
+
+<!-- \newline -->
+
+<!-- # Apéndice B: Reproducibilidad {#apendiceB} -->
+<!-- ```{r session_info, include=TRUE, echo=TRUE, results='markup'} -->
+<!-- sessionInfo() # For better reproducibility -->
+<!-- ``` -->
+
+<!-- \newline -->
 
 # Referencias  
 \
