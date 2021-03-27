@@ -90,3 +90,12 @@ save(abstracts, file = "intermediateData/abstracts.RData")
 str(abstracts)
 ```
 
+
+Word atomization:
+```{r word atomization, eval=FALSE}
+words <- word_atomizations(abstracts)
+save(words, file = "intermediateData/words.RData")
+# Move text file to results directory
+file.rename(from = "word_table.txt",
+            "results/words.txt")
+```
