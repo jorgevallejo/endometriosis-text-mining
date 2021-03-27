@@ -271,7 +271,27 @@ str(abstracts, vec.len = 1, nchar.max = 50)
 
 Vemos que consta de 3 _slots_, dos de ellos almacenando datos de tipo cadena de caracteres (título del artículo y su sumario, respectivamente), y un último _slot_ de tipo numérico almacenando el código PMID. Es a la información contenida en este objeto a la que aplicaremos los métodos de minería de textos.
 
+# Preprocesado del corpus primario
 
+El preprocesado que llevaremos a cabo consistirá en desglosar los sumarios en las palabras que los componen y registrar la frecuencia de cada palabra. Para ello usaremos la función `word_atomizations()` del paquete _pubmed.mineR_. Ésta recopilará las palabras del texto y calculará la frecuencia de cada una sin tener en cuenta espacios, signos de puntuación ni palabras muy comunes en inglés.
+
+```{r word atomization, eval=FALSE, echo=TRUE}
+words <- word_atomizations(abstracts)
+```
+```{r words atomization table}
+load("intermediateData/words.RData")
+
+kable(
+head(words, n=10L),
+row.names = FALSE,
+col.names = c("Palabras", "Frecuencia"),
+align = 'lc',
+format.args = list(big.mark = '.'),
+caption = "Las diez palabras más frecuentes en el corpus primario."
+)
+```
+
+Entre las palabras más frecuentes encontramos naturalmente la propia palabra clave que hemos usado en la búsqueda (*endometriosis*), términos relacionados con investigación ó tratamiento (*patients, study, treatment, results, group*), con la biología de este trastorno (*women, ovarian, endometrial*) y el síntoma más común (*pain*).
 
 # Referencias  
 \
