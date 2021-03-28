@@ -101,7 +101,7 @@ file.rename(from = "word_table.txt",
 ```
 
 Gene extraction:
-```{r}
+```{r gene extraction, eval=FALSE}
 genes <- gene_atomization(abstracts)
 save(genes, file = "intermediateData/genes.RData")
 # Move text file to results directory
@@ -109,6 +109,19 @@ file.rename(from = "table.txt",
             "results/genes.txt")
 ```
 
+En qué frases estás los genes sospechosos (AMH en concreto):
+```{r, official_fn, eval=FALSE}
+# Returns a text file with the sentences that contain official gene symbols from HGNC.
+official <- official_fn(genes = genes,
+            abs = abstracts,
+            filename = "intermediateData/sus.txt",
+            terms = "*")
+
+# Structure of the output is:
+# >> gene_symbol
+# PMID
+# Sentence
+```
 
 
 

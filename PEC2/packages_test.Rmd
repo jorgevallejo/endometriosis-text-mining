@@ -183,6 +183,22 @@ abstracts_xml <- xmlreadabs("intermediateData/appended_xml.txt")
 
 Nada, que si flores.
 
+Genes with pubTaTor:
+```{r pubTaTor}
+# This abstract contains mention of AMH that is 
+# the hormone, not the gene.
+pmid <- 33723748
+
+pubtator_function(pmid)
+```
 
 
+I want the complete abstract to be sure that the AMH gene is not in it, just the hormone.
+I know the pmid number (33723748), I need to know to which index does it corresponds in the object:
+```{r recover abstract from pmid}
 
+index <- which(abstracts@PMID == 33723748)
+abstracts@Abstract[index]
+```
+
+Confirmamos que el abstract hace referencia a la hormona, no al gen.
