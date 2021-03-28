@@ -112,10 +112,13 @@ file.rename(from = "table.txt",
 En qué frases estás los genes sospechosos (AMH en concreto):
 ```{r, official_fn, eval=FALSE}
 # Returns a text file with the sentences that contain official gene symbols from HGNC.
-official <- official_fn(genes = genes,
+official_fn(genes = genes,
             abs = abstracts,
             filename = "intermediateData/sus.txt",
             terms = "*")
+
+file.rename(from = "intermediateData/sus.txtofficial.txt",
+            "results/sus.txtofficial.txt")
 
 # Structure of the output is:
 # >> gene_symbol
