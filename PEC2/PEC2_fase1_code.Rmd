@@ -99,3 +99,16 @@ save(words, file = "intermediateData/words.RData")
 file.rename(from = "word_table.txt",
             "results/words.txt")
 ```
+
+Gene extraction:
+```{r}
+genes <- gene_atomization(abstracts)
+save(genes, file = "intermediateData/genes.RData")
+# Move text file to results directory
+file.rename(from = "table.txt",
+            "results/genes.txt")
+```
+
+
+
+
