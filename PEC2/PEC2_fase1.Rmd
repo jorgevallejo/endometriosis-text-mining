@@ -298,14 +298,14 @@ Entre las palabras más frecuentes encontramos naturalmente la propia palabra cl
 # Extracción de genes
 
 Una de las maneras de representar la información contenida en un texto es mediante la extracción de entidades con nombre; como son organizaciones, personas o lugares. En nuestro caso, las entidades de interés son los genes. Partimos de la hipótesis de que los genes que aparecen en los sumarios de artículos acerca de la endometriosis son importantes para este trastorno. Así pues, extraeremos un listado de los mismos para, más adelante, recuperar información a partir de los términos de ontología génica que estos genes tengan en común.
-Para realizar la extracción de términos usaremos la función `gene_atomization()` del paquete _pubmed.minerR_ de R. Esta función reconoce, y recupera de los sumarios, los símbolos aprovados por el HGNC[^4] para representar genes concretos. Esta función devuelve el símbolo del gen, su nombre largo y su frecuencia en el corpus.
+Para realizar la extracción de términos usaremos la función `gene_atomization()` del paquete _pubmed.minerR_ de R. Esta función reconoce, y recupera de los sumarios, los símbolos aprovados por el HGNC[^4] para representar genes concretos. Esta función devuelve el símbolo del gen, su nombre largo y su frecuencia en el corpus. En la tabla siguiente vemos una muestra con los primeros diez genes más frecuentes. El listado completo puede descargarse desde [este enlace](https://github.com/jorgevallejo/endometriosis-text-mining/raw/master/PEC2/results/genes.txt).
 
 [^4]: HUGO Gene Nomenclature Commitee (Comité de Nomenclatura de Genes de la HUGO), https://www.genenames.org/
 
 ```{r gene extraction, eval=FALSE, echo=TRUE}
 genes <- gene_atomization(abstracts)
 ```
-```{r load genes}
+```{r load_genes}
 load("intermediateData/genes.RData")
 
 # Print table
