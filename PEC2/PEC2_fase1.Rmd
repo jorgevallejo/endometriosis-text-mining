@@ -17,6 +17,7 @@ header-includes:
  - \floatplacement{figure}{H}
  - \usepackage{caption}
  - \captionsetup[figure]{name=Figura}
+ - \captionsetup[table]{name=Tabla}
  - \usepackage{indentfirst}
 
 # Next code for knitting into another directory with chosen filename comes from: https://stackoverflow.com/questions/39662365/knit-one-markdown-file-to-two-output-files/53280491#53280491
@@ -294,6 +295,30 @@ caption = "Las diez palabras más frecuentes en el corpus primario."
 
 Entre las palabras más frecuentes encontramos naturalmente la propia palabra clave que hemos usado en la búsqueda (*endometriosis*), términos relacionados con investigación ó tratamiento (*patients, study, treatment, results, group*), con la biología de este trastorno (*women, ovarian, endometrial*) y el síntoma más común (*pain*). El listado completo de palabras, con sus respectivas frecuencias, se puede descargar como fichero de texto desde [este enlace](https://github.com/jorgevallejo/endometriosis-text-mining/raw/master/PEC2/results/words.txt).
 
+# Extracción de genes
+
+Una de las maneras de representar la información contenida en un texto es mediante la extracción de entidades con nombre; como son organizaciones, personas o lugares. En nuestro caso, las entidades de interés son los genes. Partimos de la hipótesis de que los genes que aparecen en los sumarios de artículos acerca de la endometriosis son importantes para este trastorno. Así pues, extraeremos un listado de los mismos para, más adelante, recuperar información a partir de los términos de ontología génica que estos genes tengan en común.
+Para realizar la extracción de términos usaremos la función `gene_atomization()` del paquete _pubmed.minerR_ de R. Esta función reconoce, y recupera de los sumarios, los símbolos aprovados por el HGNC[^4] para representar genes concretos. Esta función devuelve el símbolo del gen, su nombre largo y su frecuencia en el corpus.
+
+[^4]: HUGO Gene Nomenclature Commitee (Comité de Nomenclatura de Genes de la HUGO), https://www.genenames.org/
+
+```{r gene extraction, eval=FALSE, echo=TRUE}
+genes <- gene_atomization(abstracts)
+```
+```{r load genes}
+load("intermediateData/genes.RData")
+
+# Print table
+kable(
+head(genes, n=10L),
+row.names = FALSE,
+col.names = c("Símbolo", "Nombre largo", "Frecuencia"),
+align = 'llc',
+format.args = list(big.mark = '.'),
+caption = "Los diez genes más frecuentes en el corpus primario."
+)
+
+```
 
 <!-- # Apéndice A: Código -->
 
