@@ -1,0 +1,26 @@
+PROBLEMAS Y DUDAS
+
+
+
+1. El volumen de datos con el que estoy trabajando.
+
+Haciendo la búsqueda con una palabra tan general como "endometriosis" recupero casi 30.000 registros. Trabajar con esa cantidad de datos en mi casa no es excesivo problema. Después de todo, puedo ir a hacerme un café mientras los registros se descargan o se lleva a cabo alguna operación con los datos que cueste algo de tiempo.
+
+Lo que no sé es si será una dificultad menor o mayor cuando el trabajo se lleve a cabo en un servidor con la aplicación hecha en Shiny. Limitar las fechas de búsqueda mejoraría el problema. Por ejemplo, si limitamos la búsquea "endometriosis" a los últimos 10 años el número de resultados baja hasta los 12.000. Si optamos por búsquedas más específicas, como "endometriosis genes", el volumen de resultados baja todavía mas, hasta el millar de resultados.
+
+Creo que para decidir qué estrategia aplicar esperaré a ver con qué rapidez funciona la aplicación en Shiny.
+
+
+2. Coincidencia entre símbolos HGNC y abreviaturas que no son genes
+
+Esto ya imaginaba desde el principio que iba a ocurrir. La función gene_atomization() compara las palabras de los abstracts con una lista de símbolos HGNC y recupera y cuenta las que coinciden. Los símbolos muchas veces son de pequeño tamaño, entre una y cuatro letras; lo que significa que habrá muchos que coincidan con palabras que no son genes.
+
+Y para ver un ejemplo, sólo hay que mirar la tabla con frecuencias de genes que he recuperado del corpus de endometriosis. El más común con diferencia es el AMH (anti-mullerian hormone). Es el símbolo del gen, pero también la abreviatura de la propia hormona. Para comprobarlo, he recuperado algunos códigos PMID asociados al símbolo AMH en el corpus (con la función pubmed.mineR::official_fn), a partir de éstos PMID he leído los abstract asociados y, en efecto, en los abstract se nombra la hormona, no el gen. ¿Cómo solucionar estos falsos positivos? Le he dado la vuelta a unas pocas estrategias:
+
+- Utilizar PubTator (con la función pubmed.mineR::pubtator_function), que en lugar de sencillamente mirar una lista utiliza sofisticados algoritmos y técnicas de aprendizaje automático. Pero lo he probado con los mismos PMID de antes, los del AMH, y también me devuelve el gen AMH aunque en esos abstracts se está hablando de la hormona. No es la panacea. En Liu (2016) usan GNormPlus (el pipeline que está destrás de PubTator) y se encontraron con el mismo problema (su solución fue chequear a mano todos los genes, eso aquí no nos sirve).
+
+- Escribir un script para seleccionar frases que contengan cadenas de caracteres clave como "gen", "RNA" o "DNA"; y extraer de estos resultados los símbolos HGNC y su frecuencia.
+
+- Restringir los términos de búsqueda, como en el punto 1. Por ejemplo siguiendo este esquema: (endometriosis) AND ((genes) OR (genetics)).
+
+Creo que por sencillez la mejor estrategia será esta última, hacer una búsqueda más específica.
