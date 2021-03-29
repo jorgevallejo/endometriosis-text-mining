@@ -105,7 +105,7 @@ La tabla de revistas contiene y relaciona el título completo de las revistas, s
 El índice de autores y el índice de investigadores contienen el nombre, iniciales y nombre completo de los autores incluidos en la base de datos.
 
 
-Primero de todo pruebo a realizar una búsqueda en PubMed (https://pubmed.ncbi.nlm.nih.gov/). La más básica posible y más general, sin ningún filtro, con la palabra clave "endometriosis". El resultado son 29,361 citas, desde 1927 hasta 2021.
+Primero de todo, realizamos una búsqueda en PubMed (https://pubmed.ncbi.nlm.nih.gov/). La más básica posible y más general, sin ningún filtro, con la palabra clave "endometriosis". El resultado son 29,361 citas, desde 1927 hasta 2021.
 
 ```{r pubmed_search, fig.cap="Página de resultados para el término 'endometriosis'. En la parte central se muestran las citas recuperadas por el algoritmo. En el margen izquierdo se nos ofrecen filtros interactivos para refinar la búsqueda."}
 include_graphics(path = "images/pubmed_search.png")
@@ -127,11 +127,11 @@ include_graphics(path = "images/pubmed_search_filtro.png")
 
 ## _easyPubMed_  
 
-El paquete _easyPubMed_ es una interfaz que permite usar R para interactuar con las **Entrez Programming Utilities**, las API[^2] públicas que permiten el acceso programático a las bases de datos Entrez (PubMed, PMC, Gene, Nuccore y Protein). Las funciones de este paquete permiten la descarga por lotes de grandes volúmenes de registros, y el procesado básico del resultado de las búsquedas en PubMed[@easypubmed].
+El paquete _easyPubMed_ es una interfaz que permite usar R para interactuar con las **Entrez Programming Utilities**, las API[^2] públicas que permiten el acceso programático a las bases de datos Entrez (PubMed, PMC, Gene, Nuccore y Protein). Las funciones de este paquete permiten la descarga por lotes de grandes volúmenes de registros, y el procesado básico del resultado de las búsquedas en PubMed [@easypubmed].
 
 [^2]: Siglas en inglés de interfaz de programación de aplicaciones (_application programming interface_), que se refiere al conjunto de funciones y protocolos que un programa ofrece para poder ser usado por otro programa diferente.
 
-La función principal que usaremos de este paquete es `batch_pubmed_download()`, que permite realizar una búsqueda en PubMed y descargar los resultados en forma de ficheros. Los resultados se pueden descargar en formato XML o TXT en lotes de hasta 5 000 registros. Estos resultados en formato texto conforman los datos sobre los que usaremos las funciones del paquete _pubmed.mineR_.
+La función principal que usaremos de este paquete es `batch_pubmed_download()`, que permite realizar una búsqueda en PubMed y descargar los resultados en forma de ficheros. Los resultados se pueden descargar en formato XML o TXT en lotes de hasta 5.000 registros. Estos resultados en formato texto conforman los datos sobre los que usaremos las funciones del paquete _pubmed.mineR_.
 
 Como ejemplo, descargaremos los registros correspondientes al término de búsqueda "endometriosis" con fecha de publicación posterior a 2019:
 
@@ -146,11 +146,11 @@ batch_pubmed_download(pubmed_query_string = query,
                       )
 ```
 
-El comporatmiento de la función `batch_pubmed_download()` se puede ajustar mediante diferentes opciones, algunas de las cuales se pueden ver en este ejemplo. Mediante *pubmed_query_string* especificamos los términos con los que se efectuará la búsqueda en PubMed. Puede ser una búsqueda sencilla sólo con los término o, como en el ejemplo, contener etiquetas (ej. [dp], fecha de publicación) y operadores booleanos (ej. AND).  
+El comportamiento de la función `batch_pubmed_download()` se puede ajustar mediante diferentes opciones, algunas de las cuales se pueden ver en este ejemplo. Mediante *pubmed_query_string* especificamos los términos con los que se efectuará la búsqueda en PubMed. Puede ser una búsqueda sencilla sólo con los términos de búsqueda o, como en el ejemplo, contener etiquetas (ej. [dp], fecha de publicación) y operadores booleanos (ej. AND).  
 
 El directorio de destino se puede elegir mediante la opción *dest_dir*, y la opción *dest_file_prefix* nos permite elegir el prefijo que se añadirá a cada uno de los ficheros creados para almacenar los resultados.  
 
-Con la opción *batch_size* podemos elegir el número máximo de registros incluidos en cada fichero (entre 1 y 5.000). Por último, la opción *format* nos da la oportunidad de elegir el formato en el que recibiremos los datos. El formato XML es rico en información y permite un procesado posterior más complejo del corpus primario (p.ej. subdividiéndolo por fecha, por autor, u otras opciones). Nosotros sin embargo hemos elegido una de las opciones en formato texto, ya que no necesitaremos realizar ese tipo de procesado del corpus y además resultará en ficheros que, conteniendo el mismo número de registro, ocuparán menos espacio de memoria.
+Con la opción *batch_size* podemos elegir el número máximo de registros incluidos en cada fichero (entre 1 y 5.000). Por último, la opción *format* nos da la oportunidad de elegir el formato en el que recibiremos los datos. El formato XML es rico en información y permite un procesado posterior más complejo del corpus primario (p.ej. subdividiéndolo por fecha, por autor, u otras opciones). Nosotros sin embargo hemos elegido una de las opciones en formato texto, ya que no necesitaremos realizar ese tipo de procesado del corpus y además resultará en ficheros que, conteniendo el mismo número de registros, ocuparán menos espacio de memoria.
 
 
 
@@ -158,7 +158,7 @@ Con la opción *batch_size* podemos elegir el número máximo de registros inclu
 
 ## _pubmed.mineR_  
 
-El paquete _pubmed.mineR_, para el lenguage **R**, se ha desarrollado específicamente para facilitar la minería de textos en el ámbito de la investigación biomédica; concretamente, aplicada a los sumarios (*abstracts*) de artículos incluidos en las citas de la base de datos PubMed. Para este fin, incluye multitud de herramientas que implementan algoritmos de minería de textos o que usan herramientas ya existentes en otros paquetes [@pubmedminer]. En esta sección comentaremos, de entre las muchas funciones contenidas en el paquete, tan sólo aquellas que nos resultarán de utilidad en este trabajo.
+El paquete _pubmed.mineR_, para el lenguaje **R**, se ha desarrollado específicamente para facilitar la minería de textos en el ámbito de la investigación biomédica; concretamente, aplicada a los sumarios (*abstracts*) de artículos incluidos en las citas de la base de datos PubMed. Para este fin, incluye multitud de herramientas que implementan algoritmos de minería de textos o que usan herramientas ya existentes en otros paquetes [@pubmedminer]. En esta sección comentaremos, de entre las muchas funciones contenidas en el paquete, tan sólo aquellas que nos resultarán de utilidad en este trabajo.
 
 En primer lugar, para constituir el **corpus primario**, utilizaremos la función `readabs()` sobre el archivo en formato texto que contiene los registros resultado de nuestra búsqueda previa. El resultado es un objeto tipo S4 con tres _slots_ que contienen, respectivamente, la información referente al título de la revista, el texto del sumario y el código PMID[^3] del artículo.
 
@@ -174,7 +174,7 @@ load("intermediateData/last_abstracts.RData")
 str(last_abstracts, vec.len = 1, nchar.max = 50)
 ```
 
-Disponemos de dos importantes funciones para el **reconomiento de entidades**. La función `gene_atomization()` reconoce los nombres de los genes (en su codificación como símbolo HGNC) y los extrae del del corpus primario además de calcular sus frecuencias.
+Disponemos de dos importantes funciones para el **reconocimiento de entidades**. La función `gene_atomization()` reconoce los nombres de los genes (en su codificación como símbolo HGNC) y los extrae del del corpus primario además de calcular sus frecuencias.
 
 ```{r ejemplo gene atomization, eval=FALSE, echo=TRUE}
 last_genes <- gene_atomization(last_abstracts)
@@ -197,7 +197,7 @@ load("intermediateData/last_words.RData")
 head(last_words)
 ```
 
-Finalmente, la función `tdm_for_lsa()`, a partir de un vector de términos, encuentra la frecuencia de cada término en cada uno de los sumarios del corpus primario. Devuelve una **matriz documento-término** con las frecuencias de los términos buscados en la que cada fila representa uno de los términos y cada columna representa un documento (en este caso, un sumario). Esta matriz se puede usar posteriormente para realizar un análisis semántico latente.
+Finalmente, la función `tdm_for_lsa()`, a partir de un vector de términos, encuentra la frecuencia de cada término en cada uno de los sumarios del corpus primario. Devuelve una **matriz documento-término** con las frecuencias de los términos buscados, en la que cada fila representa uno de los términos y cada columna representa un documento (en este caso, un sumario). Esta matriz se puede usar posteriormente para realizar un análisis semántico latente.
 
 ```{r term document matrix example, eval=FALSE, echo=TRUE}
 tdm <- tdm_for_lsa(last_abstracts, 
@@ -235,9 +235,9 @@ Previamente, al hacer la búsqueda de prueba en la página de PubMed ya habíamo
 include_graphics(path = "images/batch_pubmed_download.png")
 ```
 
-Crearemos un nuevo fichero de texto y copiaremos en él todos los registros, que están repartidos entre los ficheros anteriores:
+Crearemos un nuevo fichero de texto, y copiaremos en él todos los registros que están repartidos entre los ficheros anteriores:
 
-```{r concatenate text files, eval=FALSE}
+```{r concatenate text files, eval=FALSE, echo=TRUE}
 # List of files to be added together
 files_list <- list.files(path = "data/",
                          pattern = "total",
@@ -256,7 +256,7 @@ close(out_file)
 
 El resultado será un fichero llamado `todos.txt` conteniendo todos los registros resultado de la búsqueda, en formato TXT. A partir de la información contenida en este fichero generaremos el objeto de clase 'Abstracts' que pueden manipular las funciones del paquete _pubmed.mineR_:
 
-```{r generate abstract object, eval=FALSE}
+```{r generate abstract object, eval=FALSE, echo=TRUE}
 # Generate the object
 abstracts <- readabs("intermediateData/todos.txt")
 ```
@@ -293,18 +293,22 @@ caption = "Las diez palabras más frecuentes en el corpus primario."
 )
 ```
 
-Entre las palabras más frecuentes encontramos naturalmente la propia palabra clave que hemos usado en la búsqueda (*endometriosis*), términos relacionados con investigación ó tratamiento (*patients, study, treatment, results, group*), con la biología de este trastorno (*women, ovarian, endometrial*) y el síntoma más común (*pain*). El listado completo de palabras, con sus respectivas frecuencias, se puede descargar como fichero de texto desde [este enlace](https://github.com/jorgevallejo/endometriosis-text-mining/raw/master/PEC2/results/words.txt).
+Entre las palabras más frecuentes encontramos, naturalmente, la propia palabra clave que hemos usado en la búsqueda (*endometriosis*), términos relacionados con investigación o tratamiento (*patients, study, treatment, results, group*), con la biología de este trastorno (*women, ovarian, endometrial*) y el síntoma más común (*pain*). El listado completo de palabras, con sus respectivas frecuencias, se puede descargar como fichero de texto desde [este enlace](https://github.com/jorgevallejo/endometriosis-text-mining/raw/master/PEC2/results/words.txt).
 
 # Extracción de genes
 
 Una de las maneras de representar la información contenida en un texto es mediante la extracción de entidades con nombre; como son organizaciones, personas o lugares. En nuestro caso, las entidades de interés son los genes. Partimos de la hipótesis de que los genes que aparecen en los sumarios de artículos acerca de la endometriosis son importantes para este trastorno. Así pues, extraeremos un listado de los mismos para, más adelante, recuperar información a partir de los términos de ontología génica que estos genes tengan en común.
-Para realizar la extracción de términos usaremos la función `gene_atomization()` del paquete _pubmed.minerR_ de R. Esta función reconoce, y recupera de los sumarios, los símbolos aprovados por el HGNC[^4] para representar genes concretos. Esta función devuelve el símbolo del gen, su nombre largo y su frecuencia en el corpus. En la tabla siguiente vemos una muestra con los primeros diez genes más frecuentes. El listado completo puede descargarse desde [este enlace](https://github.com/jorgevallejo/endometriosis-text-mining/raw/master/PEC2/results/genes.txt).
+s
+Para realizar la extracción de términos usaremos la función `gene_atomization()` del paquete _pubmed.minerR_ de R. Esta función reconoce, y recupera de los sumarios, los símbolos aprobados por el HGNC[^4] para representar genes concretos. Esta función devuelve el símbolo del gen, su nombre largo y su frecuencia en el corpus. En la tabla siguiente vemos una muestra con los primeros diez genes más frecuentes. El listado completo puede descargarse desde [este enlace](https://github.com/jorgevallejo/endometriosis-text-mining/raw/master/PEC2/results/genes.txt).
 
 [^4]: HUGO Gene Nomenclature Commitee (Comité de Nomenclatura de Genes de la HUGO), https://www.genenames.org/
 
 ```{r gene extraction, eval=FALSE, echo=TRUE}
 genes <- gene_atomization(abstracts)
 ```
+
+\newpage
+
 ```{r load_genes}
 load("intermediateData/genes.RData")
 
