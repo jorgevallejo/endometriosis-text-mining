@@ -66,3 +66,10 @@ One more important thing about input: it’s selective about who is allowed to r
 
     It converts the output of your R code into HTML suitable for display on a web page.
 
+This is the big idea in Shiny: you don’t need to tell an output when to update, because Shiny automatically figures it out for you. 
+
+ As your app gets more complicated, it’s often useful to make a quick high-level sketch of the reactive graph to remind you how all the pieces fit together.
+ 
+ **Reactive expressions** take inputs and produce outputs
+ 
+ the order in which your code is run is determined solely by the reactive graph. This is different from most R code where the execution order is determined by the order of lines.

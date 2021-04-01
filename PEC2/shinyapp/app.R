@@ -53,7 +53,10 @@ ui <- fluidPage(
   tableOutput("static"),
   dataTableOutput("dynamic"),
   "Plots",
-  plotOutput("plot", width = "400px")
+  plotOutput("plot", width = "400px"),
+  "Reactive programming example",
+  textInput("name2", "What's your name?"),
+  textOutput("greeting")
 )
 
 # App behaviour
@@ -67,6 +70,9 @@ server <- function(input, output, session){
   output$static <- renderTable(head(mtcars))
   output$dynamic <- renderDataTable(mtcars, options = list(pageLength = 5))
   output$plot <- renderPlot(plot(1:5), res = 96)
+  # Reactive programming example
+  string <- reactive(paste0("Hello ", input$name2, "!"))
+  output$greeting <- renderText(string())
   }
   
 
