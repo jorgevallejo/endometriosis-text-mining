@@ -48,7 +48,7 @@ knitr::opts_chunk$set(echo = FALSE,
 # 'intermediateData' contains .RData objects with processed data.
 # 'results' stores the final report files.
 
-directories <- c("data", "results", "intermediateData", "images")
+directories <- c("data", "results", "intermediateData", "images", "shinyapp")
 
 # Create directories
 lapply(directories, function(x){
