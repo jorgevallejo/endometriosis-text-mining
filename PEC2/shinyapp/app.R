@@ -1,78 +1,81 @@
+library(ggplot2)
+
+freqpoly <- function(x1, x2, binwidth = 0.1, xlim = c(-3, 3)) {
+  df <- data.frame(
+    x = c(x1, x2),
+    g = c(rep("x1", length(x1)), rep("x2", length(x2)))
+  )
+  
+  ggplot(df, aes(x, colour = g)) +
+    geom_freqpoly(binwidth = binwidth, size = 1) +
+    coord_cartesian(xlim = xlim)
+}
+
+t_test <- function(x1, x2) {
+  test <- t.test(x1, x2)
+  
+  # use sprintf() to format t.test() results compactly
+  sprintf(
+    "p value: %0.3f\n[%0.2f, %0.2f]",
+    test$p.value, test$conf.int[1], test$conf.int[2]
+  )
+}
+
+# Simulate data
+x1 <- rnorm(100, mean = 0, sd = 0.5)
+x2 <- rnorm(200, mean = 0.15, sd = 0.9)
+
+# Compare both variables
+freqpoly(x1, x2)
+cat(t_test(x1, x2))
+
+
 library(shiny)
 
-animals <- c("dog", "cat", "mouse", "bird", "other", "I hate animals")
 
 # User interface
 ui <- fluidPage(
-  "Collect free text",
-  textInput("name", "What's your name?"),
-  passwordInput("password", "What's your password?"),
-  textAreaInput("story", "Tell me about yourself", rows = 3),
-  "If you want to ensure that the text has certain properties you can use `validate()`",
-  "\n",
-  "\nCollect numeric inputs",
-  numericInput("num", "Number one", value = 0, min = 0, max = 100),
-  sliderInput("min", "Limit (minimum)", value = 50, min = 0, max = 100),
-  sliderInput("rng", "Range", value = c(10, 20), min = 0, max = 100),
-  "Collect dates",
-  dateInput("dob", "When where you born?", language = "es", weekstart = 1),
-  dateRangeInput("holiday", "When do you want to go on vacation next?", language = "es", weekstart = 1),
-  "Collect limited choices",
-  selectInput("state", "What's your favouirte state?", state.name
-              #, multiple = TRUE # allows for selecting multiple options
-              ),
-  radioButtons("animal", "What's your favourite anima?", animals),
-  radioButtons("rb", "Choose one:",
-               choiceNames = list(
-                 icon("angry"),
-                 icon("smile"),
-                 icon("sad-tear")
-               ),
-               choiceValues = list("angry", "happy", "sad")
-               ),
-  checkboxGroupInput("animal", "What animals do you like?", animals),
-  checkboxInput("cleanup", "Clean up?", value = TRUE),
-  checkboxInput("shutdown", "Shutdown?"),
-  "File uploads",
-  fileInput("upload", NULL),
-  "Action buttons",
-  actionButton("click", "Click me!"),
-  actionButton("drink", "Drink me!", icon = icon("cocktail")),
   fluidRow(
-    actionButton("click", "Click me!", class = "btn-danger"),
-    actionButton("drink", "Drink me!", class = "btn-lg btn-success")
+    column(4, 
+           "Distribution 1",
+           numericInput("n1", label = "n", value = 1000, min = 1),
+           numericInput("mean1", label = "µ", value = 0, step = 0.1),
+           numericInput("sd1", label = "σ", value = 0.5, min = 0.1, step = 0.1)
+    ),
+    column(4, 
+           "Distribution 2",
+           numericInput("n2", label = "n", value = 1000, min = 1),
+           numericInput("mean2", label = "µ", value = 0, step = 0.1),
+           numericInput("sd2", label = "σ", value = 0.5, min = 0.1, step = 0.1)
+    ),
+    column(4,
+           "Frequency polygon",
+           numericInput("binwidth", label = "Bin width", value = 0.1, step = 0.1),
+           sliderInput("range", label = "range", value = c(-3, 3), min = -5, max = 5)
+    )
   ),
   fluidRow(
-    actionButton("eat", "Eat me!", class = "btn-block")
-  ),
-  # OUTPUTS
-  "Text",
-  textOutput("text"),
-  verbatimTextOutput("code"),
-  "Tables",
-  tableOutput("static"),
-  dataTableOutput("dynamic"),
-  "Plots",
-  plotOutput("plot", width = "400px"),
-  "Reactive programming example",
-  textInput("name2", "What's your name?"),
-  textOutput("greeting")
+    column(9, plotOutput("hist")),
+    column(3, verbatimTextOutput("ttest"))
+  )
 )
+
 
 # App behaviour
 server <- function(input, output, session){
-  output$text <- renderText({
-    "Hello friend!"
+  output$hist <- renderPlot({
+    x1 <- rnorm(input$n1, input$mean1, input$sd1)
+    x2 <- rnorm(input$n2, input$mean2, input$sd2)
+    
+    freqpoly(x1, x2, binwidth = input$binwidth, xlim = input$range)
+  }, res = 96)
+  
+  output$ttest <- renderText({
+    x1 <- rnorm(input$n1, input$mean1, input$sd1)
+    x2 <- rnorm(input$n2, input$mean2, input$sd2)
+    
+    t_test(x1, x2)
   })
-  output$code <- renderPrint({
-    summary(1:10)
-  })
-  output$static <- renderTable(head(mtcars))
-  output$dynamic <- renderDataTable(mtcars, options = list(pageLength = 5))
-  output$plot <- renderPlot(plot(1:5), res = 96)
-  # Reactive programming example
-  string <- reactive(paste0("Hello ", input$name2, "!"))
-  output$greeting <- renderText(string())
   }
   
 
