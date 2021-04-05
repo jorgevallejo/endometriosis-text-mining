@@ -19,7 +19,7 @@ save(endometriosis_papers,
 ```
 
 Realizando la búsqueda y descargando la información en forma de archivos de texto y formato xml:
-```{r}
+```{r batch pubmed xml}
 batch_pubmed_download(query,
                       dest_dir = "intermediateData/",
                       dest_file_prefix = query,
@@ -68,7 +68,7 @@ Debería probar a descargar la información en formato texto en lugar de xml.
 Bueno, primero he probado a modificar el texto en emacs añadiendo un nodo raíz. Pero no ha funcionado, y sigue con el error 'Extra content at the end of the document. Quizá al concatenar los archivos se podría saltar las primeras líneas y la última, o algo así.
 
 Para no volver a tardar una eternidad en descargar la información pondremos una limitación de fechas (ej. los últimos 10 años):
-```{r}
+```{r batch download last abstract}
 query <- "endometriosis AND 2020/01/01:3000/12/31[dp]"
 
 batch_pubmed_download(query,
