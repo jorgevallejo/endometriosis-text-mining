@@ -50,27 +50,30 @@ server <- function(input, output, session){
       format = "abstract",
       batch_size = 5000)
     
-    # ## Concatenate files
-    # # List of files to be added together
-    # files_list <- list.files(pattern = "pubmed_",
-    #                          full.names = TRUE) # include path
-    # # Create new file
-    # out_file <- file(description = "todos_resultados.txt",
-    #                  open = "w")
-    # # Read each downloaded file and write into final file
-    # for (i in files_list){
-    #   x <- readLines(i)
-    #   writeLines(x, out_file)
-    # }
-    # 
-    # close(out_file)
-    # # Generate object of class abstract
-    # abstracts <- readabs("todos_resultados.txt")
-    # 
-    # return(abstracts)
+    ## Concatenate files
+    # List of files to be added together
+    files_list <- list.files(pattern = "pubmed_",
+                             full.names = TRUE) # include path
+    # Create new file
+    out_file <- file(description = "todos_resultados.txt",
+                     open = "w")
+    # Read each downloaded file and write into final file
+    for (i in files_list){
+      x <- readLines(i)
+      writeLines(x, out_file)
+    }
+
+    close(out_file)
+    # Generate object of class abstract
+    abstracts <- readabs("todos_resultados.txt")
+
+    abstracts
   })
-  # Muestra la cantidad de archivos descargados (no el numero de entradas en el archivo)
-  output$n_archivos <- renderText(length(pubmed_results()))
+  # Muestra la cantidad de citas recuperadas
+  output$n_archivos <- renderText({
+    paste0("Nº de citas recuperadas: ",
+    length(pubmed_results()@PMID))
+    })
 
 
   
