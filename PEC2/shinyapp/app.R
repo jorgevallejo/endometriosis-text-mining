@@ -31,24 +31,24 @@ ui <- fluidPage(
 
 # App behaviour
 server <- function(input, output, session){
+  # Generates text for the query
+  query <- reactive(
+    paste(c(input$keywords, " AND " , format(input$fechas[1],"%Y/%m/%d"),":",
+            format(input$fechas[2],"%Y/%m/%d"),"[dp]"), collapse="")
+  )
   
   # # Displays text of the query
   # output$keyw <- renderText(query())
   
   # Downloads search results
-  # Generates the query text only at the press of search button
-  # This duplicates the code in reactive expression "query"
-    # there must be a way to simplify this
+  
   pubmed_results <- eventReactive(input$search, {
     
     resultados_busqueda <- batch_pubmed_download(
-      pubmed_query_string = paste(c(input$keywords, " AND " , format(input$fechas[1],"%Y/%m/%d"),":",
-                                    format(input$fechas[2],"%Y/%m/%d"),"[dp]"), collapse=""),
+      pubmed_query_string = query(),
       dest_file_prefix = "pubmed_",
       format = "abstract",
       batch_size = 5000)
-    
-    
     
     # ## Concatenate files
     # # List of files to be added together
