@@ -4,7 +4,7 @@ library(pubmed.mineR)
 
 # Starting value for data range
 # Five years (in days) before current date
-start_date <- Sys.Date()-(5*365.25)
+start_date <- Sys.Date()-5
 
 # User interface
 ui <- fluidPage(
@@ -31,11 +31,6 @@ ui <- fluidPage(
 
 # App behaviour
 server <- function(input, output, session){
-  # # Generates the text for the query
-  # query <- reactive(
-  #   paste(c(input$keywords, " AND ", format(input$fechas[1], "%Y/%m/%d"),
-  #         ":",format(input$fechas[2], "%Y/%m/%d"), "[dp]"), sep = "")
-  # )
   
   # # Displays text of the query
   # output$keyw <- renderText(query())
@@ -47,7 +42,8 @@ server <- function(input, output, session){
   pubmed_results <- eventReactive(input$search, {
     
     resultados_busqueda <- batch_pubmed_download(
-      pubmed_query_string = "endometriosis AND 2021/03/31:2021/04/04[dp]",
+      pubmed_query_string = paste(c(input$keywords, " AND " , format(input$fechas[1],"%Y/%m/%d"),":",
+                                    format(input$fechas[2],"%Y/%m/%d"),"[dp]"), collapse=""),
       dest_file_prefix = "pubmed_",
       format = "abstract",
       batch_size = 5000)
