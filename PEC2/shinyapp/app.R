@@ -1,7 +1,6 @@
 library(shiny)
 library(easyPubMed)
 library(pubmed.mineR)
-library(glue) # for use with message() function
 
 # Starting value for data range
 # Five years (in days) before current date
@@ -26,7 +25,9 @@ ui <- fluidPage(
   textOutput("keyw"),
   # Search button
   actionButton("search", "Buscar en PubMed"),
-  textOutput("n_archivos")
+  textOutput("n_archivos"),
+  # Cites as a table
+  tableOutput("titulos")
 )
 
 
@@ -70,7 +71,6 @@ server <- function(input, output, session){
     
     # Delete unnecesary text files
     files_to_delete <- list.files(pattern = "\\.txt$")
-    message(files_to_delete)
     file.remove(files_to_delete)
 
     abstracts
@@ -80,6 +80,20 @@ server <- function(input, output, session){
     paste0("Nº de citas recuperadas: ",
     length(pubmed_results()@PMID))
     })
+  
+  # Table of pmid plus title
+  output$titulos <- renderTable({
+    corpus <- pubmed_results()
+    if (length(corpus@PMID) <10) {
+      citas <- length(corpus@PMID)
+    } else {
+      citas <- 10
+    }
+    message(citas)
+    tabla_titulos <- data.frame(corpus@PMID[1:citas], corpus@Journal[1:citas])
+    colnames(tabla_titulos) <- c("PMID", "Publicaciones")
+    tabla_titulos
+  })
 
 
   
