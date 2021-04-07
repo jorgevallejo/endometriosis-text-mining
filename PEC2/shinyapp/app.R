@@ -1,6 +1,7 @@
 library(shiny)
 library(easyPubMed)
 library(pubmed.mineR)
+library(glue) # for use with message() function
 
 # Starting value for data range
 # Five years (in days) before current date
@@ -66,6 +67,11 @@ server <- function(input, output, session){
     close(out_file)
     # Generate object of class abstract
     abstracts <- readabs("todos_resultados.txt")
+    
+    # Delete unnecesary text files
+    files_to_delete <- list.files(pattern = "\\.txt$")
+    message(files_to_delete)
+    file.remove(files_to_delete)
 
     abstracts
   })
