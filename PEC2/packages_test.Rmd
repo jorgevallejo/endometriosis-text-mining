@@ -115,7 +115,7 @@ close(out_file)
 ```
 
 Genera objeto S4 (corpus primario):
-```{r}
+```{r genera corpus primario}
 abstracts <- readabs("intermediateData/todos.txt")
 str(abstracts)
 ```
@@ -137,17 +137,51 @@ head(last_genes)
 ```
 
 Word atomization. Disgrega el texto en palabras y las ordena según su frecuencia. No tiene en cuenta los espacios, la puntuación ni las palabras más comunes del idioma inglés.
-```{r}
+```{r word atomization}
 last_words <- word_atomizations(last_abstracts)
 head(last_words)
 ```
 
-```{r}
-barplot(last_words[1:12,2], 
-        names.arg = last_words[1:12,1],
+```{r word barplot}
+# Select the twelve most frequent
+last_words2 <- last_words[1:12,]
+# Reverse order factors
+last_words2$words2 <- factor(last_words2$words, 
+                            levels = rev(factor(last_words2$words)))
+
+freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and numerical variable
+# Adjust width of left margin
+# https://stackoverflow.com/questions/10490763/automatic-adjustment-of-margins-in-horizontal-bar-chart
+par(mar=c(5.1, 
+          max(4.1,max(nchar(as.character(varcat)))/1.8) ,
+          4.1,
+          2.1)
+)
+
+# The y object retrieves the coordinates of the categories
+# so they can be used for drawing text
+y <- barplot(varnum ~ varcat, 
         horiz = TRUE,
         las = 2,
-        space = 0)
+        space = 0.1,
+        main = main,
+        ylab = "",
+        xlab = "",
+        xlim = c(0,max(varnum * 1.1)),
+        axes = FALSE
+        )
+text(rev(varnum),
+     y = y,
+     labels = rev(varnum),
+     adj = NULL,
+     pos = 4,
+     cex = 0.9
+     )
+}
+
+freq_barplot(varcat = last_words2$words2,
+             varnum = last_words2$Freq,
+             main = "Palabras más frecuentes")
 ```
 
 word clusters
