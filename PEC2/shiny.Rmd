@@ -1,0 +1,84 @@
+# Qué es Shiny
+
+_Shiny_ es un paquete para el lenguaje de programación **R** que permite diseñar, de forma sencilla, **páginas web interactivas usando el lenguaje de programación R**. Estas aplicaciones - programas - web pueden formar parte de una página web propiamente dicha, o formar parte de documentos escritos en R Markdown. Es posible, aunque no necesario complementar estas aplicaciones con lenguaje HTML, páginas de estilo CSS y con scripts escritos en JavaScript al igual que ocurre en las páginas web tradicionales [@shiny, @wickham_2021].
+
+Uno de sus puntos fuertes es la inclusión de _widgets_ preprogramados, pequeñas aplicaciones para la entrada de datos y la comunicación de resultados, que pueden ser añadidas a la aplicación web mayor con sólo un mínimo de código.
+
+Todo programa Shiny tiene dos componentes principales: la **UI** (*user interface*, interfaz de usuario), que define el aspecto del programa y cómo el usuario interactúa con él; y la **función de servidor**, que establece cómo funciona el programa. Shiny utiliza un paradigma conocido como **programación reactiva**, significando que los resultados que se muestran al usuario cambian se actualizan automáticamente cuando cambian los inputs. Esto se logra con un tercer componente de los programas Shiny, las **expresiones reactivas**.
+
+Esquema básico de una aplicación Shiny:
+```{r esquema_shiny, eval=FALSE, echo=TRUE}
+library(shiny)
+
+ui <- fluidPage(
+  # Interfaz de usuario
+)
+
+server <- function(input, output, session) {
+  # Función de servidor
+}
+
+shinyApp(ui, server)
+  # Construye e inicia la aplicación
+```
+
+INPUTS
+As we saw in the previous chapter, you use functions to insert input controls into your UI specification. the common structure that underlies all input functions 
+
+All input functions have the same first argument: inputId. This is the identifier used to connect the front end with the back end: if your UI has an input with ID "name", the server function will access it with input$name.
+
+Most input functions have a second parameter called label. This is used to create a human-readable label for the control. 
+
+
+OUTPUTS
+Outputs in the UI create placeholders that are later filled by the server function. Like inputs, outputs take a unique ID as their first argument  if your UI specification creates an output with ID "plot", you’ll access it in the server function with output$plot.
+
+Each output function on the front end is coupled with a render function in the back end. There are three main types of output, corresponding to the three things you usually include in a report: text, tables, and plots.
+
+DOWNLOADS
+You can let the user download a file with downloadButton() or downloadLink().
+
+REACTIVITY
+
+The key idea of reactive programming is to specify a graph of dependencies so that when an input changes, all related outputs are automatically updated. 
+
+ reactive expressions allow you to eliminate duplicated work.
+ 
+  the ui object that contains the HTML presented to every user of your app. The ui is simple because every user gets the same HTML. The server is more complicated because every user needs to get an independent version of the app; when user A moves a slider, user B shouldn’t see their outputs change.
+  
+To achieve this independence, Shiny invokes your server() function each time a new session5 starts. Just like any other R function, when the server function is called it creates a new local environment that is independent of every other invocation of the function. This allows each session to have a unique state, as well as isolating the variables created inside the function. 
+
+Server functions take three parameters: input, output, and session. Because you never call the server function yourself, you’ll never create these objects yourself. Instead, they’re created by Shiny when the session begins, connecting back to a specific session.
+
+* Input
+
+The input argument is a list-like object that contains all the input data sent from the browser, named according to the input ID. input objects are read-only
+
+One more important thing about input: it’s selective about who is allowed to read it. To read from an input, you must be in a reactive context created by a function like renderText() or reactive().
+
+* Output
+
+ it’s also a list-like object named according to the output ID. The main difference is that you use it for sending output instead of receiving input. You always use the output object in concert with a render function,
+ 
+ The render function does two things:
+
+    It sets up a special reactive context that automatically tracks what inputs the output uses.
+
+    It converts the output of your R code into HTML suitable for display on a web page.
+
+This is the big idea in Shiny: you don’t need to tell an output when to update, because Shiny automatically figures it out for you. 
+
+ As your app gets more complicated, it’s often useful to make a quick high-level sketch of the reactive graph to remind you how all the pieces fit together.
+ 
+ **Reactive expressions** take inputs and produce outputs
+ 
+ the order in which your code is run is determined solely by the reactive graph. This is different from most R code where the execution order is determined by the order of lines.
+ 
+ sometimes you need to reach outside of the app and cause side-effects to happen elsewhere.  These actions don’t affect how your app looks, so you shouldn’t use an output and a render function. Instead you need to use an **observer**.
+ 
+ **Deploying the app to shinyapps.io**
+ To deploy your application, use the deployApp command from the rsconnect packages.
+ El 'working directory' tiene que ser el directorio en el que está el archivo app.R
+
+library(rsconnect)
+deployApp()
