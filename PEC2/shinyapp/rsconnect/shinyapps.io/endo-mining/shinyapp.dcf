@@ -5,6 +5,6 @@ account: endo-mining
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3898840
-bundleId: 4422259
+bundleId: 4452289
 url: https://endo-mining.shinyapps.io/shinyapp/
-when: 1617314664.82852
+when: 1618002796.90493

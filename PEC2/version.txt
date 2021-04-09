@@ -1,0 +1,12 @@
+## This document specifies current version of the web app and keeps the changelog
+
+Current version: 0.1
+
+== Changelog ==
+
+v.0.1 (2021/04/09)
+- Implemented basic search in PubMed databases.
+- Display number of retrieved cites.
+- Display of PMID and Journal info from retrieved cites.
+- Display table and barplot of word frequencies.
+- Display table and barplot of gene frequencies.
