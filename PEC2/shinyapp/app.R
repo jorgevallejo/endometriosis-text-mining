@@ -2,9 +2,13 @@ library(shiny)
 library(easyPubMed)
 library(pubmed.mineR)
 
+### Fixed variables ###
+
 # Starting value for data range
 # Five years (in days) before current date
 start_date <- Sys.Date()-5
+
+### Custom functions ###
 
 # Function for frequency barplots
 freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and numerical variable
@@ -39,6 +43,10 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
 
 # User interface
 ui <- fluidPage(
+  titlePanel("Endo-Mining",
+             windowTitle = "Endo-Mining: minería de textos aplicada a la endometriosis"),
+  fluidRow(
+    column(4,
   # Enter keywords
   textInput("keywords",
             label = "Palabras clave",
@@ -53,17 +61,28 @@ ui <- fluidPage(
                  weekstart = 1, # Monday
                  language = "es",
                  separator = "hasta"),
-  textOutput("keyw"),
+  # textOutput("keyw"),
   # Search button
-  actionButton("search", "Buscar en PubMed"),
+  actionButton("search", "Buscar en PubMed")
+    ),
+  column(8,
   textOutput("n_archivos"),
   # Cites as a table
-  tableOutput("titulos"),
+  tableOutput("titulos")
+  ),
+  fluidRow(
   # Table of words
-  tableOutput("palabras"),
-  plotOutput("words_barplot"),
+    column(6,
+           plotOutput("words_barplot"),
+  tableOutput("palabras")
+    ),
+  column(6,
+  
   plotOutput("genes_barplot"),
   tableOutput("genes_table")
+    )
+  )
+  )
 )
 
 
