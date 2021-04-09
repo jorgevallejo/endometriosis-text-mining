@@ -123,18 +123,36 @@ str(abstracts)
 Reconocimiento de entidades:
 
 -genes: la función `gene_atomization()` extrae los símbolos HGNC del texto junto con sus frecuencias.
-```{r}
+```{r gene atomization}
 genes_endometriosis <- gene_atomization(abstracts)
 head(genes_endometriosis)
 ```
 
 Para hacer la exploración más rápida, usaré los ejemplos con sólo los artículos publicados en el último año:
-```{r}
+```{r last genes}
 last_abstracts <- readabs("intermediateData/last_endometriosis01.txt")
 
 last_genes <- gene_atomization(last_abstracts)
 head(last_genes)
 ```
+
+Gene barplot:
+```{r gene barplot}
+# Select the twelve most frequent
+last_genes2 <- data.frame(last_genes[1:12,],
+                          stringsAsFactors = FALSE)
+# Codify frequency as numeric
+last_genes2$Freq <- as.numeric(last_genes2$Freq)
+# Reverse order factors
+last_genes2$genes2 <- factor(last_genes2$Gene_symbol, 
+                            levels = rev(factor(last_genes2$Gene_symbol)))
+# Draw barplot
+freq_barplot(varcat = last_genes2$genes2,
+             varnum = last_genes2$Freq,
+             main = "Genes más frecuentes")
+```
+
+
 
 Word atomization. Disgrega el texto en palabras y las ordena según su frecuencia. No tiene en cuenta los espacios, la puntuación ni las palabras más comunes del idioma inglés.
 ```{r word atomization}
@@ -198,7 +216,7 @@ tdm[, 1:10]
 25/03/2021
 
 ¿Qué pasa si, para fusionar los registros en formato XML en lugar de leer y copiar línea por línea usamos la función file.append?
-```{r}
+```{r fusiona xml files with file.append}
 file.create("intermediateData/appended_xml.txt")
 
 files_list2 <- list.files(path = "intermediateData/",

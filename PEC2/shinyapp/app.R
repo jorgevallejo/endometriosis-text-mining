@@ -11,7 +11,7 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
   # Adjust width of left margin
   # https://stackoverflow.com/questions/10490763/automatic-adjustment-of-margins-in-horizontal-bar-chart
   par(mar=c(5.1, 
-            max(4.1,max(nchar(as.character(varcat)))/1.8) ,
+            max(4.1,max(nchar(as.character(varcat)))/1.5) ,
             4.1,
             2.1)
   )
@@ -61,7 +61,9 @@ ui <- fluidPage(
   tableOutput("titulos"),
   # Table of words
   tableOutput("palabras"),
-  plotOutput("words_barplot")
+  plotOutput("words_barplot"),
+  plotOutput("genes_barplot"),
+  tableOutput("genes_table")
 )
 
 
@@ -148,6 +150,33 @@ server <- function(input, output, session){
     freq_barplot(varcat = tabla_frecuencias$words2,
                  varnum = tabla_frecuencias$Freq,
                  main = "Palabras más frecuentes")
+  })
+  
+  # Gene atomization
+  genes <- reactive({
+    genes_data <- gene_atomization(pubmed_results())
+    # Codify frequency of genes as numeric
+    genes_table <- data.frame(genes_data,
+                              stringsAsFactors = FALSE)
+    colnames(genes_table) <- c("Symbol", "Nombre", "Frecuencia")
+    genes_table$Frecuencia <- as.integer(genes_table$Frecuencia)
+    genes_table
+    })
+
+  # Table with frequency of genes
+  output$genes_table <- renderTable({
+    genes()
+  })
+  
+  
+  # Barplot with frequency of genes
+  output$genes_barplot <- renderPlot({
+    tabla_frecuencias <- genes()[1:10,]
+    tabla_frecuencias$genes2 <- factor(tabla_frecuencias$Symbol,
+                                       levels = rev(factor(tabla_frecuencias$Symbol)))
+    freq_barplot(varcat = tabla_frecuencias$genes2,
+                 varnum = tabla_frecuencias$Frecuencia,
+                 main = "Genes más frecuentes")
   })
 
 
