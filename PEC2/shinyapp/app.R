@@ -100,7 +100,11 @@ server <- function(input, output, session){
   # Downloads search results
   
   pubmed_results <- eventReactive(input$search, {
-    
+    # Progress bar
+    withProgress(message = "Descargando sumarios desde PubMed...",
+                 detail = "Espere, por favor...",
+                 value = 0, {
+                   incProgress(7/15)
     resultados_busqueda <- batch_pubmed_download(
       pubmed_query_string = query(),
       dest_file_prefix = "pubmed_",
@@ -127,7 +131,8 @@ server <- function(input, output, session){
     # Delete unnecesary text files
     files_to_delete <- list.files(pattern = "\\.txt$")
     file.remove(files_to_delete)
-
+incProgress(15/15)
+})
     abstracts
   })
   # Muestra la cantidad de citas recuperadas
@@ -152,7 +157,15 @@ server <- function(input, output, session){
   
   ## Preprocesado del corpus primario
   # Word atomization
-  words <- reactive(word_atomizations(pubmed_results()))
+  words <- reactive({
+    withProgress(message = "Recuperando palabras...",
+                 value = 0, {
+                   incProgress(1/2)
+    words <- word_atomizations(pubmed_results())
+    incProgress(2/2)
+    words
+                 })
+    })
   # Table of words
   output$palabras <- renderTable({
     
@@ -173,12 +186,18 @@ server <- function(input, output, session){
   
   # Gene atomization
   genes <- reactive({
+    withProgress(message = 'Recuperando genes...',
+                 detail = 'Suele tardar un rato...',
+                 value = 0, {
+                   incProgress(1/2)
     genes_data <- gene_atomization(pubmed_results())
     # Codify frequency of genes as numeric
     genes_table <- data.frame(genes_data,
                               stringsAsFactors = FALSE)
     colnames(genes_table) <- c("Symbol", "Nombre", "Frecuencia")
     genes_table$Frecuencia <- as.integer(genes_table$Frecuencia)
+    incProgress(2/2)
+                 })
     genes_table
     })
 
