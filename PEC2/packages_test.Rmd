@@ -19,7 +19,7 @@ save(endometriosis_papers,
 ```
 
 Realizando la búsqueda y descargando la información en forma de archivos de texto y formato xml:
-```{r}
+```{r batch pubmed xml}
 batch_pubmed_download(query,
                       dest_dir = "intermediateData/",
                       dest_file_prefix = query,
@@ -68,7 +68,7 @@ Debería probar a descargar la información en formato texto en lugar de xml.
 Bueno, primero he probado a modificar el texto en emacs añadiendo un nodo raíz. Pero no ha funcionado, y sigue con el error 'Extra content at the end of the document. Quizá al concatenar los archivos se podría saltar las primeras líneas y la última, o algo así.
 
 Para no volver a tardar una eternidad en descargar la información pondremos una limitación de fechas (ej. los últimos 10 años):
-```{r}
+```{r batch download last abstract}
 query <- "endometriosis AND 2020/01/01:3000/12/31[dp]"
 
 batch_pubmed_download(query,
@@ -115,7 +115,7 @@ close(out_file)
 ```
 
 Genera objeto S4 (corpus primario):
-```{r}
+```{r genera corpus primario}
 abstracts <- readabs("intermediateData/todos.txt")
 str(abstracts)
 ```
@@ -123,31 +123,83 @@ str(abstracts)
 Reconocimiento de entidades:
 
 -genes: la función `gene_atomization()` extrae los símbolos HGNC del texto junto con sus frecuencias.
-```{r}
+```{r gene atomization}
 genes_endometriosis <- gene_atomization(abstracts)
 head(genes_endometriosis)
 ```
 
 Para hacer la exploración más rápida, usaré los ejemplos con sólo los artículos publicados en el último año:
-```{r}
+```{r last genes}
 last_abstracts <- readabs("intermediateData/last_endometriosis01.txt")
 
 last_genes <- gene_atomization(last_abstracts)
 head(last_genes)
 ```
 
+Gene barplot:
+```{r gene barplot}
+# Select the twelve most frequent
+last_genes2 <- data.frame(last_genes[1:12,],
+                          stringsAsFactors = FALSE)
+# Codify frequency as numeric
+last_genes2$Freq <- as.numeric(last_genes2$Freq)
+# Reverse order factors
+last_genes2$genes2 <- factor(last_genes2$Gene_symbol, 
+                            levels = rev(factor(last_genes2$Gene_symbol)))
+# Draw barplot
+freq_barplot(varcat = last_genes2$genes2,
+             varnum = last_genes2$Freq,
+             main = "Genes más frecuentes")
+```
+
+
+
 Word atomization. Disgrega el texto en palabras y las ordena según su frecuencia. No tiene en cuenta los espacios, la puntuación ni las palabras más comunes del idioma inglés.
-```{r}
+```{r word atomization}
 last_words <- word_atomizations(last_abstracts)
 head(last_words)
 ```
 
-```{r}
-barplot(last_words[1:12,2], 
-        names.arg = last_words[1:12,1],
+```{r word barplot}
+# Select the twelve most frequent
+last_words2 <- last_words[1:12,]
+# Reverse order factors
+last_words2$words2 <- factor(last_words2$words, 
+                            levels = rev(factor(last_words2$words)))
+
+freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and numerical variable
+# Adjust width of left margin
+# https://stackoverflow.com/questions/10490763/automatic-adjustment-of-margins-in-horizontal-bar-chart
+par(mar=c(5.1, 
+          max(4.1,max(nchar(as.character(varcat)))/1.8) ,
+          4.1,
+          2.1)
+)
+
+# The y object retrieves the coordinates of the categories
+# so they can be used for drawing text
+y <- barplot(varnum ~ varcat, 
         horiz = TRUE,
         las = 2,
-        space = 0)
+        space = 0.1,
+        main = main,
+        ylab = "",
+        xlab = "",
+        xlim = c(0,max(varnum * 1.1)),
+        axes = FALSE
+        )
+text(rev(varnum),
+     y = y,
+     labels = rev(varnum),
+     adj = NULL,
+     pos = 4,
+     cex = 0.9
+     )
+}
+
+freq_barplot(varcat = last_words2$words2,
+             varnum = last_words2$Freq,
+             main = "Palabras más frecuentes")
 ```
 
 word clusters
@@ -164,7 +216,7 @@ tdm[, 1:10]
 25/03/2021
 
 ¿Qué pasa si, para fusionar los registros en formato XML en lugar de leer y copiar línea por línea usamos la función file.append?
-```{r}
+```{r fusiona xml files with file.append}
 file.create("intermediateData/appended_xml.txt")
 
 files_list2 <- list.files(path = "intermediateData/",

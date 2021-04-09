@@ -1,0 +1,10 @@
+name: shinyapp
+title:
+username:
+account: endo-mining
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3898840
+bundleId: 4422259
+url: https://endo-mining.shinyapps.io/shinyapp/
+when: 1617314664.82852
