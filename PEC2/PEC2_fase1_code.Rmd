@@ -110,7 +110,7 @@ file.rename(from = "table.txt",
 ```
 
 En qué frases estás los genes sospechosos (AMH en concreto):
-```{r, official_fn, eval=FALSE}
+```{r frases con genes, official_fn, eval=FALSE}
 # Returns a text file with the sentences that contain official gene symbols from HGNC.
 official_fn(genes = genes,
             abs = abstracts,
@@ -124,6 +124,64 @@ file.rename(from = "intermediateData/sus.txtofficial.txt",
 # >> gene_symbol
 # PMID
 # Sentence
+```
+
+Filtro distribución hipergeométrica
+```{r download gene2pubtatorcentral, eval=FALSE}
+
+
+```
+
+```{r read gene2pubtatorcentral, eval=FALSE}
+gene2pubtator <- read.table(
+  file = "../../PEC2_Fase1/PubTatorCentral/gene2pubtatorcentral",
+  header = FALSE,
+  colClasses = c("integer", "NULL", "character", "NULL", "NULL"),
+  col.names = c("PMID", "Type", "GeneID", "Name", "Resource"),
+  fill = TRUE,
+  quote = "",
+  sep = "\t"
+)
+
+save(gene2pubtator,
+     file = "intermediateData/gene2pubtator.RData")
+```
+
+```{r process double geneID, eval=FALSE}
+# dummy_dataframe <- data.frame(PMID = c(123, 234),
+#                               GeneID = c("123", "123;234"),
+#                               stringsAsFactors = FALSE
+# )
+# 
+# gene2pubtator2 <- dummy_dataframe
+
+gene2pubtator_dups <- data.frame(PMID = integer(),
+                                 GeneID = character(),
+                                 stringsAsFactors = FALSE)
+
+for(i in 1:nrow(gene2pubtator)) {
+  if (grepl(";", gene2pubtator$GeneID[i]) == TRUE) {
+    # Generate deduplicated row
+    x <- gene2pubtator$PMID[i];
+    y <- sub(pattern = ";[0-9]+",
+             replacement = "",
+             gene2pubtator$GeneID[i]);
+    z <- data.frame(PMID = x,
+                    GeneID = y,
+                    stringsAsFactors = FALSE);
+    gene2pubtator <- rbind(gene2pubtator, z);
+    # Delete duplicated GeneID
+    gene2pubtator$GeneID[i] <- sub(pattern = "^[0-9]+;",
+        replacement = "",
+        gene2pubtator$GeneID[i])
+  }
+}
+```
+
+```{r, eval=FALSE}
+sub(pattern=";[0-9]+",
+    replacement = "",
+     gene2pubtator$GeneID[22])
 ```
 
 
