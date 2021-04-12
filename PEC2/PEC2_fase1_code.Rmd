@@ -147,42 +147,129 @@ save(gene2pubtator,
      file = "intermediateData/gene2pubtator.RData")
 ```
 
+```{r check na values, eval=FALSE}
+c(pmid = sum(is.na(gene2pubtator$PMID)),
+  geneid = sum(is.na(gene2pubtator$GeneID)))
+```
+
+```{r check empty strings, eval = FALSE}
+sum(gene2pubtator$GeneID == "")
+```
+
+```{r prueba usando vector de indices y muestra, eval=FALSE}
+# Load sample
+sample_df <- read.table(
+  file = "../../PubTator/gene2pubtatorcentral.sample",
+  header = FALSE,
+  colClasses = c("integer", "NULL", "character", "NULL", "NULL"),
+  col.names = c("PMID", "Type", "GeneID", "Name", "Resource"),
+  fill = TRUE,
+  quote = "",
+  sep = "\t"
+)
+
+save(sample_df,
+     file = "../../PubTator/sample_df.RData")
+
+load("../../PubTator/sample_df.RData")
+
+system.time({
+while (TRUE %in% grepl(pattern = ";", sample_df$GeneID)) {
+# Retrieve indices
+double_geneids_vector <- grep(pattern = ";",
+                              x = sample_df$GeneID) 
+
+# Subset dataframe
+sample_df_dup <- sample_df[double_geneids_vector, ]
+
+# Borrar primer geneID en df original
+sample_df$GeneID <- sub(pattern = "^[0-9]+;",
+             replacement = "",
+             sample_df$GeneID)
+
+# Conserver primer gene ID en df nuevo
+sample_df_dup$GeneID <- sub(pattern = ";[[:graph:]]+",
+                             replacement = "", 
+                              x = sample_df_dup$GeneID)
+
+# Copiar nueva df a df original
+sample_df <- rbind(sample_df,
+                   sample_df_dup)
+# Borra objetos
+rm(list = c("sample_df_dup", 
+            "double_geneids_vector"))
+}
+  sample_df <- unique(sample_df)
+  })
+```
+
 ```{r process double geneID, eval=FALSE}
-# dummy_dataframe <- data.frame(PMID = c(123, 234),
-#                               GeneID = c("123", "123;234"),
+
+# Example dataframe to test the method
+# dummy_dataframe <- data.frame(PMID = c(123, 456, 789, 789),
+#                               GeneID = c("123", "123;234", "567;8910", "8910"),
 #                               stringsAsFactors = FALSE
 # )
-# 
-# gene2pubtator2 <- dummy_dataframe
 
-gene2pubtator_dups <- data.frame(PMID = integer(),
-                                 GeneID = character(),
-                                 stringsAsFactors = FALSE)
+load("intermediateData/gene2pubtator.RData")
 
-for(i in 1:nrow(gene2pubtator)) {
-  if (grepl(";", gene2pubtator$GeneID[i]) == TRUE) {
-    # Generate deduplicated row
-    x <- gene2pubtator$PMID[i];
-    y <- sub(pattern = ";[0-9]+",
+round <- 0
+
+while (TRUE %in% grepl(pattern = ";", gene2pubtator$GeneID)) {
+# Retrieve indices
+double_geneids_vector <- grep(pattern = ";",
+                              x = gene2pubtator$GeneID) 
+
+# Subset dataframe
+gene2pubtator_dup <- gene2pubtator[double_geneids_vector, ]
+
+# Borrar primer geneID en df original
+gene2pubtator$GeneID <- sub(pattern = "^[0-9]+;",
              replacement = "",
-             gene2pubtator$GeneID[i]);
-    z <- data.frame(PMID = x,
-                    GeneID = y,
-                    stringsAsFactors = FALSE);
-    gene2pubtator <- rbind(gene2pubtator, z);
-    # Delete duplicated GeneID
-    gene2pubtator$GeneID[i] <- sub(pattern = "^[0-9]+;",
-        replacement = "",
-        gene2pubtator$GeneID[i])
-  }
+             gene2pubtator$GeneID)
+
+# Conserver primer gene ID en df nuevo
+gene2pubtator_dup$GeneID <- sub(pattern = ";[[:graph:]]+",
+                             replacement = "", 
+                              x = gene2pubtator_dup$GeneID)
+
+# Copiar nueva df a df original
+gene2pubtator <- rbind(gene2pubtator,
+                   gene2pubtator_dup)
+# Borra objetos
+rm(list = c("gene2pubtator_dup", 
+            "double_geneids_vector"))
+
+# Da señales de vida
+round <- round + 1
+print(paste0("Round ", round,"!" ))
 }
+# Elimina filas duplicadas
+  gene2pubtator <- unique(gene2pubtator)
+  })
 ```
 
-```{r, eval=FALSE}
-sub(pattern=";[0-9]+",
-    replacement = "",
-     gene2pubtator$GeneID[22])
+```{r save the deduplicated table, eval = FALSE}
+save(gene2pubtator,
+     file = "intermediateData/gene2pubtator_dedup.RData")
 ```
+
+```{r contingency table, eval= FALSE}
+load("intermediateData/gene2pubtator_dedup.RData")
+
+# Generate contingency table
+# Structure: one-dimensional array
+# Each geneID is a column, the name of the column is the geneID
+geneID_frequencies <- table(gene2pubtator$GeneID)
+
+save(geneID_frequencies,
+     file = "data/geneID_frequencies.RData")
+```
+
+
+
+
+
 
 
 
