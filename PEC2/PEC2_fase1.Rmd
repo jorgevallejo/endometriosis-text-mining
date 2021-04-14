@@ -1,5 +1,5 @@
 ---
-title: "Endo-Mining: herramienta web para la búsqueda automatizada de genes potencialmente relacionados con la endometriosis a través de minería de textos en PubMed"
+title: "Endo-Mining: herramienta web para la búsqueda automatizada de genes potencialmente relacionados con la endometriosis a través de minería de textos"
 author: "Jorge Vallejo Ortega"
 date: '`r format(Sys.Date(),"%d/%m/%Y")`'
 output:
@@ -25,7 +25,7 @@ knit: (function(inputFile, encoding) {
   rmarkdown::render(inputFile, encoding = encoding,
                     output_format = NULL,
                     output_dir = "results",
-                    output_file = "vallejo_jorge_PEC2_fase1.pdf") })
+                    output_file = "vallejo_jorge_PEC2_fase1_no_entregable.pdf") })
 # And:
 # https://stackoverflow.com/a/46007686/10647267
 

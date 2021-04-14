@@ -1,0 +1,50 @@
+---
+title: "PEC 2 - Desarrollo del trabajo - Fase 1"
+subtitle: "Endo-Mining: herramienta web para la búsqueda automatizada de genes potencialmente relacionados con la endometriosis a través de minería de textos"
+author: "Jorge Vallejo Ortega"
+date: '`r format(Sys.Date(),"%d/%m/%Y")`'
+output:
+  pdf_document:
+    number_sections: true
+    toc: true
+    toc_depth: 2
+urlcolor: blue
+linkcolor: blue
+indent: true
+header-includes:
+ - \renewcommand{\contentsname}{Índice}
+ - \usepackage{float}
+ - \floatplacement{figure}{H}
+ - \usepackage{caption}
+ - \captionsetup[figure]{name=Figura}
+ - \captionsetup[table]{name=Tabla}
+ - \usepackage{indentfirst}
+
+# Next code for knitting into another directory with chosen filename comes from: https://stackoverflow.com/questions/39662365/knit-one-markdown-file-to-two-output-files/53280491#53280491
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding,
+                    output_format = NULL,
+                    output_dir = "results",
+                    output_file = "vallejo_jorge_PEC2_fase1.pdf") })
+# And:
+# https://stackoverflow.com/a/46007686/10647267
+
+bibliography: ../bibliography.bib
+link-citations: yes
+---
+  
+```{r setup, include=FALSE}
+# knitr options
+
+# Do not display code in output document
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.align = "center")
+```
+
+```{r libraries, include=FALSE}
+# Load packages
+library(knitr)
+```
+\newpage
