@@ -254,3 +254,21 @@ abstracts@Abstract[index]
 ```
 
 Confirmamos que el abstract hace referencia a la hormona, no al gen.
+
+
+Usando la función pubtator_result_list_to_table:
+```{r pubtator_result_list_to_table}
+pmid_matrix <- as.array(c(33723748, 729230))
+results_list <- apply(pmid_matrix, MARGIN = 1, FUN = pubtator_function)
+pubtator_table <- pubtator_result_list_to_table(results_list)
+pubtator_table
+# El resultado es NULL, pero el autentico resultado es un archivo llamado result.txt
+```
+
+¿Qué pasa si usamos pubtator_function sobre un vector de pmids?
+```{r pubtator function vector pmids}
+pmid_vector <- c(33723748, 729230)
+(pmid_vector_results <- pubtator_function(pmid_vector))
+```
+
+Obtenemos una lista con todos los resultados. Usando apply obtendríamos una lista de listas y tendríamos la relación con cada pmid pero, ¿me hace falta en este caso? Para la hipergeométrica no, porque sólo quiero el dato del ncbigenID.
