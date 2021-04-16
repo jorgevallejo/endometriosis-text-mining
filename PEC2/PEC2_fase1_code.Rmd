@@ -110,7 +110,7 @@ file.rename(from = "table.txt",
 ```
 
 En qué frases estás los genes sospechosos (AMH en concreto):
-```{r, official_fn, eval=FALSE}
+```{r frases con genes, official_fn, eval=FALSE}
 # Returns a text file with the sentences that contain official gene symbols from HGNC.
 official_fn(genes = genes,
             abs = abstracts,
@@ -125,6 +125,246 @@ file.rename(from = "intermediateData/sus.txtofficial.txt",
 # PMID
 # Sentence
 ```
+
+```{r gene extraction pubtator, eval=FALSE}
+load("intermediateData/last_abstracts.RData")
+
+# Vector with pmids
+pmid_vector <- last_abstracts@PMID[1:5]
+
+# Preallocate list
+extraction_list <- vector(mode = "list",
+                          length = length(pmid_vector))
+
+# Retrieve genes vectors from PubTator and store in list
+for (i in 1:length(pmid_vector)) {
+  extraction_list[[i]] <- pubtator_function(pmid_vector[i])$Genes
+}
+
+# Add pmid to Gene info in each non-null element of the gene list
+for (i in 1:length(extraction_list)) {
+if (is.null(extraction_list[[i]]) == FALSE) {
+  extraction_list[[i]] <- sub(pattern = "^",
+      replacement = paste0(pmid_vector[i],">"),
+      extraction_list[[i]])
+}
+}
+
+
+# List into vector of genes
+genes_vector <- unlist(extraction_list)
+
+# Generate dataframe with pmid, symbol, and geneID in different columns
+genes_dataframe <- data.frame(Symbol = genes_vector,
+                              stringsAsFactors = FALSE)
+genes_dataframe$GeneID <- sub(pattern = "[[:print:]]*>",
+                              replacement = "",
+                              genes_dataframe$Symbol)
+```
+
+
+Filtro distribución hipergeométrica
+```{r download gene2pubtatorcentral, eval=FALSE}
+
+
+```
+
+```{r read gene2pubtatorcentral, eval=FALSE}
+gene2pubtator <- read.table(
+  file = "../../PEC2_Fase1/PubTatorCentral/gene2pubtatorcentral",
+  header = FALSE,
+  colClasses = c("integer", "NULL", "character", "NULL", "NULL"),
+  col.names = c("PMID", "Type", "GeneID", "Name", "Resource"),
+  fill = TRUE,
+  quote = "",
+  sep = "\t"
+)
+
+save(gene2pubtator,
+     file = "intermediateData/gene2pubtator.RData")
+```
+
+```{r check na values, eval=FALSE}
+c(pmid = sum(is.na(gene2pubtator$PMID)),
+  geneid = sum(is.na(gene2pubtator$GeneID)))
+```
+
+```{r check empty strings, eval = FALSE}
+sum(gene2pubtator$GeneID == "")
+```
+
+```{r prueba usando vector de indices y muestra, eval=FALSE}
+# Load sample
+sample_df <- read.table(
+  file = "../../PubTator/gene2pubtatorcentral.sample",
+  header = FALSE,
+  colClasses = c("integer", "NULL", "character", "NULL", "NULL"),
+  col.names = c("PMID", "Type", "GeneID", "Name", "Resource"),
+  fill = TRUE,
+  quote = "",
+  sep = "\t"
+)
+
+save(sample_df,
+     file = "../../PubTator/sample_df.RData")
+
+load("../../PubTator/sample_df.RData")
+
+system.time({
+while (TRUE %in% grepl(pattern = ";", sample_df$GeneID)) {
+# Retrieve indices
+double_geneids_vector <- grep(pattern = ";",
+                              x = sample_df$GeneID) 
+
+# Subset dataframe
+sample_df_dup <- sample_df[double_geneids_vector, ]
+
+# Borrar primer geneID en df original
+sample_df$GeneID <- sub(pattern = "^[0-9]+;",
+             replacement = "",
+             sample_df$GeneID)
+
+# Conserver primer gene ID en df nuevo
+sample_df_dup$GeneID <- sub(pattern = ";[[:graph:]]+",
+                             replacement = "", 
+                              x = sample_df_dup$GeneID)
+
+# Copiar nueva df a df original
+sample_df <- rbind(sample_df,
+                   sample_df_dup)
+# Borra objetos
+rm(list = c("sample_df_dup", 
+            "double_geneids_vector"))
+}
+  sample_df <- unique(sample_df)
+  })
+```
+
+```{r process double geneID, eval=FALSE}
+
+# Example dataframe to test the method
+# dummy_dataframe <- data.frame(PMID = c(123, 456, 789, 789),
+#                               GeneID = c("123", "123;234", "567;8910", "8910"),
+#                               stringsAsFactors = FALSE
+# )
+
+load("intermediateData/gene2pubtator.RData")
+
+round <- 0
+
+while (TRUE %in% grepl(pattern = ";", gene2pubtator$GeneID)) {
+# Retrieve indices
+double_geneids_vector <- grep(pattern = ";",
+                              x = gene2pubtator$GeneID) 
+
+# Subset dataframe
+gene2pubtator_dup <- gene2pubtator[double_geneids_vector, ]
+
+# Borrar primer geneID en df original
+gene2pubtator$GeneID <- sub(pattern = "^[0-9]+;",
+             replacement = "",
+             gene2pubtator$GeneID)
+
+# Conserver primer gene ID en df nuevo
+gene2pubtator_dup$GeneID <- sub(pattern = ";[[:graph:]]+",
+                             replacement = "", 
+                              x = gene2pubtator_dup$GeneID)
+
+# Copiar nueva df a df original
+gene2pubtator <- rbind(gene2pubtator,
+                   gene2pubtator_dup)
+# Borra objetos
+rm(list = c("gene2pubtator_dup", 
+            "double_geneids_vector"))
+
+# Da señales de vida
+round <- round + 1
+print(paste0("Round ", round,"!" ))
+}
+# Elimina filas duplicadas
+  gene2pubtator <- unique(gene2pubtator)
+  })
+```
+
+```{r save the deduplicated table, eval = FALSE}
+save(gene2pubtator,
+     file = "intermediateData/gene2pubtator_dedup.RData")
+```
+
+```{r contingency table, eval= FALSE}
+load("intermediateData/gene2pubtator_dedup.RData")
+
+# Generate contingency table
+# Structure: one-dimensional array
+# Each geneID is a column, the name of the column is the geneID
+geneID_frequencies <- table(gene2pubtator$GeneID)
+
+save(geneID_frequencies,
+     file = "data/geneID_frequencies.RData")
+```
+
+```{r check big geneID values, eval = FALSE}
+# How did it take 88 rounds to deduplicate geneID field?
+
+load("intermediateData/gene2pubtator.RData")
+
+char <- ";"
+string <- gene2pubtator$GeneID
+
+rm("gene2pubtator")
+
+# Leaves only the ; characters
+# and counts them for each string in the vector
+replaced <- nchar(gsub("[^;]",
+                 "",
+                 string)
+)
+
+# What is the maximum value
+maximum <- max(replaced)
+# And prints its corresponding string
+# may be more than one, but we only retrieve the first maximum
+values <- string[which.max(replaced)]
+
+c(ID.quantity = maximum,
+  values = values)
+```
+
+
+
+```{r hypergeometric test, eval=FALSE}
+# The hypergeometric test will be used to filter
+# the gene results from text mining of the abstracts.
+# As in Ji-Long (2016)
+
+# Variables
+i <- 721         # Number of retrieved cites containing the geneID
+q <- i - 1
+m <- 4574        # Total cites containing the geneID
+                 # This number is extracted from contingency table
+n <- 33e6 - m    # Total cites without the geneID
+k <- 29000       # Total number of retrieved cites
+
+# Formula
+# Probability for extracting, at least, q results:
+P.hyp <- ( 1 - phyper(q, m, n, k))
+
+##
+# phyper() gives gives the probability of retrieving q in the sample.
+# For a p-value, we want the probability of retrieving AT LEAST q in the sample
+# Hence, 1 - phyper()
+# I want an over-representation test (probability of more successes than expected).
+# H_0: k/n = K/N
+# H_A: k/n > K/N
+
+##
+# Bonferroni correction
+# alpha/nº de tests (en este caso nº de genes)
+```
+
+
+
+
 
 
 

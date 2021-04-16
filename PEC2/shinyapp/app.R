@@ -2,9 +2,13 @@ library(shiny)
 library(easyPubMed)
 library(pubmed.mineR)
 
+### Fixed variables ###
+
 # Starting value for data range
-# Five years (in days) before current date
-start_date <- Sys.Date()-5
+# Ten years (in days) before current date
+start_date <- Sys.Date() - (365.25 * 10)
+
+### Custom functions ###
 
 # Function for frequency barplots
 freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and numerical variable
@@ -39,6 +43,10 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
 
 # User interface
 ui <- fluidPage(
+  titlePanel("Endo-Mining",
+             windowTitle = "Endo-Mining: minería de textos aplicada a la endometriosis"),
+  fluidRow(
+    column(4,
   # Enter keywords
   textInput("keywords",
             label = "Palabras clave",
@@ -53,17 +61,28 @@ ui <- fluidPage(
                  weekstart = 1, # Monday
                  language = "es",
                  separator = "hasta"),
-  textOutput("keyw"),
+  # textOutput("keyw"),
   # Search button
-  actionButton("search", "Buscar en PubMed"),
+  actionButton("search", "Buscar en PubMed")
+    ),
+  column(8,
   textOutput("n_archivos"),
   # Cites as a table
-  tableOutput("titulos"),
+  tableOutput("titulos")
+  ),
+  fluidRow(
   # Table of words
-  tableOutput("palabras"),
-  plotOutput("words_barplot"),
+    column(6,
+           plotOutput("words_barplot"),
+  tableOutput("palabras")
+    ),
+  column(6,
+  
   plotOutput("genes_barplot"),
   tableOutput("genes_table")
+    )
+  )
+  )
 )
 
 
@@ -81,7 +100,11 @@ server <- function(input, output, session){
   # Downloads search results
   
   pubmed_results <- eventReactive(input$search, {
-    
+    # Progress bar
+    withProgress(message = "Descargando sumarios desde PubMed...",
+                 detail = "Espere, por favor...",
+                 value = 0, {
+                   incProgress(7/15)
     resultados_busqueda <- batch_pubmed_download(
       pubmed_query_string = query(),
       dest_file_prefix = "pubmed_",
@@ -108,7 +131,8 @@ server <- function(input, output, session){
     # Delete unnecesary text files
     files_to_delete <- list.files(pattern = "\\.txt$")
     file.remove(files_to_delete)
-
+incProgress(15/15)
+})
     abstracts
   })
   # Muestra la cantidad de citas recuperadas
@@ -133,7 +157,15 @@ server <- function(input, output, session){
   
   ## Preprocesado del corpus primario
   # Word atomization
-  words <- reactive(word_atomizations(pubmed_results()))
+  words <- reactive({
+    withProgress(message = "Recuperando palabras...",
+                 value = 0, {
+                   incProgress(1/2)
+    words <- word_atomizations(pubmed_results())
+    incProgress(2/2)
+    words
+                 })
+    })
   # Table of words
   output$palabras <- renderTable({
     
@@ -154,12 +186,18 @@ server <- function(input, output, session){
   
   # Gene atomization
   genes <- reactive({
+    withProgress(message = 'Recuperando genes...',
+                 detail = 'Suele tardar un rato...',
+                 value = 0, {
+                   incProgress(1/2)
     genes_data <- gene_atomization(pubmed_results())
     # Codify frequency of genes as numeric
     genes_table <- data.frame(genes_data,
                               stringsAsFactors = FALSE)
     colnames(genes_table) <- c("Symbol", "Nombre", "Frecuencia")
     genes_table$Frecuencia <- as.integer(genes_table$Frecuencia)
+    incProgress(2/2)
+                 })
     genes_table
     })
 
