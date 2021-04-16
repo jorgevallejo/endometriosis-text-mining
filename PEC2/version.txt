@@ -1,8 +1,13 @@
 ## This document specifies current version of the web app and keeps the changelog
 
-Current version: 0.1
+Current version: 0.1.1
 
 == Changelog ==
+v.0.1.1 (2021/04/16)
+- Change of layout from one to two columns.
+- Added progress bars for cites retrieveing, corpus generation,
+  and gene retrieving.
+- Default date range is now 10 years from present day.
 
 v.0.1 (2021/04/09)
 - Implemented basic search in PubMed databases.

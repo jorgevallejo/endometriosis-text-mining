@@ -5,8 +5,8 @@ library(pubmed.mineR)
 ### Fixed variables ###
 
 # Starting value for data range
-# Five years (in days) before current date
-start_date <- Sys.Date()-5
+# Ten years (in days) before current date
+start_date <- Sys.Date() - (365.25 * 10)
 
 ### Custom functions ###
 
