@@ -32,6 +32,7 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
                xlim = c(0,max(varnum * 1.1)),
                axes = FALSE
   )
+  # Writes the frequency of each gen at the end of the bar
   text(rev(varnum),
        y = y,
        labels = rev(varnum),
