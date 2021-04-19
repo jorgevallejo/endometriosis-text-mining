@@ -661,6 +661,104 @@ Más que una tarea con principio y final bien delimitados, considero esta activi
 
 El método elegido ha sido el más sencillo. He abierto una cuenta gratuita en Shinyapp.io y he seguido el [tutorial](https://shiny.rstudio.com/articles/shinyapps.html) de la web. El paquete `rsconnect` hace que publicar y actualizar la aplicación en el servidor sean actividades casi triviales.
  
+# Relación de las desviaciones en la temporización y acciones de mitigación si procede y actualización del cronograma si procede 
+ 
+## Desviaciones
+ 
+Respecto a las desviaciones; varias de las tareas previstas para esta fase están sin terminar o incluso sin empezar, mientras que como se explica en el apartado anterior hay tareas previstas para la fase siguiente que han sido comenzadas antes de tiempo.
+
+Las siguientes tareas de esta fase están **sin finalizar**:
+
+- Filtrado estadístico.  
+- Definir esquema de aplicación web.  
+- Página de visualización de abstracts
+ 
+Las siguientes tareas se han **comenzado antes de lo previsto**:
+
+- Incorporar los procesos de minería y análisis de texto a la aplicación web.
+- Subir aplicación a server de Shiny.
+
+Analizando las **causas** de las desviaciones, creo que hay dos motivos para las mismas. Por una parte, soy lento escribiendo código y eso ha hecho que subestime el tiempo que debía dedicar a algunas de las tareas. Y por otra parte, cuando me he retrasado en una tarea no he sabido abandonarla a tiempo, lo que ha resultado en dejar a medias no sólo la tarea en la que originalmente tenía problemas sino también la tarea siguiente. Por ejemplo, al ver que no conseguía completar el "filtro estadístico" en el tiempo asignado, podría haber abandonado esa tarea y pasar a la de "definir el esquema de la aplicación web"; ya que esta segunda es independiente de la primera, más sencilla, y potencialmente más importante para completar el proyecto.
+
+## Acciones de mitigación
+
+Las tareas "Definir esquema de aplicación web" y "Página de visualización de abstracts" las atrasaré a la **Fase 2 de desarrollo del trabajo**. He reorganizado el planning para asignarles tiempo. Básicamente reduciendo los 16 días de "Pruebas de uso y corrección de errores" a sólo 8 días.
+
+```{r reorganinzacion plan trabajo}
+tareas <- c("_Fase 2 de desarrollo del trabajo_",
+            "Definir esquema de aplicación web",
+            "Página de visualización de abstracts",
+            "Caracterización de la lista de genes",
+            "Visualización de resultados",
+            "Incorporar los procesos de minería",
+            " y análisis de texto a la aplicación web",
+            "Subir aplicación a server de Shiny",
+            "Pruebas de uso de la aplicación",
+            " y corrección de errores",
+            "Documentar en la memoria")
+
+fecha_inicio <- c("_20/04/21_",
+                  "20/04/21",
+                  "22/04/21",
+                  "27/04/21",
+                  "27/04/21",
+                  "",
+                  "02/05/21",
+                  "07/05/21",
+                  "",
+                  "10/05/21",
+                  "20/04/21"
+                  )
+
+fecha_fin <- c("_17/05/21_",
+               "21/04/21",
+               "26/04/21",
+               "01/05/21",
+               "01/05/21",
+               "",
+               "06/05/21",
+               "09/05/21",
+               "",
+               "16/05/21",
+               "17/05/21"
+               )
+
+dias <- c("_28_", "1", "5", "5", "5", "", "5", "3", "", "8", "28")
+
+hito <- c("_Entrega de PEC3_", rep("", 10))
+
+kable(
+  data.frame(
+    tareas,
+    fecha_inicio,
+    fecha_fin,
+    dias,
+    hito,
+    stringsAsFactors = FALSE),
+  col.names = c("**Tarea**",
+                "**Inicio**",
+                "**Fin**",
+                "**Días**",
+                "**Hito**"),
+  align = 'lcccl',
+  caption = 'Nuevo plan de trabajo para la PEC 3.'
+)
+
+```
+
+## Actualización del cronograma
+
+```{r cronograma, fig.cap='Cronograma modificado respecto al cronograma original. Las tareas correspondientes a la PEC 3 están representadas en verde.'}
+include_graphics("images/cronograma.png")
+
+```
+
+
+
+XXX Entregables XXX
+
+
+ 
 # Apéndices
  
 ## Apéndice A: Código
