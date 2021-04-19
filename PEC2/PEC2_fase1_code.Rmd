@@ -154,7 +154,7 @@ if (is.null(extraction_list[[i]]) == FALSE) {
 # List into vector of genes
 genes_vector <- unlist(extraction_list)
 
-# Generate dataframe with pmid, symbol, and geneID in different columns
+# Generate dataframe with pmid, symbol, and geneID in different columns  ###INCOMPLETE ###
 genes_dataframe <- data.frame(Symbol = genes_vector,
                               stringsAsFactors = FALSE)
 genes_dataframe$GeneID <- sub(pattern = "[[:print:]]*>",
@@ -165,7 +165,8 @@ genes_dataframe$GeneID <- sub(pattern = "[[:print:]]*>",
 
 Filtro distribución hipergeométrica
 ```{r download gene2pubtatorcentral, eval=FALSE}
-
+download.file(url = "ftp://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/disease2pubtatorcentral.sample",
+              destfile = "data/disease2pubtatorcentral.sample")
 
 ```
 
@@ -360,6 +361,16 @@ P.hyp <- ( 1 - phyper(q, m, n, k))
 ##
 # Bonferroni correction
 # alpha/nº de tests (en este caso nº de genes)
+##
+
+## Implementation of the test
+# Variables
+gen_df <- as.data.frame(last_genes,
+                        stringsAsFactors = FALSE)
+gen_df$Freq <- as.integer(gen_df$Freq)
+i <- gen_df$Freq[1]
+q <- i - 1
+
 ```
 
 
