@@ -238,6 +238,8 @@ Primero de todo, realicé una búsqueda en PubMed (https://pubmed.ncbi.nlm.nih.g
 include_graphics(path = "images/pubmed_search.png")
 ```
 
+\newpage
+
 A través del enlace 'Advanced', que se encuentra en la zona superior izquierda, podemos acceder a un constructor de búsquedas que nos facilita hacer búsquedas avanzadas sin necesidad de conocer todas las etiquetas disponibles. En esa misma página podemos consultar nuestro historial de búsquedas recientes y, en éste, cómo el constructor de búsquedas ha traducido nuestra búsqueda simple ('endometriosis') utilizando las tablas de traducción:
 
 ```{r pubmed_search_translation, fig.cap="Detalle del historial de búsqueda. De izquierda a derecha muestra la siguiente información: número de la búsqueda en orden cronológico, los términos de búsqueda entrados por el usuario y los términos a los que el algoritmo de mapeo automático los ha traducido, el número de resultados y finalmente la hora a la que se solicitó la búsqueda."}
@@ -428,6 +430,8 @@ include_graphics(path = "images/gene2pubtatorcentral_sample.png")
 ```
 
 A partir de este archivo he obtenido una tabla de contingencia que contiene la frecuencia de cada gen (representado por su Gene ID). Los datos de esta tabla son los que se usarán para calcular la relación entre la frecuencia del gen en la base de datos (*K/N*) y la frecuencia del gen en los resultados de la búsqueda (*k/n*).
+
+\newpage
 
 ```{r genID contingency tabla}
 load("data/geneID_frequencies.RData")
@@ -682,6 +686,8 @@ Las siguientes tareas se han **comenzado antes de lo previsto**:
 
 Analizando las **causas** de las desviaciones, creo que hay dos motivos para las mismas. Por una parte, soy lento escribiendo código y eso ha hecho que subestime el tiempo que debía dedicar a algunas de las tareas. Y por otra parte, cuando me he retrasado en una tarea no he sabido abandonarla a tiempo, lo que ha resultado en dejar a medias no sólo la tarea en la que originalmente tenía problemas sino también la tarea siguiente. Por ejemplo, al ver que no conseguía completar el "filtro estadístico" en el tiempo asignado, podría haber abandonado esa tarea y pasar a la de "definir el esquema de la aplicación web"; ya que esta segunda es independiente de la primera, más sencilla, y potencialmente más importante para completar el proyecto.
 
+\newpage
+
 ## Acciones de mitigación
 
 Las tareas "Definir esquema de aplicación web" y "Página de visualización de abstracts" las atrasaré a la **Fase 2 de desarrollo del trabajo**. He reorganizado el planning para asignarles tiempo. Básicamente reduciendo los 16 días de "Pruebas de uso y corrección de errores" a sólo 8 días.
@@ -755,6 +761,8 @@ include_graphics("images/cronograma.png")
 
 ```
 
+\newpage
+
 # Listado de los resultados parciales obtenidos hasta el momento (entregables que se adjuntan)
 
 Los resultados parciales que se adjuntan son un script en R y el código de una aplicación Shiny que implementa las mismas funcionalidades del script:
@@ -767,14 +775,14 @@ El **código de la aplicación Shiny** se entrega como código impreso en el [ap
 
 El **script en R** se entrega como código impreso en el [apéndice E](#apendiceE), y como fichero de texto `PEC2_fase1_script.R` descargable desde [este enlace](https://github.com/jorgevallejo/endometriosis-text-mining/tree/master/PEC2) en mi repositorio de GitHub.
 
+\newpage
+
 # Apéndices
  
 ## Apéndice A: Código
 
-El documento original en formato .Rmd, que incluye el código completo en lenguaje R usado para generar este informe, se puede consultar y descargar en el siguiente repositorio de Github:
+El documento original en formato .Rmd que incluye el código completo en lenguaje R usado para generar este informe (fichero `PEC2_fase1_informe.Rmd`), se puede consultar y descargar en el siguiente repositorio de Github:
 [jorgevallejo/endometriosis-text-mining](https://github.com/jorgevallejo/endometriosis-text-mining/tree/master/PEC2)
-
-\newpage
 
 ## Apéndice B: Reproducibilidad {#apendiceB}
 ```{r session_info, include=TRUE, echo=TRUE, results='markup'}
