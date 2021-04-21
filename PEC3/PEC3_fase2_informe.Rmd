@@ -1,0 +1,104 @@
+---
+title: "PEC 3 - Desarrollo del trabajo - Fase 2"
+subtitle: "Endo-Mining: herramienta web para la búsqueda automatizada de genes potencialmente relacionados con la endometriosis a través de minería de textos"
+author: "Jorge Vallejo Ortega"
+date: '`r format(Sys.Date(),"%d/%m/%Y")`'
+output:
+  pdf_document:
+    number_sections: true
+    toc: true
+    toc_depth: 3
+urlcolor: blue
+linkcolor: blue
+indent: true
+header-includes:
+ - \renewcommand{\contentsname}{Índice}
+ - \usepackage{float}
+ - \floatplacement{figure}{H}
+ - \usepackage{caption}
+ - \captionsetup[figure]{name=Figura}
+ - \captionsetup[table]{name=Tabla}
+ - \usepackage{indentfirst}
+
+# Next code for knitting into another directory with chosen filename comes from: https://stackoverflow.com/questions/39662365/knit-one-markdown-file-to-two-output-files/53280491#53280491
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding,
+                    output_format = NULL,
+                    output_dir = "results",
+                    output_file = "vallejo_jorge_PEC3_fase2.pdf") })
+# And:
+# https://stackoverflow.com/a/46007686/10647267
+
+bibliography: ../bibliography.bib
+link-citations: yes
+<!-- nocite: | -->
+<!--   @wickham_2021 -->
+---
+  
+```{r setup, include=FALSE}
+# knitr options
+
+# Do not display code in output document
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.align = "center")
+```
+
+```{r libraries, include=FALSE}
+# Load packages
+library(knitr)
+```
+\newpage
+
+# Descripción del avance del proyecto
+
+## Grado de cumplimiento de los objetivos y resultados previstos en el plan de trabajo
+
+Los objetivos planteados generales y específicos son:
+
+### Objetivos generales
+
+1. Encontrar genes relacionados con la endometriosis aplicando técnicas de minería de textos.
+
+### Objetivos específicos
+
+1. Desarrollar un script que permita realizar un procedimiento de minería de textos automáticamente, desde la recopilación de datos en bruto hasta la presentación de resultados.
+
+2. Desarrollar una aplicación web implementando el script de minería de textos que resultó del objetivo anterior.
+
+
+
+
+# Relación de las actividades realizadas
+
+## Actividades previstas en el plan de trabajo
+
+## Actividades no previstas y realizadas
+
+# Relación de las desviaciones en la temporización y acciones de mitigación si procede y actualización del cronograma si procede 
+ 
+## Desviaciones
+
+## Acciones de mitigación
+
+## Actualización del cronograma
+
+# Listado de los resultados parciales obtenidos hasta el momento (entregables que se adjuntan)
+
+# Apéndices
+ 
+## Apéndice A: Código
+
+El documento original en formato .Rmd que incluye el código completo en lenguaje R usado para generar este informe (fichero `PEC3_fase2_informe.Rmd`), se puede consultar y descargar en el siguiente repositorio de Github:
+[jorgevallejo/endometriosis-text-mining](https://github.com/jorgevallejo/endometriosis-text-mining/tree/master/PEC2)
+
+## Apéndice B: Reproducibilidad {#apendiceB}
+```{r session_info, include=TRUE, echo=TRUE, results='markup'}
+sessionInfo() # For better reproducibility
+```
+
+\newpage
+
+# Referencias
+\
