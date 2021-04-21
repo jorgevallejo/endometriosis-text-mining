@@ -31,8 +31,8 @@ knit: (function(inputFile, encoding) {
 
 bibliography: ../bibliography.bib
 link-citations: yes
-<!-- nocite: | -->
-<!--   @wickham_2021 -->
+# nocite: |
+#  @wickham_2021
 ---
   
 ```{r setup, include=FALSE}
