@@ -74,6 +74,42 @@ Los objetivos planteados generales y específicos son:
 
 ## Actividades previstas en el plan de trabajo
 
+### Tarea 1. Definir esquema de la aplicación web
+
+El objetivo de esta tarea era tener una idea clara de la estructura que tendría la aplicación una vez finalizada; los _inputs_ necesarios, los _outputs_, los diferentes controles y una idea aproximada del aspecto final. Lo que empezó como unos garabatos en una libreta terminó convirtiéndose en una serie de diapositivas diseñadas con LibreOffice Draw que incluyo a continuación:
+
+```{r 0 pantalla inicial, fig.cap='Pantalla inicial. Incluye los campos para entrada de palabras clave de búsqueda y rango de fechas. Muestra la cantidad de citas encontradas y una tabla con los datos de publicación de todas ellas.'}
+include_graphics("data/pantallas/img0.png")
+```
+
+```{r 1 frecuencia palabras, fig.cap='Frecuencia de palabras. Muestra una tabla con la frecuencia de las palabras que componen el corpus primario.'}
+include_graphics("data/pantallas/img1.png")
+```
+
+```{r 2 frecuencia genes, fig.cap='Frecuencia de genes. Muestra una tabla con los genes recuperados del corpus primario y su frecuencia, ordenados de mayor a menor.'}
+include_graphics("data/pantallas/img2.png")
+```
+
+```{r 3 graficas frecuencia, fig.cap='Gráficas de frecuencia de palabras y genes en el corpus primario. Listas desplegables permitirán elegir el tipo de gráfica (nube de palabras o gráfica de barras) y la entidad mostrada (palabras o genes). Se podrá elegir la frecuencia máxima y mínima de las entidades representadas, y cuántas entidades aparecerán en las gráficas.'}
+include_graphics("data/pantallas/img3.png")
+```
+
+```{r 4 ontologia, fig.cap='Caracterización por ontología génica. Muestra en una gráfica de barras los datos de ontología génica sobrerrepresentados en la muestra de genes. Con una lista desplegable se podrá elegir representar los datos correspondientes a procesos biológicos, componentes celulares o función molecular.'}
+include_graphics("data/pantallas/img4.png")
+```
+
+```{r 5 filtro termino, fig.cap='Filtrar publicaciones por término. El usuario podrá introducir una palabra y obtener como resultado un subgrupo del corpus conteniendo dicha palabra.'}
+include_graphics("data/pantallas/img5.png")
+```
+
+```{r 6 filtro gen, fig.cap='Filtrar publicaciones por gen. El usuario podrá elegir un gen de una lista desplegable, de entre la lista de genes extraidos del corpus primario. El resultado será una selección de las citas del corpus que contienen el gen seleccionado.'}
+include_graphics("data/pantallas/img6.png")
+```
+
+```{r 7 acerca de, fig.cap='Esta sección de la aplicación mostrará al usuario información acerca de la propia aplicación, el trabajo de fin de máster en el que tiene su origen y los datos de contacto del creador.'}
+include_graphics("data/pantallas/img7.png")
+```
+
 ## Actividades no previstas y realizadas
 
 # Relación de las desviaciones en la temporización y acciones de mitigación si procede y actualización del cronograma si procede 
