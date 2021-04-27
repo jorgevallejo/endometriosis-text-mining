@@ -48,7 +48,7 @@ ui <- fluidPage(
              windowTitle = "Endo-Mining: minería de textos aplicada a la endometriosis"),
   navlistPanel(
     widths = c(2,10),
-    tabPanel(title = "Importar datos",
+    tabPanel(title = "Buscar en PubMed",
   fluidRow(
     column(4,
   # Enter keywords
@@ -76,16 +76,19 @@ ui <- fluidPage(
   )
   )
   ),
-  tabPanel(title = "Salida de datos",
+  tabPanel(title = "Frecuencia de palabras",
   fluidRow(
   # Table of words
     column(6,
            plotOutput("words_barplot"),
   tableOutput("palabras")
-    ),
+    ))),
+  tabPanel(title = "Frecuencia de genes",
+           fluidRow(
   column(6,
-  
+  # Barplot of genes
   plotOutput("genes_barplot"),
+  # Table of genes
   tableOutput("genes_table")
     )
   )
