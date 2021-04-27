@@ -1,12 +1,14 @@
 library(shiny)
 library(easyPubMed)
 library(pubmed.mineR)
+library(DT)
+library(tokenizers)
 
 ### Fixed variables ###
 
 # Starting value for data range
 # Ten years (in days) before current date
-start_date <- Sys.Date() - (365.25 * 10)
+start_date <- Sys.Date() - (30)
 
 ### Custom functions ###
 
@@ -46,6 +48,9 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
 ui <- fluidPage(
   titlePanel("Endo-Mining",
              windowTitle = "Endo-Mining: minería de textos aplicada a la endometriosis"),
+  navlistPanel(
+    widths = c(2,10),
+    tabPanel(title = "Buscar en PubMed",
   fluidRow(
     column(4,
   # Enter keywords
@@ -69,22 +74,32 @@ ui <- fluidPage(
   column(8,
   textOutput("n_archivos"),
   # Cites as a table
-  tableOutput("titulos")
+  DT::dataTableOutput("titulos"),
+  # Abstract of selected cite
+  htmlOutput("abstractText")
+  )
+  )
   ),
+  tabPanel(title = "Frecuencia de palabras",
   fluidRow(
   # Table of words
     column(6,
            plotOutput("words_barplot"),
   tableOutput("palabras")
-    ),
+    ))),
+  tabPanel(title = "Frecuencia de genes",
+           fluidRow(
   column(6,
-  
+  # Barplot of genes
   plotOutput("genes_barplot"),
+  # Table of genes
   tableOutput("genes_table")
     )
   )
   )
+    )
 )
+
 
 
 # App behaviour
@@ -143,18 +158,53 @@ incProgress(15/15)
     })
   
   # Table of pmid plus title
-  output$titulos <- renderTable({
+  output$titulos <- DT::renderDataTable({
     corpus <- pubmed_results()
-    if (length(corpus@PMID) <10) {
-      citas <- length(corpus@PMID)
-    } else {
-      citas <- 10
-    }
-    
-    tabla_titulos <- data.frame(corpus@PMID[1:citas], corpus@Journal[1:citas])
+    # Table content
+    tabla_titulos <- data.frame(corpus@PMID, corpus@Journal)
     colnames(tabla_titulos) <- c("PMID", "Publicaciones")
-    tabla_titulos
-  })
+    datatable(tabla_titulos,
+              selection = list(mode = 'single', selected = 1),
+              options = list(language = list(url = 'spanish.json')))
+    })
+  
+  ## Abstract of selected pmid
+  output$abstractText <- renderText({
+    row_selected <- input$titulos_rows_selected
+    abstracts <- pubmed_results()@Abstract[row_selected]
+    abstractSentences <- tokenize_sentences(abstracts, simplify = TRUE)
+    to_print <- paste('<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', pubmed_results()@Journal[row_selected],
+              '</b></font>', '</h4></p>', '\n')
+    for (i in seq_along(abstractSentences)){
+      if (i < 3) {
+        to_print <- paste(to_print,
+          '<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', abstractSentences[i],
+          '</b></font>', '</h4></p>', '\n')
+      } else{
+        to_print <- paste(to_print,
+                          '<p><i>',abstractSentences[i],'</i></p>','\n')
+      }
+    }
+    to_print <- paste(to_print,
+                      paste0('<p><a href="https://www.ncbi.nlm.nih.gov/pubmed/',pubmed_results()@PMID[row_selected],'" target=_blank>'
+                            , 'Abrir publicación en PubMed', '</a></p>','\n'))
+    to_print
+   })
+  
+  ### Function for printing abstracts
+  # printAbstracts <- function(row_sel, abstractSent){
+  #   cat(paste('<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', pubmed_results()@Journal[row_sel],
+  #             '</b></font>', '</h4></p>'))
+    # for (i in (1:length(abstractSentences))){
+    #   if (i==1 || i==2){
+    #     cat(paste('<p><h4>','<font color=\"#4B04F6\"><b>', abstractSentences[i],'</b></font>','</h4>',
+    #               '\n','</p>'),fill = TRUE)
+    #   } else {cat(paste('<p><i>',abstractSentences[i],'</i></p>'), fill = TRUE)
+    #   }
+    #   
+    # } 
+  #}
+  
   
   ## Preprocesado del corpus primario
   # Word atomization
