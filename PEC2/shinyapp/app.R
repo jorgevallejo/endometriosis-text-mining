@@ -1,6 +1,7 @@
 library(shiny)
 library(easyPubMed)
 library(pubmed.mineR)
+library(DT)
 
 ### Fixed variables ###
 
@@ -72,7 +73,7 @@ ui <- fluidPage(
   column(8,
   textOutput("n_archivos"),
   # Cites as a table
-  tableOutput("titulos")
+  DT::dataTableOutput("titulos")
   )
   )
   ),
@@ -154,18 +155,16 @@ incProgress(15/15)
     })
   
   # Table of pmid plus title
-  output$titulos <- renderTable({
+  output$titulos <- DT::renderDataTable({
     corpus <- pubmed_results()
-    if (length(corpus@PMID) <10) {
-      citas <- length(corpus@PMID)
-    } else {
-      citas <- 10
-    }
-    
-    tabla_titulos <- data.frame(corpus@PMID[1:citas], corpus@Journal[1:citas])
+    # Table content
+    tabla_titulos <- data.frame(corpus@PMID, corpus@Journal)
     colnames(tabla_titulos) <- c("PMID", "Publicaciones")
-    tabla_titulos
-  })
+    datatable(tabla_titulos,
+              selection = list(mode = 'single', selected = 1),
+              options = list(language = list(url = 'spanish.json')))
+    })
+  
   
   ## Preprocesado del corpus primario
   # Word atomization
