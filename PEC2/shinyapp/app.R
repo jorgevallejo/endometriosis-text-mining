@@ -46,6 +46,9 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
 ui <- fluidPage(
   titlePanel("Endo-Mining",
              windowTitle = "Endo-Mining: minería de textos aplicada a la endometriosis"),
+  navlistPanel(
+    widths = c(2,10),
+    tabPanel(title = "Importar datos",
   fluidRow(
     column(4,
   # Enter keywords
@@ -70,7 +73,10 @@ ui <- fluidPage(
   textOutput("n_archivos"),
   # Cites as a table
   tableOutput("titulos")
+  )
+  )
   ),
+  tabPanel(title = "Salida de datos",
   fluidRow(
   # Table of words
     column(6,
@@ -84,7 +90,9 @@ ui <- fluidPage(
     )
   )
   )
+    )
 )
+
 
 
 # App behaviour
