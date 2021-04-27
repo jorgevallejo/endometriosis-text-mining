@@ -2,12 +2,13 @@ library(shiny)
 library(easyPubMed)
 library(pubmed.mineR)
 library(DT)
+library(tokenizers)
 
 ### Fixed variables ###
 
 # Starting value for data range
 # Ten years (in days) before current date
-start_date <- Sys.Date() - (365.25 * 10)
+start_date <- Sys.Date() - (30)
 
 ### Custom functions ###
 
@@ -73,7 +74,9 @@ ui <- fluidPage(
   column(8,
   textOutput("n_archivos"),
   # Cites as a table
-  DT::dataTableOutput("titulos")
+  DT::dataTableOutput("titulos"),
+  # Abstract of selected cite
+  htmlOutput("abstractText")
   )
   )
   ),
@@ -164,6 +167,40 @@ incProgress(15/15)
               selection = list(mode = 'single', selected = 1),
               options = list(language = list(url = 'spanish.json')))
     })
+  
+  ## Abstract of selected pmid
+  output$abstractText <- renderText({
+    row_selected <- input$titulos_rows_selected
+    abstracts <- pubmed_results()@Abstract[row_selected]
+    abstractSentences <- tokenize_sentences(abstracts, simplify = TRUE)
+    to_print <- paste('<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', pubmed_results()@Journal[row_selected],
+              '</b></font>', '</h4></p>', '\n')
+    for (i in seq_along(abstractSentences)){
+      if (i < 3) {
+        to_print <- paste(to_print,
+          '<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', abstractSentences[i],
+          '</b></font>', '</h4></p>', '\n')
+      } else{
+        to_print <- paste(to_print,
+                          '<p><i>',abstractSentences[i],'</i></p>','\n')
+      }
+    }
+    to_print
+   })
+  
+  ### Function for printing abstracts
+  # printAbstracts <- function(row_sel, abstractSent){
+  #   cat(paste('<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', pubmed_results()@Journal[row_sel],
+  #             '</b></font>', '</h4></p>'))
+    # for (i in (1:length(abstractSentences))){
+    #   if (i==1 || i==2){
+    #     cat(paste('<p><h4>','<font color=\"#4B04F6\"><b>', abstractSentences[i],'</b></font>','</h4>',
+    #               '\n','</p>'),fill = TRUE)
+    #   } else {cat(paste('<p><i>',abstractSentences[i],'</i></p>'), fill = TRUE)
+    #   }
+    #   
+    # } 
+  #}
   
   
   ## Preprocesado del corpus primario
