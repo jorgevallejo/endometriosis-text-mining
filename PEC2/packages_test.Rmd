@@ -272,3 +272,21 @@ pmid_vector <- c(33723748, 729230)
 ```
 
 Obtenemos una lista con todos los resultados. Usando apply obtendríamos una lista de listas y tendríamos la relación con cada pmid pero, ¿me hace falta en este caso? Para la hipergeométrica no, porque sólo quiero el dato del ncbigenID.
+
+Explorando `enrichGO()` de _clusterProfiler_:
+```{r enrichGO}
+library(clusterProfiler)
+library(org.Hs.eg.db)
+
+# Set of genes from the search
+load("intermediateData/genes.RData")
+keys <- genes[, "Gene_symbol"]
+# Get equivalent entrezId
+entrez <- select(org.Hs.eg.db,
+                 keys = keys,
+                 columns = c("SYMBOL", "ENTREZID"),
+                 keytype = "SYMBOL")
+# Get all genes from pubtator list
+
+```
+
