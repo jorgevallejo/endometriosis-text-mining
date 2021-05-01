@@ -1,6 +1,9 @@
 ### packages ###
 library(easyPubMed)
 library(pubmed.mineR)
+library(clusterProfiler) # GO enrichment
+library(org.Hs.eg.db)    # GO enrichment and
+                         #translation of gene ids
 
 ### Variables ###
 # Default variables retrieve all results for endometriosis
@@ -147,3 +150,36 @@ freq_barplot(varcat = genes2$genes2,
              main = "Genes más frecuentes")
 # Close file
 dev.off()
+
+## Gene characterization (GO enrichment)
+
+# Translate gene symbols to entrezId
+# Beware: the result is a dataframe
+keys <- genes[, "Gene_symbol"]
+
+entrez <- select(org.Hs.eg.db,
+                 keys = keys,
+                 columns = c("SYMBOL", "ENTREZID"),
+                 keytype = "SYMBOL")
+
+# Get all genes ID from pubtator contingency table
+load("PEC2/data/geneID_frequencies.RData")
+# List of entrezID in org.Hs.eg.db
+human_genes_entrezid <- keys(org.Hs.eg.db)
+# Vector of all genes from pubtator list
+universe <- names(geneID_frequencies)
+# Filter by human genes vector
+universe <- names(geneID_frequencies)[names(geneID_frequencies) %in% human_genes_entrezid]
+# Enrichment test: biological processes
+ego_all <- enrichGO(gene = entrez$ENTREZID,
+                   universe = universe,
+                   OrgDb = org.Hs.eg.db,
+                   ont = "ALL",
+                   pAdjustMethod = "BH",
+                   pvalueCutoff = 0.05,
+                   qvalueCutoff = 0.5,
+                   readable = TRUE)
+
+# Generate BP results as a csv file
+write.csv(ego_all[ego_all@result$ONTOLOGY == "BP", ],
+          file="PEC2/intermediateData/results/ego_BP.csv")
