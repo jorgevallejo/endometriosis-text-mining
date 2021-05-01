@@ -59,31 +59,32 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
 # 'intermediateData' contains .RData objects with processed data.
 # 'results' stores final report files.
 
-directories <- c("data", "results", "intermediateData")
+directories <- c("script/data", "script/results", "script/intermediateData")
 
 # Create directories
 lapply(directories, function(x){
   if (!(dir.exists(x))){
-    dir.create(x)
+    dir.create(x,
+               recursive = TRUE)
   }
 })
 
 # Retrieve query results
 
 batch_pubmed_download(query(),
-                      dest_dir = "data/",
-                      dest_file_prefix = "total_endometriosis", # Correct this #
+                      dest_dir = "script/data/",
+                      dest_file_prefix = "total_endometriosis",
                       format = "abstract",
                       batch_size = 5000
 )
 
 #concatenate text files
 # List of files to be added together
-files_list <- list.files(path = "data/",
+files_list <- list.files(path = "script/data/",
                          pattern = "total",
                          full.names = TRUE) # include path
 # Create new file
-out_file <- file(description = "intermediateData/todos.txt",
+out_file <- file(description = "script/data/todos.txt",
                  open = "w")
 # Read each downloaded file and write into final file
 for (i in files_list){
@@ -93,19 +94,22 @@ for (i in files_list){
 
 close(out_file)
 
+# Delete batch text files
+file.remove(files_list)
+
 # Generate S4 object of class 'Abstract' (corpus primario):
   
 # Generate the object
-abstracts <- readabs("intermediateData/todos.txt")
+abstracts <- readabs("script/data/todos.txt")
 # Save object
-save(abstracts, file = "intermediateData/abstracts.RData")
+save(abstracts, file = "script/intermediateData/abstracts.RData")
 
 # Word atomization:
 words <- word_atomizations(abstracts)
-save(words, file = "intermediateData/words.RData")
+save(words, file = "script/intermediateData/words.RData")
 # Move text file to results directory
 file.rename(from = "word_table.txt",
-            "results/words.txt")
+            "script/results/words.txt")
 
 # Barplot of word frequencies:
 
@@ -116,7 +120,7 @@ words2$words2 <- factor(words2$words,
                              levels = rev(factor(words2$words)))
 # Draw barplot and save as png
 # Open png file
-png(filename = "results\wordsbarplot.png")
+png(filename = "script/results/wordsbarplot.png")
 # Create plot
 freq_barplot(varcat = words2$words2,
              varnum = words2$Freq,
@@ -126,10 +130,10 @@ dev.off()
 
 # Gene extraction
 genes <- gene_atomization(abstracts)
-save(genes, file = "intermediateData/genes.RData")
+save(genes, file = "script/intermediateData/genes.RData")
 # Move text file to results directory
 file.rename(from = "table.txt",
-            "results/genes.txt")
+            "script/results/genes.txt")
 
 # Gene barplot:
   
@@ -143,7 +147,7 @@ genes2$genes2 <- factor(genes2$Gene_symbol,
                              levels = rev(factor(genes2$Gene_symbol)))
 # Draw barplot and save as png
 # Open png file
-png(filename = "results\genebarplot.png")
+png(filename = "script/results/genebarplot.png")
 # Create plot
 freq_barplot(varcat = genes2$genes2,
              varnum = genes2$Freq,
@@ -182,4 +186,10 @@ ego_all <- enrichGO(gene = entrez$ENTREZID,
 
 # Generate BP results as a csv file
 write.csv(ego_all[ego_all@result$ONTOLOGY == "BP", ],
-          file="PEC2/intermediateData/results/ego_BP.csv")
+          file="script/results/ego_BP.csv")
+# Generate CC results as a csv file
+write.csv(ego_all[ego_all@result$ONTOLOGY == "CC", ],
+          file="script/results/ego_CC.csv")
+# Generate MF results as a csv file
+write.csv(ego_all[ego_all@result$ONTOLOGY == "MF", ],
+          file="script/results/ego_MF.csv")
