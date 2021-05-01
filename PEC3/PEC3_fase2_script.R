@@ -3,7 +3,9 @@ library(easyPubMed)
 library(pubmed.mineR)
 library(clusterProfiler) # GO enrichment
 library(org.Hs.eg.db)    # GO enrichment and
-                         #translation of gene ids
+                         #    translation of gene ids
+library(enrichplot)      # GO enrichment barplots
+library(ggplot2)         # GO enrichment barplots
 
 ### Variables ###
 # Default variables retrieve all results for endometriosis
@@ -175,21 +177,34 @@ universe <- names(geneID_frequencies)
 # Filter by human genes vector
 universe <- names(geneID_frequencies)[names(geneID_frequencies) %in% human_genes_entrezid]
 # Enrichment test: biological processes
-ego_all <- enrichGO(gene = entrez$ENTREZID,
+for (ontology in c("BP", "CC", "MF")) {
+  ego <- enrichGO(gene = entrez$ENTREZID,
                    universe = universe,
                    OrgDb = org.Hs.eg.db,
-                   ont = "ALL",
+                   ont = ontology,
                    pAdjustMethod = "BH",
                    pvalueCutoff = 0.05,
                    qvalueCutoff = 0.5,
                    readable = TRUE)
 
-# Generate BP results as a csv file
-write.csv(ego_all[ego_all@result$ONTOLOGY == "BP", ],
-          file="script/results/ego_BP.csv")
-# Generate CC results as a csv file
-write.csv(ego_all[ego_all@result$ONTOLOGY == "CC", ],
-          file="script/results/ego_CC.csv")
-# Generate MF results as a csv file
-write.csv(ego_all[ego_all@result$ONTOLOGY == "MF", ],
-          file="script/results/ego_MF.csv")
+  # Generate results as a csv file
+  write.csv(ego,
+            file= paste0("script/results/ego_", ontology, ".csv"))
+
+
+  # Generate barplots of enrichment results
+  # Terms for plot titles
+  go_plot_titles <- c("BP" = "procesos biológicos",
+                              "CC" = "componentes celulares",
+                              "MF" = "funciones moleculares")
+  
+  # Create plot
+  barplot(height = ego,
+          showCategory = 20,
+          title = paste0("Términos GO enriquecidos \n(",
+                         go_plot_titles[[ontology]],
+                         ")"))
+  # Close png file
+  ggsave(filename = paste0("script/results/go_", ontology, "barplot.png"))
+  
+}
