@@ -303,6 +303,25 @@ ego_bp <- enrichGO(gene = entrez$ENTREZID,
                 pvalueCutoff = 0.05,
                 qvalueCutoff = 0.5,
                 readable = TRUE)
+
+# Temporal
+ego_CC <- enrichGO(gene = entrez$ENTREZID,
+                universe = universe,
+                OrgDb = org.Hs.eg.db,
+                ont = "CC",
+                pAdjustMethod = "BH",
+                pvalueCutoff = 0.05,
+                qvalueCutoff = 0.5,
+                readable = TRUE)
+
+ego_MF <- enrichGO(gene = entrez$ENTREZID,
+                universe = universe,
+                OrgDb = org.Hs.eg.db,
+                ont = "MF",
+                pAdjustMethod = "BH",
+                pvalueCutoff = 0.05,
+                qvalueCutoff = 0.5,
+                readable = TRUE)
 ```
 
 ```{r ejemplo listado sobrerrepresentacion BF}
@@ -312,4 +331,27 @@ knitr::kable(
   caption = 'Ejemplo de términos GO sobrerrepresentados en la lista de genes recuperados de los sumarios de artículos acerca de endometriosis.')
 
 ```
+We can remove redundant GO terms with the function clusterProfiler::simplify():
+```{r simplify GO terms}
+# Simplify GO terms for BP
+# https://guangchuangyu.github.io/2015/10/use-simplify-to-remove-redundancy-of-enriched-go-terms/
+system.time(
+ego_cc2 <- simplify(ego_CC, cutoff = 0.7, by = "p.adjust", select_fun = min)
+)
 
+system.time(ego_mf2 <- simplify(ego_MF, cutoff = 0.7, by = "p.adjust", select_fun = min))
+
+system.time(ego_bp2 <- simplify(ego_bp, cutoff = 0.7, by = "p.adjust", select_fun = min))
+
+save(ego_bp2,
+     ego_cc2,
+     ego_mf2,
+     file = "intermediateData/simplified_egos.RData")
+```
+
+¡Es lento de narices! Incluso con los 16GB del MSI.
+
+Usando proc.time para cronometrar objetos de diferente tamaño:
+ego_CC (615 GO terms, user 1.14 system 0.02 elapsed 1.17) después de simplificar: 50 GO terms
+ego_MF (965 GO terms, user 5.56 system 0.10, elapsed 5.75) después de simplificar: 106 GO terms
+ego_BP (6062 GO terms, user 1625.07 system 140.13 elapsed 1770.02) Media hora. Despés de simplificar: 551
