@@ -72,7 +72,7 @@ ui <- fluidPage(
   p(),
   p(strong("Texto consulta a Pubmed")),
   # Query text
-  textOutput("keyw"),
+  verbatimTextOutput("keyw")
     ),
   column(8,
   textOutput("n_archivos"),
@@ -109,8 +109,11 @@ ui <- fluidPage(
 server <- function(input, output, session){
   # Generates text for the query
   query <- reactive(
-    paste(c(input$keywords, " AND " , format(input$fechas[1],"%Y/%m/%d"),":",
-            format(input$fechas[2],"%Y/%m/%d"),"[dp]"), collapse="")
+    if (input$fechas[1]>input$fechas[2]) {
+             "ERROR: LA FECHA FINAL DEBE SER MAYOR QUE LA INICIAL \nREVISE EL RANGO DE FECHAS, POR FAVOR"
+    } else {
+      paste(c(input$keywords, " AND " , format(input$fechas[1],"%Y/%m/%d"),":",
+            format(input$fechas[2],"%Y/%m/%d"),"[dp]"), collapse="")}
   )
   
   # # Displays text of the query while being written
