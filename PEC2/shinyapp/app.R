@@ -67,9 +67,12 @@ ui <- fluidPage(
                  weekstart = 1, # Monday
                  language = "es",
                  separator = "hasta"),
-  # textOutput("keyw"),
   # Search button
-  actionButton("search", "Buscar en PubMed")
+  actionButton("search", "Buscar en PubMed"),
+  p(),
+  p(strong("Texto consulta a Pubmed")),
+  # Query text
+  textOutput("keyw"),
     ),
   column(8,
   textOutput("n_archivos"),
@@ -110,8 +113,8 @@ server <- function(input, output, session){
             format(input$fechas[2],"%Y/%m/%d"),"[dp]"), collapse="")
   )
   
-  # # Displays text of the query
-  # output$keyw <- renderText(query())
+  # # Displays text of the query while being written
+  output$keyw <-  renderText(query())
   
   # Downloads search results
   
