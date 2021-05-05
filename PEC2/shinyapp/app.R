@@ -57,7 +57,7 @@ ui <- fluidPage(
   textInput("keywords",
             label = "Palabras clave",
             value = "endometriosis",
-            placeholder = "endometriosis"),
+            placeholder = "E.g., endometriosis"),
   # Enter date range
   dateRangeInput("fechas",
                  label = "Rango de fechas",
@@ -108,20 +108,19 @@ ui <- fluidPage(
 # App behaviour
 server <- function(input, output, session){
   # Generates text for the query
-  query <- reactive(
-    if (input$fechas[1]>input$fechas[2]) {
-             "ERROR: LA FECHA FINAL DEBE SER MAYOR QUE LA INICIAL \nREVISE EL RANGO DE FECHAS, POR FAVOR"
-    } else {
-      paste(c(input$keywords, " AND " , format(input$fechas[1],"%Y/%m/%d"),":",
-            format(input$fechas[2],"%Y/%m/%d"),"[dp]"), collapse="")}
-  )
+  query <- reactive({
+    validate(need(input$keywords != "", message = "POR FAVOR, INTRODUZCA LAS PALABRAS CLAVE DE SU INTERÉS" ))
+    
+    paste(c(input$keywords, " AND " , format(input$fechas[1],"%Y/%m/%d"),":",
+            format(input$fechas[2],"%Y/%m/%d"),"[dp]"), collapse="")
+  })
   
   # # Displays text of the query while being written
-  output$keyw <-  renderText(query())
+  output$keyw <-  renderText( query() )
   
   # Downloads search results
   
-  pubmed_results <- eventReactive(input$search, {
+  pubmed_results <- eventReactive(req(input$search, input$keywords != ""), {
     # Progress bar
     withProgress(message = "Descargando sumarios desde PubMed...",
                  detail = "Espere, por favor...",
@@ -165,6 +164,7 @@ incProgress(15/15)
   
   # Table of pmid plus title
   output$titulos <- DT::renderDataTable({
+    validate(need(input$keywords != "", message = "POR FAVOR, INTRODUZCA LAS PALABRAS CLAVE DE SU INTERÉS" ))
     corpus <- pubmed_results()
     # Table content
     tabla_titulos <- data.frame(corpus@PMID, corpus@Journal)
