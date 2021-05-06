@@ -57,7 +57,7 @@ ui <- fluidPage(
   textInput("keywords",
             label = "Palabras clave",
             value = "endometriosis",
-            placeholder = "endometriosis"),
+            placeholder = "E.g., endometriosis"),
   # Enter date range
   dateRangeInput("fechas",
                  label = "Rango de fechas",
@@ -67,19 +67,35 @@ ui <- fluidPage(
                  weekstart = 1, # Monday
                  language = "es",
                  separator = "hasta"),
-  # textOutput("keyw"),
-  # Search button
-  actionButton("search", "Buscar en PubMed")
-    ),
-  column(8,
+  # Do not select by date
+  checkboxInput("check_all_dates",
+                label = " Seleccionar máximo rango de fechas",
+                value = FALSE),
+  p(),
+  p(strong("Texto consulta a PubMed")),
+  # Query text
+  verbatimTextOutput("keyw"),
+  fluidRow(
+    column(4,
+           tabsetPanel(
+             id = "SearchButton",
+             type = "hidden",
+             tabPanelBody(value = "button",
+                          actionButton("search", "Buscar en PubMed")),
+             tabPanelBody(value = "not_button",
+                          "Búsqueda desactivada")
+           )
+    )
+  )),
+  column(8, # quiza deberia ser 6
   textOutput("n_archivos"),
   # Cites as a table
   DT::dataTableOutput("titulos"),
   # Abstract of selected cite
   htmlOutput("abstractText")
   )
-  )
-  ),
+  )),
+  
   tabPanel(title = "Frecuencia de palabras",
   fluidRow(
   # Table of words
@@ -102,16 +118,46 @@ ui <- fluidPage(
 
 
 
+
 # App behaviour
 server <- function(input, output, session){
   # Generates text for the query
-  query <- reactive(
+  query <- reactive({
+    validate(need(input$keywords != "", message = "POR FAVOR, INTRODUZCA LAS PALABRAS CLAVE DE SU INTERÉS" ),
+             need(input$fechas[1] < input$fechas[2], message = "LA FECHA DE INICIO DEBE SER ANTERIOR A LA FECHA FINAL"))
+    
     paste(c(input$keywords, " AND " , format(input$fechas[1],"%Y/%m/%d"),":",
             format(input$fechas[2],"%Y/%m/%d"),"[dp]"), collapse="")
+  })
+  
+  # # Displays text of the query while being written
+  output$keyw <-  renderText( query() )
+  
+  # Shows or hides search button
+  # Hides when there are no keywords OR start date is bigger than finish date
+  observe({
+    if (input$keywords == "" || input$fechas[1] > input$fechas[2]) {
+      updateTabsetPanel(inputId = "SearchButton",
+                        selected = "not_button")
+    }else{
+      updateTabsetPanel(inputId = "SearchButton",
+                        selected = "button")
+    }
+    }
   )
   
-  # # Displays text of the query
-  # output$keyw <- renderText(query())
+  # Updates date range when checkbox is ticked
+  observe({
+    if (input$check_all_dates == TRUE){
+      updateDateRangeInput(inputId = "fechas",
+                           start = "1800-01-01",
+                           end = "3000-12-31")
+    } else {
+      updateDateRangeInput(inputId = "fechas",
+                                 start = start_date,
+                                 end = Sys.Date())}
+               
+  })
   
   # Downloads search results
   
@@ -159,6 +205,8 @@ incProgress(15/15)
   
   # Table of pmid plus title
   output$titulos <- DT::renderDataTable({
+    # Display error message when input is wrong
+    validate(need(input$SearchButton == "button", message = query() ))
     corpus <- pubmed_results()
     # Table content
     tabla_titulos <- data.frame(corpus@PMID, corpus@Journal)
@@ -185,9 +233,9 @@ incProgress(15/15)
                           '<p><i>',abstractSentences[i],'</i></p>','\n')
       }
     }
-    to_print <- paste(to_print,
-                      paste0('<p><a href="https://www.ncbi.nlm.nih.gov/pubmed/',pubmed_results()@PMID[row_selected],'" target=_blank>'
-                            , 'Abrir publicación en PubMed', '</a></p>','\n'))
+    to_print <- paste(paste0('<p><a href="https://www.ncbi.nlm.nih.gov/pubmed/',pubmed_results()@PMID[row_selected],'" target=_blank>'
+                            , 'Abrir publicación en PubMed', '</a></p>','\n'),
+                      to_print)
     to_print
    })
   
