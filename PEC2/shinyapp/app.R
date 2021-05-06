@@ -68,7 +68,14 @@ ui <- fluidPage(
                  language = "es",
                  separator = "hasta"),
   # Search button
-  actionButton("search", "Buscar en PubMed"),
+  # tabsetPanel(
+  #   id = "Search button",
+  #   type = "hidden",
+  #   tabPanelBody(value = "button",
+  #                actionButton("search", "Buscar en PubMed")),
+  #   tabPanelBody(value = "not_button",
+  #                "Búsqueda desactivada")
+  # ),
   p(),
   p(strong("Texto consulta a Pubmed")),
   # Query text
@@ -81,6 +88,17 @@ ui <- fluidPage(
   # Abstract of selected cite
   htmlOutput("abstractText")
   )
+  ),
+  fluidRow(
+    column(4,
+           tabsetPanel(
+               id = "SearchButton",
+               type = "hidden",
+               tabPanelBody(value = "button",
+                            actionButton("search", "Buscar en PubMed")),
+               tabPanelBody(value = "not_button",
+                            "Búsqueda desactivada")
+             ))
   )
   ),
   tabPanel(title = "Frecuencia de palabras",
@@ -109,7 +127,8 @@ ui <- fluidPage(
 server <- function(input, output, session){
   # Generates text for the query
   query <- reactive({
-    validate(need(input$keywords != "", message = "POR FAVOR, INTRODUZCA LAS PALABRAS CLAVE DE SU INTERÉS" ))
+    validate(need(input$keywords != "", message = "POR FAVOR, INTRODUZCA LAS PALABRAS CLAVE DE SU INTERÉS" ),
+             need(input$fechas[1] < input$fechas[2], message = "LA FECHA DE INICIO DEBE SER ANTERIOR A LA FECHA FINAL"))
     
     paste(c(input$keywords, " AND " , format(input$fechas[1],"%Y/%m/%d"),":",
             format(input$fechas[2],"%Y/%m/%d"),"[dp]"), collapse="")
@@ -118,9 +137,22 @@ server <- function(input, output, session){
   # # Displays text of the query while being written
   output$keyw <-  renderText( query() )
   
+  # Shows or hides search button
+  # Hides when there are no keywords OR start date is bigger than finish date
+  observe({
+    if (input$keywords == "" || input$fechas[1] > input$fechas[2]) {
+      updateTabsetPanel(inputId = "SearchButton",
+                        selected = "not_button")
+    }else{
+      updateTabsetPanel(inputId = "SearchButton",
+                        selected = "button")
+    }
+    }
+  )
+  
   # Downloads search results
   
-  pubmed_results <- eventReactive(req(input$search, input$keywords != ""), {
+  pubmed_results <- eventReactive(input$search, {
     # Progress bar
     withProgress(message = "Descargando sumarios desde PubMed...",
                  detail = "Espere, por favor...",
@@ -164,7 +196,8 @@ incProgress(15/15)
   
   # Table of pmid plus title
   output$titulos <- DT::renderDataTable({
-    validate(need(input$keywords != "", message = "POR FAVOR, INTRODUZCA LAS PALABRAS CLAVE DE SU INTERÉS" ))
+    # Display error message when input is wrong
+    validate(need(input$SearchButton == "button", message = query() ))
     corpus <- pubmed_results()
     # Table content
     tabla_titulos <- data.frame(corpus@PMID, corpus@Journal)
