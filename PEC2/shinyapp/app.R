@@ -233,9 +233,9 @@ incProgress(15/15)
                           '<p><i>',abstractSentences[i],'</i></p>','\n')
       }
     }
-    to_print <- paste(to_print,
-                      paste0('<p><a href="https://www.ncbi.nlm.nih.gov/pubmed/',pubmed_results()@PMID[row_selected],'" target=_blank>'
-                            , 'Abrir publicación en PubMed', '</a></p>','\n'))
+    to_print <- paste(paste0('<p><a href="https://www.ncbi.nlm.nih.gov/pubmed/',pubmed_results()@PMID[row_selected],'" target=_blank>'
+                            , 'Abrir publicación en PubMed', '</a></p>','\n'),
+                      to_print)
     to_print
    })
   
