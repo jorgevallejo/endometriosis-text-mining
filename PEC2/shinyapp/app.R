@@ -67,40 +67,35 @@ ui <- fluidPage(
                  weekstart = 1, # Monday
                  language = "es",
                  separator = "hasta"),
-  # Search button
-  # tabsetPanel(
-  #   id = "Search button",
-  #   type = "hidden",
-  #   tabPanelBody(value = "button",
-  #                actionButton("search", "Buscar en PubMed")),
-  #   tabPanelBody(value = "not_button",
-  #                "Búsqueda desactivada")
-  # ),
+  # Do not select by date
+  checkboxInput("check_all_dates",
+                label = " Seleccionar máximo rango de fechas",
+                value = FALSE),
   p(),
-  p(strong("Texto consulta a Pubmed")),
+  p(strong("Texto consulta a PubMed")),
   # Query text
-  verbatimTextOutput("keyw")
-    ),
-  column(8,
+  verbatimTextOutput("keyw"),
+  fluidRow(
+    column(4,
+           tabsetPanel(
+             id = "SearchButton",
+             type = "hidden",
+             tabPanelBody(value = "button",
+                          actionButton("search", "Buscar en PubMed")),
+             tabPanelBody(value = "not_button",
+                          "Búsqueda desactivada")
+           )
+    )
+  )),
+  column(8, # quiza deberia ser 6
   textOutput("n_archivos"),
   # Cites as a table
   DT::dataTableOutput("titulos"),
   # Abstract of selected cite
   htmlOutput("abstractText")
   )
-  ),
-  fluidRow(
-    column(4,
-           tabsetPanel(
-               id = "SearchButton",
-               type = "hidden",
-               tabPanelBody(value = "button",
-                            actionButton("search", "Buscar en PubMed")),
-               tabPanelBody(value = "not_button",
-                            "Búsqueda desactivada")
-             ))
-  )
-  ),
+  )),
+  
   tabPanel(title = "Frecuencia de palabras",
   fluidRow(
   # Table of words
@@ -120,6 +115,7 @@ ui <- fluidPage(
   )
     )
 )
+
 
 
 
@@ -149,6 +145,19 @@ server <- function(input, output, session){
     }
     }
   )
+  
+  # Updates date range when checkbox is ticked
+  observe({
+    if (input$check_all_dates == TRUE){
+      updateDateRangeInput(inputId = "fechas",
+                           start = "1800-01-01",
+                           end = "3000-12-31")
+    } else {
+      updateDateRangeInput(inputId = "fechas",
+                                 start = start_date,
+                                 end = Sys.Date())}
+               
+  })
   
   # Downloads search results
   
