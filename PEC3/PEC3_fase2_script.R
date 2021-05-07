@@ -192,11 +192,18 @@ for (ontology in c("BP", "CC", "MF")) {
             file= paste0("script/results/ego_", ontology, ".csv"))
   
   # Simplify redundant results
-  ego_simplified <- simplify(ego, cutoff = 0.7, by = "p.adjust", select_fun = min)
-  # Generate csv files from simplified results
-  write.csv(ego,
-            file= paste0("script/results/ego_", ontology, "_simplified.csv"))
-
+  cantidad_terminos <- length(ego@result$ID)
+  if (cantidad_terminos >= 4300) {
+    print(paste("Los resultados contienen", cantidad_terminos, "términos GO. Calcular 
+                y simplificar los términos redundantes necesita una cantidad de tiempo
+                inconfortablemente elevada y no se hará."))
+  } else {
+    ego <- simplify(ego, cutoff = 0.7, by = "p.adjust", select_fun = min)
+    # Generate csv files from simplified results
+    write.csv(ego,
+              file= paste0("script/results/ego_", ontology, "_simplified.csv"))
+  }
+  
   # Generate barplots of enrichment results
   # Terms for plot titles
   go_plot_titles <- c("BP" = "procesos biológicos",
@@ -204,7 +211,7 @@ for (ontology in c("BP", "CC", "MF")) {
                               "MF" = "funciones moleculares")
   
   # Create plot
-  barplot(height = ego_simplified,
+  barplot(height = ego,
           showCategory = 20,
           title = paste0("Términos GO enriquecidos \n(",
                          go_plot_titles[[ontology]],
