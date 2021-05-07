@@ -1,12 +1,14 @@
 library(shiny)
 library(easyPubMed)
 library(pubmed.mineR)
+library(DT)
+library(tokenizers)
 
 ### Fixed variables ###
 
 # Starting value for data range
 # Ten years (in days) before current date
-start_date <- Sys.Date() - (365.25 * 10)
+start_date <- Sys.Date() - (30)
 
 ### Custom functions ###
 
@@ -46,13 +48,16 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
 ui <- fluidPage(
   titlePanel("Endo-Mining",
              windowTitle = "Endo-Mining: minería de textos aplicada a la endometriosis"),
+  navlistPanel(
+    widths = c(2,10),
+    tabPanel(title = "Buscar en PubMed",
   fluidRow(
     column(4,
   # Enter keywords
   textInput("keywords",
             label = "Palabras clave",
             value = "endometriosis",
-            placeholder = "endometriosis"),
+            placeholder = "E.g., endometriosis"),
   # Enter date range
   dateRangeInput("fechas",
                  label = "Rango de fechas",
@@ -62,41 +67,97 @@ ui <- fluidPage(
                  weekstart = 1, # Monday
                  language = "es",
                  separator = "hasta"),
-  # textOutput("keyw"),
-  # Search button
-  actionButton("search", "Buscar en PubMed")
-    ),
-  column(8,
+  # Do not select by date
+  checkboxInput("check_all_dates",
+                label = " Seleccionar máximo rango de fechas",
+                value = FALSE),
+  p(),
+  p(strong("Texto consulta a PubMed")),
+  # Query text
+  verbatimTextOutput("keyw"),
+  fluidRow(
+    column(4,
+           tabsetPanel(
+             id = "SearchButton",
+             type = "hidden",
+             tabPanelBody(value = "button",
+                          actionButton("search", "Buscar en PubMed")),
+             tabPanelBody(value = "not_button",
+                          "Búsqueda desactivada")
+           )
+    )
+  )),
+  column(8, # quiza deberia ser 6
   textOutput("n_archivos"),
   # Cites as a table
-  tableOutput("titulos")
-  ),
+  DT::dataTableOutput("titulos"),
+  # Abstract of selected cite
+  htmlOutput("abstractText")
+  )
+  )),
+  
+  tabPanel(title = "Frecuencia de palabras",
   fluidRow(
   # Table of words
     column(6,
            plotOutput("words_barplot"),
   tableOutput("palabras")
-    ),
+    ))),
+  tabPanel(title = "Frecuencia de genes",
+           fluidRow(
   column(6,
-  
+  # Barplot of genes
   plotOutput("genes_barplot"),
+  # Table of genes
   tableOutput("genes_table")
     )
   )
   )
+    )
 )
+
+
 
 
 # App behaviour
 server <- function(input, output, session){
   # Generates text for the query
-  query <- reactive(
+  query <- reactive({
+    validate(need(input$keywords != "", message = "POR FAVOR, INTRODUZCA LAS PALABRAS CLAVE DE SU INTERÉS" ),
+             need(input$fechas[1] < input$fechas[2], message = "LA FECHA DE INICIO DEBE SER ANTERIOR A LA FECHA FINAL"))
+    
     paste(c(input$keywords, " AND " , format(input$fechas[1],"%Y/%m/%d"),":",
             format(input$fechas[2],"%Y/%m/%d"),"[dp]"), collapse="")
+  })
+  
+  # # Displays text of the query while being written
+  output$keyw <-  renderText( query() )
+  
+  # Shows or hides search button
+  # Hides when there are no keywords OR start date is bigger than finish date
+  observe({
+    if (input$keywords == "" || input$fechas[1] > input$fechas[2]) {
+      updateTabsetPanel(inputId = "SearchButton",
+                        selected = "not_button")
+    }else{
+      updateTabsetPanel(inputId = "SearchButton",
+                        selected = "button")
+    }
+    }
   )
   
-  # # Displays text of the query
-  # output$keyw <- renderText(query())
+  # Updates date range when checkbox is ticked
+  observe({
+    if (input$check_all_dates == TRUE){
+      updateDateRangeInput(inputId = "fechas",
+                           start = "1800-01-01",
+                           end = "3000-12-31")
+    } else {
+      updateDateRangeInput(inputId = "fechas",
+                                 start = start_date,
+                                 end = Sys.Date())}
+               
+  })
   
   # Downloads search results
   
@@ -143,18 +204,55 @@ incProgress(15/15)
     })
   
   # Table of pmid plus title
-  output$titulos <- renderTable({
+  output$titulos <- DT::renderDataTable({
+    # Display error message when input is wrong
+    validate(need(input$SearchButton == "button", message = query() ))
     corpus <- pubmed_results()
-    if (length(corpus@PMID) <10) {
-      citas <- length(corpus@PMID)
-    } else {
-      citas <- 10
-    }
-    
-    tabla_titulos <- data.frame(corpus@PMID[1:citas], corpus@Journal[1:citas])
+    # Table content
+    tabla_titulos <- data.frame(corpus@PMID, corpus@Journal)
     colnames(tabla_titulos) <- c("PMID", "Publicaciones")
-    tabla_titulos
-  })
+    datatable(tabla_titulos,
+              selection = list(mode = 'single', selected = 1),
+              options = list(language = list(url = 'spanish.json')))
+    })
+  
+  ## Abstract of selected pmid
+  output$abstractText <- renderText({
+    row_selected <- input$titulos_rows_selected
+    abstracts <- pubmed_results()@Abstract[row_selected]
+    abstractSentences <- tokenize_sentences(abstracts, simplify = TRUE)
+    to_print <- paste('<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', pubmed_results()@Journal[row_selected],
+              '</b></font>', '</h4></p>', '\n')
+    for (i in seq_along(abstractSentences)){
+      if (i < 3) {
+        to_print <- paste(to_print,
+          '<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', abstractSentences[i],
+          '</b></font>', '</h4></p>', '\n')
+      } else{
+        to_print <- paste(to_print,
+                          '<p><i>',abstractSentences[i],'</i></p>','\n')
+      }
+    }
+    to_print <- paste(paste0('<p><a href="https://www.ncbi.nlm.nih.gov/pubmed/',pubmed_results()@PMID[row_selected],'" target=_blank>'
+                            , 'Abrir publicación en PubMed', '</a></p>','\n'),
+                      to_print)
+    to_print
+   })
+  
+  ### Function for printing abstracts
+  # printAbstracts <- function(row_sel, abstractSent){
+  #   cat(paste('<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', pubmed_results()@Journal[row_sel],
+  #             '</b></font>', '</h4></p>'))
+    # for (i in (1:length(abstractSentences))){
+    #   if (i==1 || i==2){
+    #     cat(paste('<p><h4>','<font color=\"#4B04F6\"><b>', abstractSentences[i],'</b></font>','</h4>',
+    #               '\n','</p>'),fill = TRUE)
+    #   } else {cat(paste('<p><i>',abstractSentences[i],'</i></p>'), fill = TRUE)
+    #   }
+    #   
+    # } 
+  #}
+  
   
   ## Preprocesado del corpus primario
   # Word atomization
