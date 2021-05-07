@@ -68,7 +68,7 @@ Los objetivos planteados generales y específicos son:
 2. Desarrollar una aplicación web implementando el script de minería de textos que resultó del objetivo anterior.
 
 
-
+\newpage
 
 # Relación de las actividades realizadas
 
@@ -122,6 +122,8 @@ include_graphics("images/visualizacion_abstracts.png")
 
 ## Actividades no previstas y realizadas
 
+\newpage
+
 # Relación de las desviaciones en la temporización y acciones de mitigación si procede y actualización del cronograma si procede 
  
 ## Desviaciones
@@ -130,7 +132,11 @@ include_graphics("images/visualizacion_abstracts.png")
 
 ## Actualización del cronograma
 
+\newpage
+
 # Listado de los resultados parciales obtenidos hasta el momento (entregables que se adjuntan)
+
+\newpage
 
 # Apéndices
  
