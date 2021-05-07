@@ -68,7 +68,7 @@ Los objetivos planteados generales y específicos son:
 2. Desarrollar una aplicación web implementando el script de minería de textos que resultó del objetivo anterior.
 
 
-
+\newpage
 
 # Relación de las actividades realizadas
 
@@ -110,7 +110,19 @@ include_graphics("data/pantallas/img6.png")
 include_graphics("data/pantallas/img7.png")
 ```
 
+### Tarea 2. Página de visualización de abstracts
+
+El objetivo de esta tarea es permitir que el usuario, desde la aplicación web, pueda leer los sumarios de las citas recuperadas. Además se ofrece la posibilidad de navegar hasta la página origen de la cita en PubMed, a través de un hiperenlace.
+
+En la pantalla inicial de la aplicación los resultados de la búsqueda se muestran como una tabla interactiva. Al seleccionar el usuario cualquiera de los resultados de la tabla, se le  muestra la información contenida en el respectivo sumario maquetada de forma que la información de la publicación (título, año, etc.) aparece en letra negrita, al igual que el título del artículo, y el resto del texto del sumario en letra cursiva. También se crea de forma reactiva un hiperenlace a PubMed, donde puede consultarse la cita y, en su caso, el texto completo del artículo.
+
+```{r visualizacion_abstracts, fig.cap='Pantalla de inicio de la aplicación. Depués de introducir las palabras clave, el rango de fechas y pulsar en el botón "Buscar en PubMed" los resultados de la búsqueda se muestran en la zona derecha de la imagen. Seleccionando cualquiera de los resultados de la tabla, el texto del sumario correspondiente se muestra bajo la misma, junto a un hiperenlace para visitar la página en PubMed dedicada al artículo.'}
+include_graphics("images/visualizacion_abstracts.png")
+```
+
 ## Actividades no previstas y realizadas
+
+\newpage
 
 # Relación de las desviaciones en la temporización y acciones de mitigación si procede y actualización del cronograma si procede 
  
@@ -120,7 +132,11 @@ include_graphics("data/pantallas/img7.png")
 
 ## Actualización del cronograma
 
+\newpage
+
 # Listado de los resultados parciales obtenidos hasta el momento (entregables que se adjuntan)
+
+\newpage
 
 # Apéndices
  

@@ -1,8 +1,17 @@
 ## This document specifies current version of the web app and keeps the changelog
 
-Current version: 0.1.1
+Current version: 0.2.0
 
 == Changelog ==
+v.0.2.0 (2021/05/07)
+- Change layout to side menu and main body.
+- Display abstract of pmid selected from results table, and a hyperlink to the corresponding webpage in PubMed.
+- Display query text that is going to be sent to PubMed.
+- Prevent sending query to PubMed when input is wrong and display error messages.
+- Change start data of data range to five years before the present day.
+- Check button that updates date range input toggling it between all-inclusive dates and default (five year) dates.
+
+
 v.0.1.1 (2021/04/16)
 - Change of layout from one to two columns.
 - Added progress bars for cites retrieveing, corpus generation,
