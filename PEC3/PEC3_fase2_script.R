@@ -27,7 +27,7 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
   # Adjust width of left margin
   # https://stackoverflow.com/questions/10490763/automatic-adjustment-of-margins-in-horizontal-bar-chart
   par(mar=c(5.1, 
-            max(4.1,max(nchar(as.character(varcat)))/1.8) ,
+            max(4.3,max(nchar(as.character(varcat)))/1.8) ,
             4.1,
             2.1)
   )
@@ -190,7 +190,12 @@ for (ontology in c("BP", "CC", "MF")) {
   # Generate results as a csv file
   write.csv(ego,
             file= paste0("script/results/ego_", ontology, ".csv"))
-
+  
+  # Simplify redundant results
+  ego_simplified <- simplify(ego, cutoff = 0.7, by = "p.adjust", select_fun = min)
+  # Generate csv files from simplified results
+  write.csv(ego,
+            file= paste0("script/results/ego_", ontology, "_simplified.csv"))
 
   # Generate barplots of enrichment results
   # Terms for plot titles
@@ -199,7 +204,7 @@ for (ontology in c("BP", "CC", "MF")) {
                               "MF" = "funciones moleculares")
   
   # Create plot
-  barplot(height = ego,
+  barplot(height = ego_simplified,
           showCategory = 20,
           title = paste0("Términos GO enriquecidos \n(",
                          go_plot_titles[[ontology]],

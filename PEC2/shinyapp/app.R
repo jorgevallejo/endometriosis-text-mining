@@ -17,7 +17,7 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
   # Adjust width of left margin
   # https://stackoverflow.com/questions/10490763/automatic-adjustment-of-margins-in-horizontal-bar-chart
   par(mar=c(5.1, 
-            max(4.1,max(nchar(as.character(varcat)))/1.5) ,
+            max(4.3,max(nchar(as.character(varcat)))/1.5) ,
             4.1,
             2.1)
   )
