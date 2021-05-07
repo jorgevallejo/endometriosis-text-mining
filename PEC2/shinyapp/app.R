@@ -7,8 +7,8 @@ library(tokenizers)
 ### Fixed variables ###
 
 # Starting value for data range
-# Ten years (in days) before current date
-start_date <- Sys.Date() - (30)
+# Five years (in days) before current date
+start_date <- Sys.Date() - (5 * 365.25)
 
 ### Custom functions ###
 
