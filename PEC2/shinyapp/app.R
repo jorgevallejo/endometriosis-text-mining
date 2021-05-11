@@ -182,7 +182,9 @@ ui <- fluidPage(
                                           "Holm",
                                           "Hommel",
                                           "Benjamini & Hochberg",
-                                          "Benjamini & Yekutieli"))
+                                          "Benjamini & Yekutieli")),
+                  actionButton(inputId = "GO_button",
+                               label = "GO test")
                   ),
            column(6,
                   renderPlot(barplot(height = ego,
@@ -380,18 +382,18 @@ incProgress(15/15)
   })
   
   ## GO-over-representation test
-  ego_cc <- enrichGO(gene = entrez()$ENTREZID,
-                           universe = universe_genes(),
-                           OrgDb = org.Hs.eg.db,
-                           ont = 'CC',
-                           pAdjustMethod =,
-                           pvalueCutoff = 0.05,
-                           qvalueCutoff = 0.5,
-                           readable = FALSE)
-  
-  output$ontologyCC <- renderPlot(height = ego_CC,
-                                  showCategory = 20,
-                                  title = "Título")
+  # ego_cc <- enrichGO(gene = entrez()$ENTREZID,
+  #                          universe = universe_genes(),
+  #                          OrgDb = org.Hs.eg.db,
+  #                          ont = 'CC',
+  #                          pAdjustMethod =,
+  #                          pvalueCutoff = 0.05,
+  #                          qvalueCutoff = 0.5,
+  #                          readable = FALSE)
+  # 
+  # output$ontologyCC <- renderPlot(height = ego_CC,
+  #                                 showCategory = 20,
+  #                                 title = "Título")
   
   # # Get human genes ID from pubtator contingency table
   # universe_genes <- read.csv("PEC2/shinyapp/human_geneID_universe.csv",
