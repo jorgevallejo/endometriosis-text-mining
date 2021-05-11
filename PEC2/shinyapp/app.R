@@ -3,6 +3,8 @@ library(easyPubMed)
 library(pubmed.mineR)
 library(DT)
 library(tokenizers)
+library(org.Hs.eg.db) # GO over-representation test
+library(clusterProfiler) # GO over-representation test
 
 ### Fixed variables ###
 
@@ -44,7 +46,37 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
   )
 }
 
-# User interface
+  ## GO-over-representation test
+  # Get human genes ID from pubtator contingency table
+  universe_genes <- read.csv("human_geneID_universe.csv",
+                             header = FALSE,
+                             # Store as vector instead of dataframe
+                             colClasses = "character")[,1]
+  # Translate gene symbols to entrezId
+  # Beware: the result is a dataframe
+  # entrez <- select(org.Hs.eg.db,
+  #                  keys = genes()$Symbol,
+  #                  columns = c("SYMBOL", "ENTREZID"),
+  #                  keytype = "SYMBOL") 
+  ontology_aspect <- list("Función molecular" = "MF",
+                          "Componente celular" = "CC",
+                          "Proceso biológico" = "BP")
+  adjust_methods <- list("Bonferroni" = "bonferroni",
+                         "Holm" = "holm",
+                         "Hommel" = "hommel",
+                         "Benjamini & Hochberg" = "BH",
+                         "Benjamini & Yekutieli" = "BY")
+  # General GO overrepresentation function
+  # ego_function <- enrichGO(gene = entrez()$ENTREZID,
+  #                          universe = universe_genes(),
+  #                          OrgDb = org.Hs.eg.db,
+  #                          ont = ontology_aspect()$input$select_aspect,
+  #                          pAdjustMethod =,
+  #                          pvalueCutoff = 0.05,
+  #                          qvalueCutoff = 0.5,
+  #                          readable = FALSE)
+
+### User interface ###
 ui <- fluidPage(
   titlePanel("Endo-Mining",
              windowTitle = "Endo-Mining: minería de textos aplicada a la endometriosis"),
@@ -122,9 +154,42 @@ ui <- fluidPage(
   # Caracterización de genes
   tabPanel(title = "Caracterización de genes",
            h1("Caracterización de genes por ontología génica"),
-           column(4
+           column(4,
+                  selectInput(inputId = "select_aspect",
+                              "Aspecto funcional",
+                              choices = c("Función molecular",
+                                          "Componente celular",
+                                          "Proceso biológico")),
+                  numericInput(inputId = "go_categories",
+                               "Categorías",
+                               value = 20,
+                               step = 1),
+                  numericInput(inputId = "p_valor",
+                               "Punto de corte: P-valor",
+                               value = 0.01,
+                               max = 1,
+                               min = 0,
+                               step = 0.005),
+                  numericInput(inputId = "q_valor",
+                               "Punto de corte: Q-valor",
+                               value = 0.5,
+                               max = 1,
+                               min = 0,
+                               step = 0.05),
+                  selectInput(inputId = "metodo_ajuste",
+                              "Método de ajuste del p-valor",
+                              choices = c("Bonferroni",
+                                          "Holm",
+                                          "Hommel",
+                                          "Benjamini & Hochberg",
+                                          "Benjamini & Yekutieli"))
                   ),
-           column(6
+           column(6,
+                  renderPlot(barplot(height = ego,
+                                     showCategory = 20,
+                                     title = paste0("Términos GO enriquecidos \n(",
+                                                    go_plot_titles[[ontology]],
+                                                    ")")))
                   ))
     )
 )
@@ -252,21 +317,6 @@ incProgress(15/15)
     to_print
    })
   
-  ### Function for printing abstracts
-  # printAbstracts <- function(row_sel, abstractSent){
-  #   cat(paste('<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', pubmed_results()@Journal[row_sel],
-  #             '</b></font>', '</h4></p>'))
-    # for (i in (1:length(abstractSentences))){
-    #   if (i==1 || i==2){
-    #     cat(paste('<p><h4>','<font color=\"#4B04F6\"><b>', abstractSentences[i],'</b></font>','</h4>',
-    #               '\n','</p>'),fill = TRUE)
-    #   } else {cat(paste('<p><i>',abstractSentences[i],'</i></p>'), fill = TRUE)
-    #   }
-    #   
-    # } 
-  #}
-  
-  
   ## Preprocesado del corpus primario
   # Word atomization
   words <- reactive({
@@ -328,6 +378,32 @@ incProgress(15/15)
                  varnum = tabla_frecuencias$Frecuencia,
                  main = "Genes más frecuentes")
   })
+  
+  ## GO-over-representation test
+  ego_cc <- enrichGO(gene = entrez()$ENTREZID,
+                           universe = universe_genes(),
+                           OrgDb = org.Hs.eg.db,
+                           ont = 'CC',
+                           pAdjustMethod =,
+                           pvalueCutoff = 0.05,
+                           qvalueCutoff = 0.5,
+                           readable = FALSE)
+  
+  output$ontologyCC <- renderPlot(height = ego_CC,
+                                  showCategory = 20,
+                                  title = "Título")
+  
+  # # Get human genes ID from pubtator contingency table
+  # universe_genes <- read.csv("PEC2/shinyapp/human_geneID_universe.csv",
+  #                            header = FALSE,
+  #                            # Store as vector instead of dataframe
+  #                            colClasses = "character")[,1]
+  # # Translate gene symbols to entrezId
+  # # Beware: the result is a dataframe
+  # entrez <- select(org.Hs.eg.db,
+  #                  keys = genes()$Symbol,
+  #                  columns = c("SYMBOL", "ENTREZID"),
+  #                  keytype = "SYMBOL") 
 
 
   
