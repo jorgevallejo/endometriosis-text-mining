@@ -51,6 +51,7 @@ ui <- fluidPage(
   navlistPanel(
     widths = c(2,10),
     tabPanel(title = "Buscar en PubMed",
+             h1("Búsqueda en PubMed"),
   fluidRow(
     column(4,
   # Enter keywords
@@ -97,6 +98,7 @@ ui <- fluidPage(
   )),
   
   tabPanel(title = "Frecuencia de palabras",
+           h1("Frecuencia de palabras"),
   fluidRow(
   # Table of words
     column(6,
@@ -104,6 +106,7 @@ ui <- fluidPage(
   tableOutput("palabras")
     ))),
   tabPanel(title = "Frecuencia de genes",
+           h1("Frecuencia de genes"),
            fluidRow(
   column(6,
   # Barplot of genes
@@ -112,7 +115,17 @@ ui <- fluidPage(
   tableOutput("genes_table")
     )
   )
-  )
+  ),
+  # Gráficas de frecuencia
+  tabPanel(title = "Gráficas de frecuencia",
+           h1("Placeholder")),
+  # Caracterización de genes
+  tabPanel(title = "Caracterización de genes",
+           h1("Caracterización de genes por ontología génica"),
+           column(4
+                  ),
+           column(6
+                  ))
     )
 )
 
