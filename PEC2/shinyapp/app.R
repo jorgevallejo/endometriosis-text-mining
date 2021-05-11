@@ -187,11 +187,13 @@ ui <- fluidPage(
                                label = "GO test")
                   ),
            column(6,
-                  renderPlot(barplot(height = ego,
-                                     showCategory = 20,
-                                     title = paste0("Términos GO enriquecidos \n(",
-                                                    go_plot_titles[[ontology]],
-                                                    ")")))
+                  # GO terms as a table
+                  DT::dataTableOutput("GOterms")
+                  # renderPlot(barplot(height = ego,
+                  #                    showCategory = 20,
+                  #                    title = paste0("Términos GO enriquecidos \n(",
+                  #                                   go_plot_titles[[ontology]],
+                  #                                   ")")))
                   ))
     )
 )
@@ -382,6 +384,17 @@ incProgress(15/15)
   })
   
   ## GO-over-representation test
+  # GO enrichment analysis of the gene set
+  output$GOterms <- DT::renderDataTable({
+    validate(need(input$GO_button == 1, 'Hay que pulsar el botón'))
+    table_GO <- data.frame(c("uno", "dos"),
+                           c("prueba 1", "prueba 2"))
+    colnames(table_GO) <- c("Primero", "Segundo")
+    datatable(table_GO,
+              selection = list(mode = 'single', selected = 1),
+              options = list(language = list(url = 'spanish.json')))
+  })
+  
   # ego_cc <- enrichGO(gene = entrez()$ENTREZID,
   #                          universe = universe_genes(),
   #                          OrgDb = org.Hs.eg.db,
