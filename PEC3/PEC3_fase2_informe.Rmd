@@ -76,7 +76,7 @@ Los objetivos planteados generales y específicos son:
 
 ### Tarea 1. Definir esquema de la aplicación web
 
-El objetivo de esta tarea era tener una idea clara de la estructura que tendría la aplicación una vez finalizada; los _inputs_ necesarios, los _outputs_, los diferentes controles y una idea aproximada del aspecto final. Lo que empezó como unos garabatos en una libreta terminó convirtiéndose en una serie de diapositivas diseñadas con LibreOffice Draw que incluyo a continuación:
+El objetivo de esta tarea era tener una idea clara de la estructura que tendría la aplicación una vez finalizada; los _inputs_ necesarios, los _outputs_, los diferentes controles al alcance del usuario y una idea aproximada del aspecto final. A continuación incluyo los diseños, realizados con LibreOffice Draw, de las diferentes secciones que planeé para la aplicación web:
 
 ```{r 0 pantalla inicial, fig.cap='Pantalla inicial. Incluye los campos para entrada de palabras clave de búsqueda y rango de fechas. Muestra la cantidad de citas encontradas y una tabla con los datos de publicación de todas ellas.'}
 include_graphics("data/pantallas/img0.png")
@@ -102,7 +102,7 @@ include_graphics("data/pantallas/img4.png")
 include_graphics("data/pantallas/img5.png")
 ```
 
-```{r 6 filtro gen, fig.cap='Filtrar publicaciones por gen. El usuario podrá elegir un gen de una lista desplegable, de entre la lista de genes extraidos del corpus primario. El resultado será una selección de las citas del corpus que contienen el gen seleccionado.'}
+```{r 6 filtro gen, fig.cap='Filtrar publicaciones por gen. El usuario podrá elegir un gen de una lista desplegable, de entre la lista de genes extraídos del corpus primario. El resultado será una selección de las citas del corpus que contienen el gen seleccionado.'}
 include_graphics("data/pantallas/img6.png")
 ```
 
@@ -110,13 +110,15 @@ include_graphics("data/pantallas/img6.png")
 include_graphics("data/pantallas/img7.png")
 ```
 
+A medida que fui implementando funcionalidades, algunas opciones acabaron siendo descartadas, y se incluyeron otras al juzgar que el usuario las encontraría útiles. XXXX Completar y modificar este párrafo con ejemplos concretos sacados de la aplicación real (ej. los controles en la sección de ontología génica son más completos de previsto) XXX
+
 ### Tarea 2. Página de visualización de abstracts
 
 El objetivo de esta tarea es permitir que el usuario, desde la aplicación web, pueda leer los sumarios de las citas recuperadas. Además se ofrece la posibilidad de navegar hasta la página origen de la cita en PubMed, a través de un hiperenlace.
 
 En la pantalla inicial de la aplicación los resultados de la búsqueda se muestran como una tabla interactiva. Al seleccionar el usuario cualquiera de los resultados de la tabla, se le  muestra la información contenida en el respectivo sumario maquetada de forma que la información de la publicación (título, año, etc.) aparece en letra negrita, al igual que el título del artículo, y el resto del texto del sumario en letra cursiva. También se crea de forma reactiva un hiperenlace a PubMed, donde puede consultarse la cita y, en su caso, el texto completo del artículo.
 
-```{r visualizacion_abstracts, fig.cap='Pantalla de inicio de la aplicación. Depués de introducir las palabras clave, el rango de fechas y pulsar en el botón "Buscar en PubMed" los resultados de la búsqueda se muestran en la zona derecha de la imagen. Seleccionando cualquiera de los resultados de la tabla, el texto del sumario correspondiente se muestra bajo la misma, junto a un hiperenlace para visitar la página en PubMed dedicada al artículo.'}
+```{r visualizacion_abstracts, fig.cap='Pantalla de inicio de la aplicación. Después de introducir las palabras clave, el rango de fechas y pulsar en el botón "Buscar en PubMed" los resultados de la búsqueda se muestran en la zona derecha de la imagen. Seleccionando cualquiera de los resultados de la tabla, el texto del sumario correspondiente se muestra bajo la misma, junto a un hiperenlace para visitar la página en PubMed dedicada al artículo.'}
 include_graphics("images/visualizacion_abstracts.png")
 ```
 
@@ -142,7 +144,7 @@ include_graphics("images/visualizacion_abstracts.png")
  
 ## Apéndice A: Código
 
-El documento original en formato .Rmd que incluye el código completo en lenguaje R usado para generar este informe (fichero `PEC3_fase2_informe.Rmd`), se puede consultar y descargar en el siguiente repositorio de Github:
+El documento original en formato .Rmd que incluye el código completo en lenguaje R usado para generar este informe (fichero `PEC3_fase2_informe.Rmd`), se puede consultar y descargar desde el siguiente repositorio en Github:
 [jorgevallejo/endometriosis-text-mining](https://github.com/jorgevallejo/endometriosis-text-mining/tree/master/PEC2)
 
 ## Apéndice B: Reproducibilidad {#apendiceB}
