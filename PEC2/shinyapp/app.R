@@ -3,6 +3,8 @@ library(easyPubMed)
 library(pubmed.mineR)
 library(DT)
 library(tokenizers)
+library(BiocManager) # Necessary for building clusterProfiler into the app
+options(repos = BiocManager::repositories()) # Necessary for building clusterProfiler into the app
 library(org.Hs.eg.db) # GO over-representation test
 library(clusterProfiler) # GO over-representation test
 
