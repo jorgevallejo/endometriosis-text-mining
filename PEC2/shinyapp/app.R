@@ -185,7 +185,9 @@ ui <- fluidPage(
                   ),
            column(6,
                   # GO terms as a table
-                  DT::dataTableOutput("GOterms")
+                  DT::dataTableOutput("GOterms"),
+                  # Hyperlink to AmiGO website
+                  htmlOutput("GO_link")
                   # renderPlot(barplot(height = ego,
                   #                    showCategory = 20,
                   #                    title = paste0("Términos GO enriquecidos \n(",
@@ -403,8 +405,6 @@ incProgress(15/15)
   # GO terms table
   output$GOterms <- DT::renderDataTable({
     validate(need(input$GO_button == 1, 'Hay que pulsar el botón'))
-    
-    # colnames(table_GO) <- c("GO_ID")
     datatable(ego_cc(),
               rownames = FALSE,
               colnames = c("GO_ID", "Descripción", "GeneRatio", "BgRatio", "p-valor ajustado"),
@@ -415,27 +415,13 @@ incProgress(15/15)
   })
   
   ## Hyperlink for GO term
-  # output$GO_link <- renderText({
-  #   row_selected <- input$GOterms_rows_selected
-  #   abstracts <- pubmed_results()@Abstract[row_selected]
-  #   abstractSentences <- tokenize_sentences(abstracts, simplify = TRUE)
-  #   to_print <- paste('<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', pubmed_results()@Journal[row_selected],
-  #                     '</b></font>', '</h4></p>', '\n')
-  #   for (i in seq_along(abstractSentences)){
-  #     if (i < 3) {
-  #       to_print <- paste(to_print,
-  #                         '<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', abstractSentences[i],
-  #                         '</b></font>', '</h4></p>', '\n')
-  #     } else{
-  #       to_print <- paste(to_print,
-  #                         '<p><i>',abstractSentences[i],'</i></p>','\n')
-  #     }
-  #   }
-  #   to_print <- paste(paste0('<p><a href="https://www.ncbi.nlm.nih.gov/pubmed/',pubmed_results()@PMID[row_selected],'" target=_blank>'
-  #                            , 'Abrir publicación en PubMed', '</a></p>','\n'),
-  #                     to_print)
-  #   to_print
-  # })
+  output$GO_link <- renderText({
+    row_selected <- input$GOterms_rows_selected
+    # Build hyperlink
+    paste0('<br /><br /><p><a href="http://amigo.geneontology.org/amigo/term/', ego_cc()[row_selected,"ID"],'" target=_blank>',
+           'Abrir enlace a la página de información del término ', ego_cc()[row_selected,"ID"],
+           ' (', ego_cc()[row_selected,"Description"],') en AmiGO', '</a></p>','\n')
+  })
   
   
   # 
