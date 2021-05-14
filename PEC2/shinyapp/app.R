@@ -54,12 +54,7 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
                              header = FALSE,
                              # Store as vector instead of dataframe
                              colClasses = "character")[,1]
-  # Translate gene symbols to entrezId
-  # Beware: the result is a dataframe
-  # entrez <- select(org.Hs.eg.db,
-  #                  keys = genes()$Symbol,
-  #                  columns = c("SYMBOL", "ENTREZID"),
-  #                  keytype = "SYMBOL") 
+  
   ontology_aspect <- list("Función molecular" = "MF",
                           "Componente celular" = "CC",
                           "Proceso biológico" = "BP")
@@ -362,7 +357,7 @@ incProgress(15/15)
     # Codify frequency of genes as numeric
     genes_table <- data.frame(genes_data,
                               stringsAsFactors = FALSE)
-    colnames(genes_table) <- c("Symbol", "Nombre", "Frecuencia")
+    colnames(genes_table) <- c("Símbolo", "Nombre", "Frecuencia")
     genes_table$Frecuencia <- as.integer(genes_table$Frecuencia)
     incProgress(2/2)
                  })
@@ -387,24 +382,43 @@ incProgress(15/15)
   
   ## GO-over-representation test
   # GO enrichment analysis of the gene set
+  ego_cc <- reactive({
+    load(file = "../intermediateData/genes.RData") # Temporal
+    keys <- genes[, "Gene_symbol"]
+    entrezID <- select(org.Hs.eg.db,
+                       keys = keys,
+                       columns = c("SYMBOL", "ENTREZID"),
+                       keytype = "SYMBOL")
+    enrichGO(gene = entrezID[,"ENTREZID"],
+                           universe = universe_genes,
+                           OrgDb = org.Hs.eg.db,
+                           ont = 'CC',
+                           pAdjustMethod ='bonferroni',
+                           pvalueCutoff = 0.05,
+                           qvalueCutoff = 0.5,
+                           readable = FALSE)
+  })
+  
+  # GO terms table
   output$GOterms <- DT::renderDataTable({
     validate(need(input$GO_button == 1, 'Hay que pulsar el botón'))
-    table_GO <- data.frame(c("uno", "dos"),
-                           c("prueba 1", "prueba 2"))
-    colnames(table_GO) <- c("Primero", "Segundo")
+    # Translate gene symbols to entrezId
+    # Beware: the result is a dataframe
+    # keys <- genes()[, "Símbolo"]
+    # load(file = "../intermediateData/genes.RData") # Temporal
+    # keys <- genes[, "Gene_symbol"]
+    # entrezID <- select(org.Hs.eg.db,
+    #                    keys = keys,
+    #                    columns = c("SYMBOL", "ENTREZID"),
+    #                    keytype = "SYMBOL")
+    table_GO <- ego_cc()@result[, c("ID", "Description", "GeneRatio", "BgRatio", "p.adjust", "Count")]
+    # colnames(table_GO) <- c("GO_ID")
     datatable(table_GO,
               selection = list(mode = 'single', selected = 1),
               options = list(language = list(url = 'spanish.json')))
   })
   
-  # ego_cc <- enrichGO(gene = entrez()$ENTREZID,
-  #                          universe = universe_genes(),
-  #                          OrgDb = org.Hs.eg.db,
-  #                          ont = 'CC',
-  #                          pAdjustMethod =,
-  #                          pvalueCutoff = 0.05,
-  #                          qvalueCutoff = 0.5,
-  #                          readable = FALSE)
+  
   # 
   # output$ontologyCC <- renderPlot(height = ego_CC,
   #                                 showCategory = 20,
