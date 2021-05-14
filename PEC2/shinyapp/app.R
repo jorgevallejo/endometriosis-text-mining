@@ -402,20 +402,15 @@ incProgress(15/15)
   # GO terms table
   output$GOterms <- DT::renderDataTable({
     validate(need(input$GO_button == 1, 'Hay que pulsar el botón'))
-    # Translate gene symbols to entrezId
-    # Beware: the result is a dataframe
-    # keys <- genes()[, "Símbolo"]
-    # load(file = "../intermediateData/genes.RData") # Temporal
-    # keys <- genes[, "Gene_symbol"]
-    # entrezID <- select(org.Hs.eg.db,
-    #                    keys = keys,
-    #                    columns = c("SYMBOL", "ENTREZID"),
-    #                    keytype = "SYMBOL")
-    table_GO <- ego_cc()@result[, c("ID", "Description", "GeneRatio", "BgRatio", "p.adjust", "Count")]
+    table_GO <- as.data.frame(ego_cc()[, c("ID", "Description", "GeneRatio", "BgRatio", "p.adjust")])
     # colnames(table_GO) <- c("GO_ID")
     datatable(table_GO,
+              rownames = FALSE,
+              colnames = c("GO_ID", "Descripción", "GeneRatio", "BgRatio", "p-valor ajustado"),
               selection = list(mode = 'single', selected = 1),
-              options = list(language = list(url = 'spanish.json')))
+              options = list(language = list(url = 'spanish.json'))) %>%
+      formatSignif('p.adjust', 2) %>%  # Significative digits for p.adjust column
+      formatStyle(columns = c("GeneRatio", "BgRatio", "p.adjust"), `text-align` = 'center') # Center columns
   })
   
   
