@@ -389,7 +389,7 @@ incProgress(15/15)
                        keys = keys,
                        columns = c("SYMBOL", "ENTREZID"),
                        keytype = "SYMBOL")
-    enrichGO(gene = entrezID[,"ENTREZID"],
+    ego <- enrichGO(gene = entrezID[,"ENTREZID"],
                            universe = universe_genes,
                            OrgDb = org.Hs.eg.db,
                            ont = 'CC',
@@ -397,14 +397,15 @@ incProgress(15/15)
                            pvalueCutoff = 0.05,
                            qvalueCutoff = 0.5,
                            readable = FALSE)
+    table_GO <- as.data.frame(ego[, c("ID", "Description", "GeneRatio", "BgRatio", "p.adjust")])
   })
   
   # GO terms table
   output$GOterms <- DT::renderDataTable({
     validate(need(input$GO_button == 1, 'Hay que pulsar el botón'))
-    table_GO <- as.data.frame(ego_cc()[, c("ID", "Description", "GeneRatio", "BgRatio", "p.adjust")])
+    
     # colnames(table_GO) <- c("GO_ID")
-    datatable(table_GO,
+    datatable(ego_cc(),
               rownames = FALSE,
               colnames = c("GO_ID", "Descripción", "GeneRatio", "BgRatio", "p-valor ajustado"),
               selection = list(mode = 'single', selected = 1),
@@ -412,6 +413,29 @@ incProgress(15/15)
       formatSignif('p.adjust', 2) %>%  # Significative digits for p.adjust column
       formatStyle(columns = c("GeneRatio", "BgRatio", "p.adjust"), `text-align` = 'center') # Center columns
   })
+  
+  ## Hyperlink for GO term
+  # output$GO_link <- renderText({
+  #   row_selected <- input$GOterms_rows_selected
+  #   abstracts <- pubmed_results()@Abstract[row_selected]
+  #   abstractSentences <- tokenize_sentences(abstracts, simplify = TRUE)
+  #   to_print <- paste('<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', pubmed_results()@Journal[row_selected],
+  #                     '</b></font>', '</h4></p>', '\n')
+  #   for (i in seq_along(abstractSentences)){
+  #     if (i < 3) {
+  #       to_print <- paste(to_print,
+  #                         '<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', abstractSentences[i],
+  #                         '</b></font>', '</h4></p>', '\n')
+  #     } else{
+  #       to_print <- paste(to_print,
+  #                         '<p><i>',abstractSentences[i],'</i></p>','\n')
+  #     }
+  #   }
+  #   to_print <- paste(paste0('<p><a href="https://www.ncbi.nlm.nih.gov/pubmed/',pubmed_results()@PMID[row_selected],'" target=_blank>'
+  #                            , 'Abrir publicación en PubMed', '</a></p>','\n'),
+  #                     to_print)
+  #   to_print
+  # })
   
   
   # 
