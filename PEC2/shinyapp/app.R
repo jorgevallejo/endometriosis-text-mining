@@ -64,8 +64,8 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
                          "Benjamini & Hochberg" = "BH",
                          "Benjamini & Yekutieli" = "BY")
   # General GO overrepresentation function
-  ego_function <- function(ontology, padjust, pvalue, qvalue) {
-    enrichGO(gene = entrezID[, "ENTREZID"],
+  ego_function <- function(genes, ontology, padjust, pvalue, qvalue) {
+    enrichGO(gene = genes,
                            universe = universe_genes,
                            OrgDb = org.Hs.eg.db,
                            ont = ontology,
@@ -156,9 +156,9 @@ ui <- fluidPage(
            column(4,
                   selectInput(inputId = "select_aspect",
                               "Aspecto funcional",
-                              choices = c("Función molecular",
-                                          "Componente celular",
-                                          "Proceso biológico")),
+                              choices = c("Componente celular",
+                                          "Proceso biológico",
+                                          "Función molecular")),
                   numericInput(inputId = "go_categories",
                                "Categorías",
                                value = 20,
@@ -390,31 +390,76 @@ incProgress(15/15)
   
   ## GO-over-representation test
   # GO enrichment analysis of the gene set
-  ego_cc <- eventReactive(
+  # Configure sample genes as entrezID
+  keys <- eventReactive(input$GO_button, {
+    load(file = "../intermediateData/genes.RData") # Temporal
+    genes[, "Gene_symbol"]
+  })
+  entrezID <- eventReactive(input$GO_button, {
+    entrez <- select(org.Hs.eg.db,
+           keys = keys(),
+           columns = c("SYMBOL", "ENTREZID"),
+           keytype = "SYMBOL")
+    entrez[, "ENTREZID"]
+  })
+  # Compute enrichResult objects of each ontology aspect
+  ego_cc <- eventReactive(input$GO_button,{
+    req(input$select_aspect == 'Componente celular')
+    ego_function( genes = entrezID(),
+                  ontology = 'CC',
+                   padjust = adjust_methods[[input$metodo_ajuste]],
+                   pvalue = input$p_valor,
+                   qvalue = input$q_valor)
+  })
+  
+  ego_bp <- eventReactive(input$GO_button,{
+    req(input$select_aspect == 'Proceso biológico')
+    ego_function( genes = entrezID(),
+                  ontology = 'BP',
+                  padjust = adjust_methods[[input$metodo_ajuste]],
+                  pvalue = input$p_valor,
+                  qvalue = input$q_valor)
+  })
+  
+  ego_mf <- eventReactive(input$GO_button,{
+    req(input$select_aspect == 'Función molecular')
+    ego_function( genes = entrezID(),
+                  ontology = 'MF',
+                  padjust = adjust_methods[[input$metodo_ajuste]],
+                  pvalue = input$p_valor,
+                  qvalue = input$q_valor)
+  })
+  
+  # Compose data frame from eGO results
+  ego_table <- eventReactive(
     input$GO_button, {
     withProgress(message = "Computing enriched GO terms", { 
-    load(file = "../intermediateData/genes.RData") # Temporal
+      if (input$select_aspect == 'Componente celular') {
+        ego_object <- ego_cc()
+      } else if (input$select_aspect == 'Proceso biológico') {
+        ego_object <- ego_bp()
+      } else if (input$select_aspect == 'Función molecular') {
+        ego_object <- ego_mf()
+      }
+    # load(file = "../intermediateData/genes.RData") # Temporal
       incProgress(1/5)
-    keys <- genes[, "Gene_symbol"]
+    # keys <- genes[, "Gene_symbol"]
     incProgress(2/5)
-    entrezID <- select(org.Hs.eg.db,
-                       keys = keys,
-                       columns = c("SYMBOL", "ENTREZID"),
-                       keytype = "SYMBOL")
+    # entrezID <- select(org.Hs.eg.db,
+    #                    keys = keys,
+    #                    columns = c("SYMBOL", "ENTREZID"),
+    #                    keytype = "SYMBOL")
     incProgress(3/5)
-    ego <- ego_function(   ontology = 'CC',
-                           padjust = adjust_methods[[input$metodo_ajuste]],
-                           pvalue = input$p_valor,
-                           qvalue = input$q_valor)
+    
     incProgress(4/5)
-    table_GO <- as.data.frame(ego[, c("ID", "Description", "GeneRatio", "BgRatio", "p.adjust")])
+    as.data.frame(ego_object[, c("ID", "Description", "GeneRatio", "BgRatio", "p.adjust")])
     })
   })
   
   # GO terms table
   output$GOterms <- DT::renderDataTable({
     # validate(need(input$GO_button == 1, 'Hay que pulsar el botón'))
-    datatable(ego_cc(),
+    datatable(ego_table(),
               rownames = FALSE,
               colnames = c("GO_ID", "Descripción", "GeneRatio", "BgRatio", "p-valor ajustado"),
               selection = list(mode = 'single', selected = 1),
@@ -425,18 +470,18 @@ incProgress(15/15)
   
   ## Hyperlink for GO term
   output$GO_link <- renderText({
-    req(ego_cc())
+    req(ego_table())
     row_selected <- input$GOterms_rows_selected
     # Build hyperlink
-    paste0('<br /><br /><p><a href="http://amigo.geneontology.org/amigo/term/', ego_cc()[row_selected,"ID"],'" target=_blank>',
-           'Abrir enlace a la página de información del término ', ego_cc()[row_selected,"ID"],
-           ' (', ego_cc()[row_selected,"Description"],') en AmiGO', '</a></p>','\n')
+    paste0('<br /><br /><p><a href="http://amigo.geneontology.org/amigo/term/', ego_table()[row_selected,"ID"],'" target=_blank>',
+           'Abrir enlace a la página de información del término ', ego_table()[row_selected,"ID"],
+           ' (', ego_table()[row_selected,"Description"],') en AmiGO', '</a></p>','\n')
   })
   
   ## Prepare GO data for download
   
   output$GO_download_ui <- renderUI({
-    req(ego_cc())
+    req(ego_table())
     downloadButton("GO_download",
                    label = "Descargar como archivo .csv")
   })
@@ -446,7 +491,7 @@ incProgress(15/15)
       paste0(query(),'enrichedGOterms.csv')
     },
     content = function(file) {
-      write.csv(ego_cc(),
+      write.csv(ego_table(),
                 file = file,
                 row.names = FALSE)
     }
