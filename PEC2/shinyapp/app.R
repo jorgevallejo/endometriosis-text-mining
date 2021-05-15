@@ -385,6 +385,7 @@ incProgress(15/15)
   ## GO-over-representation test
   # GO enrichment analysis of the gene set
   ego_cc <- reactive({
+    input$GO_button
     load(file = "../intermediateData/genes.RData") # Temporal
     keys <- genes[, "Gene_symbol"]
     entrezID <- select(org.Hs.eg.db,
@@ -416,6 +417,7 @@ incProgress(15/15)
   
   ## Hyperlink for GO term
   output$GO_link <- renderText({
+    validate(need(input$GO_button == 1, ""))
     row_selected <- input$GOterms_rows_selected
     # Build hyperlink
     paste0('<br /><br /><p><a href="http://amigo.geneontology.org/amigo/term/', ego_cc()[row_selected,"ID"],'" target=_blank>',
