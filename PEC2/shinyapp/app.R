@@ -64,14 +64,16 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
                          "Benjamini & Hochberg" = "BH",
                          "Benjamini & Yekutieli" = "BY")
   # General GO overrepresentation function
-  # ego_function <- enrichGO(gene = entrez()$ENTREZID,
-  #                          universe = universe_genes(),
-  #                          OrgDb = org.Hs.eg.db,
-  #                          ont = ontology_aspect()$input$select_aspect,
-  #                          pAdjustMethod =,
-  #                          pvalueCutoff = 0.05,
-  #                          qvalueCutoff = 0.5,
-  #                          readable = FALSE)
+  ego_function <- function(ontology, padjust, pvalue, qvalue) {
+    enrichGO(gene = entrezID[, "ENTREZID"],
+                           universe = universe_genes,
+                           OrgDb = org.Hs.eg.db,
+                           ont = ontology,
+                           pAdjustMethod = padjust,
+                           pvalueCutoff = pvalue,
+                           qvalueCutoff = qvalue,
+                           readable = FALSE)
+  }
 
 ### User interface ###
 ui <- fluidPage(
@@ -186,8 +188,12 @@ ui <- fluidPage(
            column(6,
                   # GO terms as a table
                   DT::dataTableOutput("GOterms"),
+                  # Download button
+                  uiOutput("GO_download_ui"),
                   # Hyperlink to AmiGO website
                   htmlOutput("GO_link")
+                  
+                  
                   # renderPlot(barplot(height = ego,
                   #                    showCategory = 20,
                   #                    title = paste0("Términos GO enriquecidos \n(",
@@ -384,8 +390,8 @@ incProgress(15/15)
   
   ## GO-over-representation test
   # GO enrichment analysis of the gene set
-  ego_cc <- reactive({
-    input$GO_button
+  ego_cc <- eventReactive(
+    input$GO_button, {
     withProgress(message = "Computing enriched GO terms", { 
     load(file = "../intermediateData/genes.RData") # Temporal
       incProgress(1/5)
@@ -396,14 +402,10 @@ incProgress(15/15)
                        columns = c("SYMBOL", "ENTREZID"),
                        keytype = "SYMBOL")
     incProgress(3/5)
-    ego <- enrichGO(gene = entrezID[,"ENTREZID"],
-                           universe = universe_genes,
-                           OrgDb = org.Hs.eg.db,
-                           ont = 'CC',
-                           pAdjustMethod ='bonferroni',
-                           pvalueCutoff = 0.05,
-                           qvalueCutoff = 0.5,
-                           readable = FALSE)
+    ego <- ego_function(   ontology = 'CC',
+                           padjust = adjust_methods[[input$metodo_ajuste]],
+                           pvalue = input$p_valor,
+                           qvalue = input$q_valor)
     incProgress(4/5)
     table_GO <- as.data.frame(ego[, c("ID", "Description", "GeneRatio", "BgRatio", "p.adjust")])
     })
@@ -411,7 +413,7 @@ incProgress(15/15)
   
   # GO terms table
   output$GOterms <- DT::renderDataTable({
-    validate(need(input$GO_button == 1, 'Hay que pulsar el botón'))
+    # validate(need(input$GO_button == 1, 'Hay que pulsar el botón'))
     datatable(ego_cc(),
               rownames = FALSE,
               colnames = c("GO_ID", "Descripción", "GeneRatio", "BgRatio", "p-valor ajustado"),
@@ -423,13 +425,32 @@ incProgress(15/15)
   
   ## Hyperlink for GO term
   output$GO_link <- renderText({
-    validate(need(input$GO_button == 1, ""))
+    req(ego_cc())
     row_selected <- input$GOterms_rows_selected
     # Build hyperlink
     paste0('<br /><br /><p><a href="http://amigo.geneontology.org/amigo/term/', ego_cc()[row_selected,"ID"],'" target=_blank>',
            'Abrir enlace a la página de información del término ', ego_cc()[row_selected,"ID"],
            ' (', ego_cc()[row_selected,"Description"],') en AmiGO', '</a></p>','\n')
   })
+  
+  ## Prepare GO data for download
+  
+  output$GO_download_ui <- renderUI({
+    req(ego_cc())
+    downloadButton("GO_download",
+                   label = "Descargar como archivo .csv")
+  })
+    
+    output$GO_download <- downloadHandler(
+    filename = function() {
+      paste0(query(),'enrichedGOterms.csv')
+    },
+    content = function(file) {
+      write.csv(ego_cc(),
+                file = file,
+                row.names = FALSE)
+    }
+  )
   
   
   # 
