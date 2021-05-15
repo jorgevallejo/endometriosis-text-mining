@@ -386,12 +386,16 @@ incProgress(15/15)
   # GO enrichment analysis of the gene set
   ego_cc <- reactive({
     input$GO_button
+    withProgress(message = "Computing enriched GO terms", { 
     load(file = "../intermediateData/genes.RData") # Temporal
+      incProgress(1/5)
     keys <- genes[, "Gene_symbol"]
+    incProgress(2/5)
     entrezID <- select(org.Hs.eg.db,
                        keys = keys,
                        columns = c("SYMBOL", "ENTREZID"),
                        keytype = "SYMBOL")
+    incProgress(3/5)
     ego <- enrichGO(gene = entrezID[,"ENTREZID"],
                            universe = universe_genes,
                            OrgDb = org.Hs.eg.db,
@@ -400,7 +404,9 @@ incProgress(15/15)
                            pvalueCutoff = 0.05,
                            qvalueCutoff = 0.5,
                            readable = FALSE)
+    incProgress(4/5)
     table_GO <- as.data.frame(ego[, c("ID", "Description", "GeneRatio", "BgRatio", "p.adjust")])
+    })
   })
   
   # GO terms table
