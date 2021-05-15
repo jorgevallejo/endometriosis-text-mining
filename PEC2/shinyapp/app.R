@@ -391,11 +391,11 @@ incProgress(15/15)
   ## GO-over-representation test
   # GO enrichment analysis of the gene set
   # Configure sample genes as entrezID
-  keys <- eventReactive(input$GO_button, {
+  keys <- reactive({
     load(file = "../intermediateData/genes.RData") # Temporal
     genes[, "Gene_symbol"]
   })
-  entrezID <- eventReactive(input$GO_button, {
+  entrezID <- reactive({
     entrez <- select(org.Hs.eg.db,
            keys = keys(),
            columns = c("SYMBOL", "ENTREZID"),
@@ -441,17 +441,8 @@ incProgress(15/15)
       } else if (input$select_aspect == 'Función molecular') {
         ego_object <- ego_mf()
       }
-    # load(file = "../intermediateData/genes.RData") # Temporal
-      incProgress(1/5)
-    # keys <- genes[, "Gene_symbol"]
-    incProgress(2/5)
-    # entrezID <- select(org.Hs.eg.db,
-    #                    keys = keys,
-    #                    columns = c("SYMBOL", "ENTREZID"),
-    #                    keytype = "SYMBOL")
-    incProgress(3/5)
     
-    incProgress(4/5)
+    incProgress(1/2)
     as.data.frame(ego_object[, c("ID", "Description", "GeneRatio", "BgRatio", "p.adjust")])
     })
   })
