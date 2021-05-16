@@ -154,6 +154,10 @@ ui <- fluidPage(
   tabPanel(title = "Caracterización de genes",
            h1("Caracterización de genes por ontología génica"),
            column(4,
+                  selectInput(inputId = "select_display",
+                              "Mostrar resultados como",
+                              choices = c("Tabla",
+                                          "Gráfico de barras")),
                   selectInput(inputId = "select_aspect",
                               "Aspecto funcional",
                               choices = c("Componente celular",
@@ -186,19 +190,34 @@ ui <- fluidPage(
                                label = "GO test")
                   ),
            column(6,
-                  # GO terms as a table
-                  DT::dataTableOutput("GOterms"),
-                  # Download button
-                  uiOutput("GO_download_ui"),
-                  # Hyperlink to AmiGO website
-                  htmlOutput("GO_link")
+                  # Optional UI with tabsets
+                  # Will display results as table or as barplot
+                  # according to user selection.
+                  tabsetPanel(
+                    id = 'tabla_grafico',
+                    type = 'hidden',
+                    tabPanelBody(
+                      "Tabla",
+                      # GO terms as a table
+                      DT::dataTableOutput("GOterms"),
+                      # Download button
+                      uiOutput("GO_download_ui"),
+                      # Hyperlink to AmiGO website
+                      htmlOutput("GO_link")
+                    ),
+                    tabPanelBody("Gráfico de barras",
+                                 "Aquí va un gráfico de barras"
+                                 # renderPlot(barplot(height = ego,
+                                 #                    showCategory = 20,
+                                 #                    title = paste0("Términos GO enriquecidos \n(",
+                                 #                                   go_plot_titles[[ontology]],
+                                 #                                   ")")))
+                                 )
+                  )
                   
                   
-                  # renderPlot(barplot(height = ego,
-                  #                    showCategory = 20,
-                  #                    title = paste0("Términos GO enriquecidos \n(",
-                  #                                   go_plot_titles[[ontology]],
-                  #                                   ")")))
+                  
+                  
                   ))
     )
 )
@@ -447,9 +466,15 @@ incProgress(15/15)
     })
   })
   
+  # Display results in table or barplot
+  observeEvent(input$select_display, {
+    updateTabsetPanel(
+      inputId = "tabla_grafico",
+      selected = input$select_display)
+  })
+  
   # GO terms table
   output$GOterms <- DT::renderDataTable({
-    # validate(need(input$GO_button == 1, 'Hay que pulsar el botón'))
     datatable(ego_table(),
               rownames = FALSE,
               colnames = c("GO_ID", "Descripción", "GeneRatio", "BgRatio", "p-valor ajustado"),
@@ -470,7 +495,6 @@ incProgress(15/15)
   })
   
   ## Prepare GO data for download
-  
   output$GO_download_ui <- renderUI({
     req(ego_table())
     downloadButton("GO_download",
