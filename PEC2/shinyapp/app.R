@@ -450,18 +450,21 @@ incProgress(15/15)
   # Selected ego results
   ego_object <- reactive(
         if (input$select_aspect == 'Componente celular') {
-          ego_cc()
+          withProgress(message = "Calculando términos GO enriquecidos \npara componentes celulares",
+          ego_cc())
         } else if (input$select_aspect == 'Proceso biológico') {
-        ego_bp()
+          withProgress(message = "Calculando términos GO enriquecidos \npara procesos biológicos",
+        ego_bp())
         } else if (input$select_aspect == 'Función molecular') {
-        ego_mf()
+          withProgress(message = "Calculando términos GO enriquecidos \npara funciones moleculares",
+        ego_mf())
         }
     )
   
   # Compose data frame from eGO results
   ego_table <- eventReactive(
     input$GO_button, {
-      withProgress(message = "Computing enriched GO terms", {
+      # withProgress(message = "Computing enriched GO terms", {
     #     if (input$select_aspect == 'Componente celular') {
     #       ego_object <- ego_cc()
     #     } else if (input$select_aspect == 'Proceso biológico') {
@@ -470,11 +473,11 @@ incProgress(15/15)
     #       ego_object <- ego_mf()
     #     }
         
-        incProgress(1/2)
+        # incProgress(1/2)
         
         
         as.data.frame(ego_object()[, c("ID", "Description", "GeneRatio", "BgRatio", "p.adjust")])
-      })
+      # })
     })
   
   # Display results in table or barplot
