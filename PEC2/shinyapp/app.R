@@ -158,15 +158,15 @@ ui <- fluidPage(
                               "Mostrar resultados como",
                               choices = c("Tabla",
                                           "Gráfico de barras")),
+                  numericInput(inputId = "go_categories",
+                               "Categorías mostradas",
+                               value = 20,
+                               step = 1),
                   selectInput(inputId = "select_aspect",
                               "Aspecto funcional",
                               choices = c("Componente celular",
                                           "Proceso biológico",
                                           "Función molecular")),
-                  numericInput(inputId = "go_categories",
-                               "Categorías",
-                               value = 20,
-                               step = 1),
                   numericInput(inputId = "p_valor",
                                "Punto de corte: P-valor",
                                value = 0.01,
@@ -206,12 +206,9 @@ ui <- fluidPage(
                       htmlOutput("GO_link")
                     ),
                     tabPanelBody("Gráfico de barras",
-                                 "Aquí va un gráfico de barras"
-                                 # renderPlot(barplot(height = ego,
-                                 #                    showCategory = 20,
-                                 #                    title = paste0("Términos GO enriquecidos \n(",
-                                 #                                   go_plot_titles[[ontology]],
-                                 #                                   ")")))
+                                 plotOutput(outputId = "GO_barplot"
+                                            )
+                                 
                                  )
                   )
                   
@@ -511,6 +508,17 @@ incProgress(15/15)
                 row.names = FALSE)
     }
   )
+    
+    output$GO_barplot <- renderPlot(barplot(height = ego_cc(),
+                         showCategory = input$go_categories,
+                         title = paste0("Términos GO enriquecidos \n(",
+                                        input$select_aspect,
+                                        ")")),
+                         # Barplot size enough to display all chosen categories
+                         height = reactive(
+                           max(400, input$go_categories * 20)),
+                         res = 96,
+                         alt = 'Gráfica de barras')
   
   
   # 
