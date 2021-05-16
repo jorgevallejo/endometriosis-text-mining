@@ -446,22 +446,35 @@ incProgress(15/15)
                   qvalue = input$q_valor)
   })
   
+  # Selected ego results
+  ego_object <- reactive(
+        if (input$select_aspect == 'Componente celular') {
+          ego_cc()
+        } else if (input$select_aspect == 'Proceso biológico') {
+        ego_bp()
+        } else if (input$select_aspect == 'Función molecular') {
+        ego_mf()
+        }
+    )
+  
   # Compose data frame from eGO results
   ego_table <- eventReactive(
     input$GO_button, {
-    withProgress(message = "Computing enriched GO terms", { 
-      if (input$select_aspect == 'Componente celular') {
-        ego_object <- ego_cc()
-      } else if (input$select_aspect == 'Proceso biológico') {
-        ego_object <- ego_bp()
-      } else if (input$select_aspect == 'Función molecular') {
-        ego_object <- ego_mf()
-      }
-    
-    incProgress(1/2)
-    as.data.frame(ego_object[, c("ID", "Description", "GeneRatio", "BgRatio", "p.adjust")])
+      withProgress(message = "Computing enriched GO terms", {
+    #     if (input$select_aspect == 'Componente celular') {
+    #       ego_object <- ego_cc()
+    #     } else if (input$select_aspect == 'Proceso biológico') {
+    #       ego_object <- ego_bp()
+    #     } else if (input$select_aspect == 'Función molecular') {
+    #       ego_object <- ego_mf()
+    #     }
+        
+        incProgress(1/2)
+        
+        
+        as.data.frame(ego_object()[, c("ID", "Description", "GeneRatio", "BgRatio", "p.adjust")])
+      })
     })
-  })
   
   # Display results in table or barplot
   observeEvent(input$select_display, {
@@ -509,7 +522,7 @@ incProgress(15/15)
     }
   )
     
-    output$GO_barplot <- renderPlot(barplot(height = ego_cc(),
+    output$GO_barplot <- renderPlot(barplot(height = ego_object(),
                          showCategory = input$go_categories,
                          title = paste0("Términos GO enriquecidos \n(",
                                         input$select_aspect,
