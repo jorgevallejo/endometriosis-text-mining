@@ -7,6 +7,7 @@ library(BiocManager) # Necessary for building clusterProfiler into the app
 options(repos = BiocManager::repositories()) # Necessary for building clusterProfiler into the app
 library(org.Hs.eg.db) # GO over-representation test
 library(clusterProfiler) # GO over-representation test
+library(ggplot2) # For putting xlabel in GO enrichment barplot
 
 ### Fixed variables ###
 
@@ -526,8 +527,8 @@ incProgress(15/15)
                          showCategory = input$go_categories,
                          title = paste0("Términos GO enriquecidos \n(",
                                         input$select_aspect,
-                                        ")")),
-                         # Barplot size enough to display all chosen categories
+                                        ")")) + labs(y = "Número de genes en cada categoría"),
+                         # Plot size enough to display all chosen categories
                          height = reactive(
                            max(400, input$go_categories * 20)),
                          res = 96,
