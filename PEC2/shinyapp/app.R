@@ -531,13 +531,14 @@ incProgress(15/15)
    
   ### GO terms table
   output$GOterms <- DT::renderDataTable({
-      datatable(ego_terms()[[ontology()]][, c("Term", "Adjusted.P.value", "Combined.Score", "Overlap")])
-        #         rownames = FALSE,
-        #         colnames = c("GO_ID", "Descripción", "GeneRatio", "BgRatio", "p-valor ajustado"),
-        #         selection = list(mode = 'single', selected = 1),
-        #         options = list(language = list(url = 'spanish.json'))) %>%
-        # formatSignif('p.adjust', 2) %>%  # Significative digits for p.adjust column
-        # formatStyle(columns = c("GeneRatio", "BgRatio", "p.adjust"), `text-align` = 'center') # Center columns
+      datatable(ego_terms()[[ontology()]][, c("Term", "Adjusted.P.value", "Combined.Score", "Overlap")],
+                rownames = FALSE,
+                colnames = c("Término GO", "p-valor ajustado", "Puntuación combinada", "Genes coincidentes"),
+                selection = list(mode = 'single', selected = 1),
+                options = list(language = list(url = 'spanish.json'))) %>%
+        formatSignif('Adjusted.P.value', 2) %>%  # Significative digits 
+        formatRound('Combined.Score', 0) %>%  # Round Score to units
+        formatStyle(columns = c("Adjusted.P.value", "Overlap"), `text-align` = 'left') # Center columns
     })
   
   # Hyperlink for GO term
