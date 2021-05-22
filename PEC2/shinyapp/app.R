@@ -16,7 +16,10 @@ library(enrichR) # GO over-representation test, interfaze for Enrichr webtool
 
 # Starting value for data range
 # Five years (in days) before current date
-start_date <- Sys.Date() - (5 * 365.25)
+# end_date <- Sys.Date()
+# start_date <- end_date - (5 * 365.25)
+end_date <- "2021-05-20" # Temporal - only for test purposes
+start_date <- "2021-04-20" # Temporal - only for test purposes
 
 ### Custom functions ###
 
@@ -98,6 +101,7 @@ ui <- fluidPage(
   dateRangeInput("fechas",
                  label = "Rango de fechas",
                  start = start_date,
+                 end = end_date,
                  format = "dd-mm-yyyy",
                  startview = "year",
                  weekstart = 1, # Monday
@@ -262,7 +266,7 @@ server <- function(input, output, session){
     } else {
       updateDateRangeInput(inputId = "fechas",
                                  start = start_date,
-                                 end = Sys.Date())}
+                                 end = end_date)}
                
   })
   
@@ -490,13 +494,13 @@ incProgress(15/15)
       # })
     # })
 
-  # # Display results in table or barplot
-  # observeEvent(input$select_display, {
-  #   updateTabsetPanel(
-  #     inputId = "tabla_grafico",
-  #     selected = input$select_display)
-  # })
-  # 
+  # Display results in table or barplot
+  observeEvent(input$select_display, {
+    updateTabsetPanel(
+      inputId = "tabla_grafico",
+      selected = input$select_display)
+  })
+
   # GO terms table
   # output$GOterms <- DT::renderDataTable({
   #   datatable(ego_table(),
@@ -520,7 +524,7 @@ incProgress(15/15)
     })
   })
     
-  ### Temporal - Display genes() as a datatable instead of GO terms
+  ### GO terms table
   output$GOterms <- DT::renderDataTable({
       datatable(ego_terms()[["GO_Cellular_Component_2018"]][, c("Term", "Adjusted.P.value", "Combined.Score", "Overlap")])
         #         rownames = FALSE,
@@ -543,7 +547,7 @@ incProgress(15/15)
   
   ## Prepare GO data for download
   output$GO_download_ui <- renderUI({
-    # req(ego_table())
+    req(ego_terms())
     downloadButton("GO_download",
                    label = "Descargar como archivo .csv")
   })
@@ -558,17 +562,32 @@ incProgress(15/15)
   #               row.names = FALSE)
   #   }
   # )
-    
-    output$GO_barplot <- renderPlot(barplot(height = ego_object(),
-                         showCategory = input$go_categories,
-                         title = paste0("Términos GO enriquecidos \n(",
-                                        input$select_aspect,
-                                        ")")) + labs(y = "Número de genes en cada categoría"),
-                         # Plot size enough to display all chosen categories
-                         height = reactive(
-                           max(400, input$go_categories * 20)),
-                         res = 96,
-                         alt = 'Gráfica de barras')
+   
+  # Plot enriched GO terms
+  # y-axis is number of genes in each term
+  # Order is by p-value
+  output$GO_barplot <- renderPlot(
+    plotEnrich(df = ego_terms()[["GO_Cellular_Component_2018"]],
+               showTerms = 20,
+               numChar = 40,
+               xlab = 'Términos GO significativamente enriquecidos en la muestra',
+               ylab = "Número de genes en cada categoría",
+               title = paste0("Términos GO enriquecidos \n(", input$select_aspect,")")),
+    height = 600,
+    res = 96,
+    alt = 'Gráfica de barras de términos GO enriquecidos'
+  )
+  
+    # output$GO_barplot <- renderPlot(barplot(height = ego_object(),
+    #                      showCategory = input$go_categories,
+    #                      title = paste0("Términos GO enriquecidos \n(",
+    #                                     input$select_aspect,
+    #                                     ")")) + labs(y = "Número de genes en cada categoría"),
+    #                      # Plot size enough to display all chosen categories
+    #                      height = reactive(
+    #                        max(400, input$go_categories * 20)),
+    #                      res = 96,
+    #                      alt = 'Gráfica de barras')
   
   
   # 
