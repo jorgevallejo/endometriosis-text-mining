@@ -122,6 +122,57 @@ En la pantalla inicial de la aplicación los resultados de la búsqueda se muest
 include_graphics("images/visualizacion_abstracts.png")
 ```
 
+### Tarea 3. Caracterización de la lista de genes
+
+Al igual que ocurre con otras herramientas de análisis de genes a gran escala, como las microarrays o las técnicas de secuenciación de alto rendimiento, la minería de textos también tiene la capacidad de devolvernos largas listas de genes relacionados con el tema investigado. En el caso de este proyecto, por ejemplo, hemos recuperado 1.383 genes posiblemente relacionados con la endometriosis.  
+Ya se trate de cientos, o de unas pocas decenas, en cualquier caso tales cantidades de genes de interés suponen un desafío a la hora de interpretar el resultado del ensayo realizado. Una estrategia para enfrentarse a ese desafío consiste en apartar la vista de los genes individuales y buscar temas comunes en las funciones de los mismos.  
+El Consorcio de Ontología Génica [^1] mantiene y desarrolla un vocabulario controlado de atributos asociados a los genes y sus productos. Dichos atributos (términos GO) están clasificados en tres grandes ontologías de Procesos Biológicos, Funciones Moleculares y Componentes Celulares; y cada gen (o producto génico) está asociado a uno o más atributos[XXX Cita web GO Consortium XXX]. Una forma de usar estos términos GO para explorar posibles temas comunes en los genes de interés, consiste en determinar si alguno de los términos está representado en la lista de genes en una frecuencia mayor de la que sería esperable por azar[XXX Cita Boyle 2004 XXX]. Esto se lleva a cabo calculando, para cada uno de los términos representados en la lista de genes, un p-valor usando la distribución hipergeométrica:
+
+[^1]: _Gene Ontology Consortium_, http://geneontology.org.
+
+$$
+ Pr(X = k) 
+= \frac{\binom{K}{k} \binom{N - K}{n-k}}{\binom{N}{n}}
+$$
+
+Con ésta lo que conseguimos es modelar un test de muestreo sin reposición. En la ecuación, _N_ es la población de genes de la que se extrae la muestra (en nuestro caso, todos los genes que aparecen en los sumarios de PubMed), _K_ es la cantidad de genes _de la población_ asociados al término GO que estamos testeando, _n_ es el tamaño de la lista de genes de interés (en nuestro caso los genes que hemos recuperado al hacer minería de textos de genes asociados a endometriosis, _la muestra_), y _k_ es el número de genes de la muestra que están asociados a ése mismo término GO. El p-valor calculado será la probabilidad de, por azar, haber recuperado esos _k_ genes (o más). Y consideramos que la detección del término GO es estadísticamente significativa cuando el p-valor calculado está por debajo de un valor elegido previamente (tradicionalmente 0.05 ó 0.01).
+
+Para llevar a cabo esta prueba estadística de forma automatizada he usado el paquete clusterProfiler [XXX Cita clusterProfiler XXX] para R. En concreto, la función `enrichGO()` para el test estadístico de sobrerrepresentación de términos GO:
+
+```{r}
+enrichGO (gene          = gene,
+          universe      = names(geneList),
+          OrgDb         = org.Hs.eg.db,
+          ont           = "CC",
+          pAdjustMethod = "BH",
+          pvalueCutoff  = 0.01,
+          qvalueCutoff  = 0.05,
+          readable      = TRUE)
+```
+
+Los parámetros que he aportado a la función son los siguientes:
+
+- **gene:** La lista de genes de interés (obtenidos previamente mediante minería de texto) en forma de vector de texto y codificados con el código Entrez.  
+- **universe:** La "población" de genes de la que hemos extraído la muestra anterior en forma de vector de texto y codificados con el código Entrez. En este caso, todos los genes nombrados en los sumarios de PubMed. Para simplificar, los filtré a través de la base de datos `org.Hs.eg.db` para utilizar sólo genes humanos.  
+- **OrgDB:** Base de datos en formato AnnotationDb que contiene las relaciones entre los términos GO y los genes. En este caso utilicé la base de datos `org.Hs.eg.db`, específica de humanos.  
+- **ont:** Es la categoría ontológica (procesos biológicos, funciones moleculares o componentes celulares) que queremos explorar.  
+- **pAdjustMethod:** Método de ajuste del p-valor para comparaciones múltiples, que sirve para controlar la probabilidad de falsos positivos. Personalmente uso el método de ajuste de Bonferroni, por ser el más restrictivo de los que se pueden usar en esta función.  
+- **pvalueCutoff:** Probabilidad por debajo de la cual hemos decidido que el p-valor ajustado se considererá como estadísticamente significativo.  
+- **qvalueCutoff:** Probabilidad por debajo de la cual hemos decidido que el q-valor señala un resultado estadísticamente significativo. Sirve para controlar la probabilidad de falsos negativos al realizar comparaciones múltiples.  
+- **readable:** Nos permite indicarle a la función si queremos que el nombre del gen aparezca junto a su código identificador. En este caso no me servía y lo especifiqué como FALSO.
+
+El resultado que devuelve la función es un objeto de clase enrichResult. Este contiene, entre otras informaciones, los resultados del test para los diferentes términos GO. La clase dispone de un utilísimo método `as.data.frame()` que devuelve una dataframe conteniendo tan sólo aquellos términos GO que, según el test, aparecen en nuestra lista de genes de interés con mayor frecuencia de la que sería de esperar por azar. La tabla de resultados contiene diferentes columnas:
+
+- **ID**: El código del término GO testeado.  
+- **Description**: Corta descripción asociada al término.  
+- **GeneRatio**: Fracción de genes _de la muestra_ asociados al término.  
+- **BgRatio:** Fracción de genes _de la población_ (background ratio) asociados al término.  
+- **pvalue:** P-valor calculado según la distribución hipergeométrica.  
+- **p.adjust:** P-valor ajustado según el método de ajuste elegido para comparaciones múltiples.  
+- **qvalue:** Q-valor calculado para este término.
+
+
+
 ## Actividades no previstas y realizadas
 
 \newpage

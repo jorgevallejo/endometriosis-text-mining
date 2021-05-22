@@ -86,7 +86,7 @@ files_list <- list.files(path = "script/data/",
                          pattern = "total",
                          full.names = TRUE) # include path
 # Create new file
-out_file <- file(description = "script/data/todos.txt",
+out_file <- file(description = "script/data/todos2.txt",
                  open = "w")
 # Read each downloaded file and write into final file
 for (i in files_list){
