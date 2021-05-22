@@ -557,16 +557,16 @@ incProgress(15/15)
                    label = "Descargar como archivo .csv")
   })
     
-  #   output$GO_download <- downloadHandler(
-  #   filename = function() {
-  #     paste0(query(),'enrichedGOterms.csv')
-  #   },
-  #   content = function(file) {
-  #     write.csv(ego_table(),
-  #               file = file,
-  #               row.names = FALSE)
-  #   }
-  # )
+    output$GO_download <- downloadHandler(
+    filename = function() {
+      paste0(query(),'enrichedGOterms_',input$select_aspect,'.csv')
+    },
+    content = function(file) {
+      write.csv(ego_terms()[[ontology()]],
+                file = file,
+                row.names = FALSE)
+    }
+  )
    
   # Plot enriched GO terms
   # y-axis is number of genes in each term
