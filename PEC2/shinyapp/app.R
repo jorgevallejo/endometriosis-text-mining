@@ -62,25 +62,27 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
                              # Store as vector instead of dataframe
                              colClasses = "character")[,1]
   
-  ontology_aspect <- list("Función molecular" = "MF",
-                          "Componente celular" = "CC",
-                          "Proceso biológico" = "BP")
-  adjust_methods <- list("Bonferroni" = "bonferroni",
-                         "Holm" = "holm",
-                         "Hommel" = "hommel",
-                         "Benjamini & Hochberg" = "BH",
-                         "Benjamini & Yekutieli" = "BY")
-  # General GO overrepresentation function
-  ego_function <- function(genes, ontology, padjust, pvalue, qvalue) {
-    enrichGO(gene = genes,
-                           universe = universe_genes,
-                           OrgDb = org.Hs.eg.db,
-                           ont = ontology,
-                           pAdjustMethod = padjust,
-                           pvalueCutoff = pvalue,
-                           qvalueCutoff = qvalue,
-                           readable = FALSE)
-  }
+  ontology_aspect <- list("Función molecular" = "GO_Molecular_Function_2018",  
+                          "Componente celular" = "GO_Cellular_Component_2018",
+                          "Proceso biológico" = "GO_Biological_Process_2018")
+  
+  # adjust_methods <- list("Bonferroni" = "bonferroni",
+  #                        "Holm" = "holm",
+  #                        "Hommel" = "hommel",
+  #                        "Benjamini & Hochberg" = "BH",
+  #                        "Benjamini & Yekutieli" = "BY")
+  
+  # # General GO overrepresentation function
+  # ego_function <- function(genes, ontology, padjust, pvalue, qvalue) {
+  #   enrichGO(gene = genes,
+  #                          universe = universe_genes,
+  #                          OrgDb = org.Hs.eg.db,
+  #                          ont = ontology,
+  #                          pAdjustMethod = padjust,
+  #                          pvalueCutoff = pvalue,
+  #                          qvalueCutoff = qvalue,
+  #                          readable = FALSE)
+  # }
 
 ### User interface ###
 ui <- fluidPage(
@@ -523,10 +525,13 @@ incProgress(15/15)
                         databases = databases)
     })
   })
-    
+   
+  # Ontology aspect that the user wants to explore
+  ontology <- reactive(ontology_aspect[[input$select_aspect]])
+   
   ### GO terms table
   output$GOterms <- DT::renderDataTable({
-      datatable(ego_terms()[["GO_Cellular_Component_2018"]][, c("Term", "Adjusted.P.value", "Combined.Score", "Overlap")])
+      datatable(ego_terms()[[ontology()]][, c("Term", "Adjusted.P.value", "Combined.Score", "Overlap")])
         #         rownames = FALSE,
         #         colnames = c("GO_ID", "Descripción", "GeneRatio", "BgRatio", "p-valor ajustado"),
         #         selection = list(mode = 'single', selected = 1),
@@ -567,7 +572,7 @@ incProgress(15/15)
   # y-axis is number of genes in each term
   # Order is by p-value
   output$GO_barplot <- renderPlot(
-    plotEnrich(df = ego_terms()[["GO_Cellular_Component_2018"]],
+    plotEnrich(df = ego_terms()[[ontology()]],
                showTerms = 20,
                numChar = 40,
                xlab = 'Términos GO significativamente enriquecidos en la muestra',
