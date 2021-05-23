@@ -16,10 +16,10 @@ library(enrichR) # GO over-representation test, interfaze for Enrichr webtool
 
 # Starting value for data range
 # Five years (in days) before current date
-# end_date <- Sys.Date()
-# start_date <- end_date - (5 * 365.25)
-end_date <- "2021-05-20" # Temporal - only for test purposes
-start_date <- "2021-04-20" # Temporal - only for test purposes
+end_date <- Sys.Date()
+start_date <- end_date - (5 * 365.25)
+# end_date <- "2021-05-20" # Temporal - only for test purposes
+# start_date <- "2021-04-20" # Temporal - only for test purposes
 
 ### Custom functions ###
 
