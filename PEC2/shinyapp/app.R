@@ -566,6 +566,7 @@ incProgress(15/15)
   })
   
   ## Prepare GO data for download
+  
   output$GO_download_ui <- renderUI({
     req(ego_terms())
     downloadButton("GO_download",
@@ -590,7 +591,8 @@ incProgress(15/15)
       write.csv(download_table,
                 file = file,
                 row.names = FALSE)
-    }
+    },
+    contentType = "text/csv"
   )
    
   # Plot enriched GO terms
