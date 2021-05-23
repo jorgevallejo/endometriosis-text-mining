@@ -578,12 +578,15 @@ incProgress(15/15)
   # Order is by p-value
   output$GO_barplot <- renderPlot(
     plotEnrich(df = ego_terms()[[ontology()]],
-               showTerms = 20,
-               numChar = 40,
-               xlab = 'Términos GO significativamente enriquecidos en la muestra',
-               ylab = "Número de genes en cada categoría",
+               # Number of bars in the plot is the minimum between actual
+               # number of rows in the table or the number inputed by user
+               showTerms = min(nrow(ego_terms()[[ontology()]]),
+                               input$go_categories),
+               numChar = 40, # Characters in x-axis labels
+               xlab = 'Términos GO',
+               ylab = "Número de genes en la categoría",
                title = paste0("Términos GO enriquecidos \n(", input$select_aspect,")")),
-    height = 600,
+    height = reactive(max(600, input$go_categories * 20)),
     res = 96,
     alt = 'Gráfica de barras de términos GO enriquecidos'
   )
