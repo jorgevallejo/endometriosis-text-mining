@@ -577,7 +577,17 @@ incProgress(15/15)
       paste0(query(),'enrichedGOterms_',input$select_aspect,'.csv')
     },
     content = function(file) {
-      write.csv(ego_terms()[[ontology()]],
+      # The table to download will not be cut off by p-value
+      # so that the user will have access to all the info
+      download_table <- ego_terms()[[ontology()]]
+      # Subset columns (those that would make sense for the user)
+      download_table <- download_table[, c("Term", "P.value", "Adjusted.P.value",
+                                           "Combined.Score", "Overlap", "Genes")]
+      # Change colnames to coincide with the ones in the web app
+      colnames(download_table) <- c("Término GO", "p-valor", "p-valor ajustado",
+                                    "Puntuación combinada", "Genes coincidentes", "Genes")
+      # Generate the csv file
+      write.csv(download_table,
                 file = file,
                 row.names = FALSE)
     }
