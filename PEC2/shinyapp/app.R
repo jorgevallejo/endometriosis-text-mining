@@ -343,7 +343,7 @@ incProgress(15/15)
       }
     }
     to_print <- paste(paste0('<p><a href="https://www.ncbi.nlm.nih.gov/pubmed/',pubmed_results()@PMID[row_selected],'" target=_blank>'
-                            , 'Abrir publicación en PubMed', '</a></p>','\n'),
+                            , 'Visitar página de la cita en PubMed', '</a></p>','\n'),
                       to_print)
     to_print
    })
