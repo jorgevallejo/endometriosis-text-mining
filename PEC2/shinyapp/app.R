@@ -170,7 +170,7 @@ ui <- fluidPage(
                                           "Gráfico de barras")),
                   numericInput(inputId = "go_categories",
                                "Categorías mostradas",
-                               value = 20,
+                               value = 10,
                                step = 1),
                   selectInput(inputId = "select_aspect",
                               "Aspecto funcional",
@@ -179,7 +179,7 @@ ui <- fluidPage(
                                           "Función molecular")),
                   numericInput(inputId = "p_valor",
                                "Punto de corte: P-valor",
-                               value = 0.01,
+                               value = 0.05,
                                max = 1,
                                min = 0,
                                step = 0.005),
@@ -524,16 +524,26 @@ incProgress(15/15)
    
   # Ontology aspect that the user wants to explore
   ontology <- reactive(ontology_aspect[[input$select_aspect]])
+  
+  # GO terms dataframe
+  go_dataframe <- reactive({
+    # Create dataframe per ontology aspect
+    dataframe <- ego_terms()[[ontology()]]
+    # Adjusted P-value Cutoff
+    dataframe[dataframe[,"Adjusted.P.value"] <= input$p_valor, ]
+  })
    
   ### GO terms table
   output$GOterms <- DT::renderDataTable({
-      datatable(ego_terms()[[ontology()]][, c("Term", "Adjusted.P.value", "Combined.Score", "Overlap")],
+      datatable(go_dataframe()[, c("Term", "Adjusted.P.value", "Combined.Score", "Overlap")],
+        #ego_terms()[[ontology()]][, c("Term", "Adjusted.P.value", "Combined.Score", "Overlap")],
                 rownames = FALSE,
                 colnames = c("Término GO", "p-valor ajustado", "Puntuación combinada", "Genes coincidentes"),
                 selection = list(mode = 'single', selected = 1),
                 options = list(language = list(url = 'spanish.json'),
                                # Number of rows in each page are determined by user 
-                               pageLength = min(nrow(ego_terms()[[ontology()]]),
+                               pageLength = min(nrow(go_dataframe()),
+                                 #nrow(ego_terms()[[ontology()]]),
                                                 input$go_categories))) %>%
         formatSignif('Adjusted.P.value', 2) %>%  # Significative digits 
         formatRound('Combined.Score', 0) %>%  # Round Score to units
@@ -577,13 +587,18 @@ incProgress(15/15)
   # y-axis is number of genes in each term
   # Order is by p-value
   output$GO_barplot <- renderPlot(
-    plotEnrich(df = ego_terms()[[ontology()]],
+    plotEnrich(df = go_dataframe(), 
+                 #ego_terms()[[ontology()]],
                # Number of bars in the plot is the minimum between actual
                # number of rows in the table or the number inputed by user
-               showTerms = min(nrow(ego_terms()[[ontology()]]),
+               showTerms = min(nrow(go_dataframe()),
+                 #nrow(ego_terms()[[ontology()]]),
                                input$go_categories),
                numChar = 40, # Characters in x-axis labels
-               xlab = 'Términos GO',
+               xlab = paste0('Términos GO (',
+                             min(nrow(go_dataframe()),input$go_categories),
+                             ' de ', 
+                             nrow(go_dataframe()), ' significativos)'),
                ylab = "Número de genes en la categoría",
                title = paste0("Términos GO enriquecidos \n(", input$select_aspect,")")),
     height = reactive(max(600, input$go_categories * 20)),
