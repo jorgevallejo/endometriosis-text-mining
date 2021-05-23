@@ -542,14 +542,19 @@ incProgress(15/15)
     })
   
   # Hyperlink for GO term
-  # output$GO_link <- renderText({
-  #    # req(ego_table())
-  #   row_selected <- input$GOterms_rows_selected
-  #   # Build hyperlink
-  #   paste0('<br /><br /><p><a href="http://amigo.geneontology.org/amigo/term/', ego_table()[row_selected,"ID"],'" target=_blank>',
-  #          'Abrir enlace a la página de información del término ', ego_table()[row_selected,"ID"],
-  #          ' (', ego_table()[row_selected,"Description"],') en AmiGO', '</a></p>','\n')
-  # })
+  output$GO_link <- renderText({
+    req(ego_terms())
+    row_selected <- input$GOterms_rows_selected
+    # isolate GO ID for composing hyperlink
+    ego_term <- regmatches(ego_terms()[[ontology()]][row_selected,"Term"],  # Term selected in the table
+                           regexec(pattern = 'GO:([[:digit:]]+)',  # Look for a substring of digits after 'GO:'
+                                   ego_terms()[[ontology()]][row_selected,"Term"]))[[1]][1]  # Select the second term of the results vector
+      
+    # Build hyperlink
+    paste0('<br /><br /><p><a href="http://amigo.geneontology.org/amigo/term/', ego_term,'" target=_blank>',
+           'Abrir enlace a la página de información del término ', ego_terms()[[ontology()]][row_selected,"Term"],
+           ' en AmiGO', '</a></p>','\n')
+  })
   
   ## Prepare GO data for download
   output$GO_download_ui <- renderUI({
