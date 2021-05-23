@@ -531,7 +531,10 @@ incProgress(15/15)
                 rownames = FALSE,
                 colnames = c("Término GO", "p-valor ajustado", "Puntuación combinada", "Genes coincidentes"),
                 selection = list(mode = 'single', selected = 1),
-                options = list(language = list(url = 'spanish.json'))) %>%
+                options = list(language = list(url = 'spanish.json'),
+                               # Number of rows in each page are determined by user 
+                               pageLength = min(nrow(ego_terms()[[ontology()]]),
+                                                input$go_categories))) %>%
         formatSignif('Adjusted.P.value', 2) %>%  # Significative digits 
         formatRound('Combined.Score', 0) %>%  # Round Score to units
         formatStyle(columns = c("Adjusted.P.value", "Overlap"), `text-align` = 'left') # Center columns
