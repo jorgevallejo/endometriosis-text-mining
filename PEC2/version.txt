@@ -1,8 +1,23 @@
 ## This document specifies current version of the web app and keeps the changelog
 
-Current version: 0.2.0
+Current version: 0.3.0
 
 == Changelog ==
+v.0.3.0 (2021/05/23)
+- Displays hyperlink to AmiGO webpage when the user selects a GO term.
+- Results of GO enrichment test presented as a table and as a barplot.
+- Performs GO enrichment test using Enrichr through enrichR interface.
+- Input controls for gene ontology characterization (Functional aspect, number of categories, pvalue cutoff)
+- Specific tab for gene ontology.
+- Write headers for each tab.
+
+***Known issues***
+- There is no friendly error message when no gen is recovered.
+- GO term hyperlink displays a warning for a short time before being composed.
+- There is no friendly error message when Enrichr server is off-line.
+- IMPORTANT: Downloand button, for GO terms table, only works for Cellular Components results in the server
+   (it works as expected in local, though).
+
 v.0.2.0 (2021/05/07)
 - Change layout to side menu and main body.
 - Display abstract of pmid selected from results table, and a hyperlink to the corresponding webpage in PubMed.

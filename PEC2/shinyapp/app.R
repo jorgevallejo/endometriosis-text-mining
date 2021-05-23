@@ -16,10 +16,10 @@ library(enrichR) # GO over-representation test, interfaze for Enrichr webtool
 
 # Starting value for data range
 # Five years (in days) before current date
-# end_date <- Sys.Date()
-# start_date <- end_date - (5 * 365.25)
-end_date <- "2021-05-20" # Temporal - only for test purposes
-start_date <- "2021-04-20" # Temporal - only for test purposes
+end_date <- Sys.Date()
+start_date <- end_date - (5 * 365.25)
+# end_date <- "2021-05-20" # Temporal - only for test purposes
+# start_date <- "2021-04-20" # Temporal - only for test purposes
 
 ### Custom functions ###
 
@@ -343,7 +343,7 @@ incProgress(15/15)
       }
     }
     to_print <- paste(paste0('<p><a href="https://www.ncbi.nlm.nih.gov/pubmed/',pubmed_results()@PMID[row_selected],'" target=_blank>'
-                            , 'Abrir publicación en PubMed', '</a></p>','\n'),
+                            , 'Visitar página de la cita en PubMed', '</a></p>','\n'),
                       to_print)
     to_print
    })
