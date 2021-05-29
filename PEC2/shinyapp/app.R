@@ -144,8 +144,7 @@ ui <- fluidPage(
   fluidRow(
   # Table of words
     column(6,
-           plotOutput("words_barplot"),
-  tableOutput("palabras")
+           DT::dataTableOutput("palabras")
     ))),
   tabPanel(title = "Frecuencia de genes",
            h1("Frecuencia de genes"),
@@ -160,7 +159,8 @@ ui <- fluidPage(
   ),
   # Gráficas de frecuencia
   tabPanel(title = "Gráficas de frecuencia",
-           h1("Placeholder")),
+           h1("Gráficas de frecuencia"),
+           plotOutput("words_barplot")),
   # Caracterización de genes
   tabPanel(title = "Caracterización de genes",
            h1("Caracterización de genes por ontología génica"),
@@ -361,6 +361,9 @@ incProgress(15/15)
                  })
     })
   
+  ### Temporal for words in local
+  # words <- reactive(readRDS("words.RDS"))
+  
   # Header for frequency of words section
   output$header_frecuencia_palabras <- renderUI({
     query_keywords <- input$keywords
@@ -375,11 +378,15 @@ incProgress(15/15)
   })
   
   # Table of words
-  output$palabras <- renderTable({
-    
-    tabla_palabras <- data.frame(words()[1:10,])
-    colnames(tabla_palabras) <- c("Palabra", "Frecuencia")
-    tabla_palabras
+  output$palabras <- DT::renderDataTable({
+    # Table content
+    tabla_palabras <- data.frame(words())
+    # tabla_palabras <- words() # Temporal mientras pruebo en local
+    datatable(tabla_palabras,
+              colnames = c("Palabra", "Frecuencia"),
+              rownames = FALSE,
+              selection = list(mode = 'single', selected = 1),
+              options = list(language = list(url = 'spanish.json')))
   })
   
   # Barplot with frequency of words
