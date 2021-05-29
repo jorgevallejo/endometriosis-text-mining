@@ -139,7 +139,8 @@ ui <- fluidPage(
   )),
   
   tabPanel(title = "Frecuencia de palabras",
-           h1("Frecuencia de palabras"),
+           # h1("Frecuencia de palabras"),
+           uiOutput("header_frecuencia_palabras"),
   fluidRow(
   # Table of words
     column(6,
@@ -359,6 +360,20 @@ incProgress(15/15)
     words
                  })
     })
+  
+  # Header for frequency of words section
+  output$header_frecuencia_palabras <- renderUI({
+    query_keywords <- input$keywords
+    if (is.null(query_keywords)) {h1("Frecuencia de palabras")}
+    else {
+      h1(
+        HTML(
+          paste0(
+            "Frecuencia de palabras en",
+            tags$br(),
+            "publicaciones sobre ", query_keywords)))}
+  })
+  
   # Table of words
   output$palabras <- renderTable({
     
