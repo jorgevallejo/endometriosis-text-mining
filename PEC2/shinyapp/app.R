@@ -5,21 +5,16 @@ library(easyPubMed)
 library(pubmed.mineR)
 library(DT)
 library(tokenizers)
-# library(BiocManager) # Necessary for building clusterProfiler into the app
-# options(repos = BiocManager::repositories()) # Necessary for building clusterProfiler into the app
-# library(org.Hs.eg.db) # GO over-representation test
-# library(clusterProfiler) # GO over-representation test
-# library(ggplot2) # For putting xlabel in GO enrichment barplot
 library(enrichR) # GO over-representation test, interfaze for Enrichr webtool
 
 ### Fixed variables ###
 
 # Starting value for data range
 # Five years (in days) before current date
-# end_date <- Sys.Date()
-# start_date <- end_date - (5 * 365.25)
-end_date <- "2021-05-20" # Temporal - only for test purposes
-start_date <- "2021-04-20" # Temporal - only for test purposes
+end_date <- Sys.Date()
+start_date <- end_date - (5 * 365.25)
+# end_date <- "2021-05-20" # Temporal - only for test purposes
+# start_date <- "2021-04-20" # Temporal - only for test purposes
 
 ### Custom functions ###
 
@@ -66,24 +61,6 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
                           "Componente celular" = "GO_Cellular_Component_2018",
                           "Proceso biológico" = "GO_Biological_Process_2018")
   
-  # adjust_methods <- list("Bonferroni" = "bonferroni",
-  #                        "Holm" = "holm",
-  #                        "Hommel" = "hommel",
-  #                        "Benjamini & Hochberg" = "BH",
-  #                        "Benjamini & Yekutieli" = "BY")
-  
-  # # General GO overrepresentation function
-  # ego_function <- function(genes, ontology, padjust, pvalue, qvalue) {
-  #   enrichGO(gene = genes,
-  #                          universe = universe_genes,
-  #                          OrgDb = org.Hs.eg.db,
-  #                          ont = ontology,
-  #                          pAdjustMethod = padjust,
-  #                          pvalueCutoff = pvalue,
-  #                          qvalueCutoff = qvalue,
-  #                          readable = FALSE)
-  # }
-
 ### User interface ###
 ui <- fluidPage(
   titlePanel("Endo-Mining",
@@ -197,12 +174,6 @@ ui <- fluidPage(
                                max = 1,
                                min = 0,
                                step = 0.005),
-                  # numericInput(inputId = "q_valor",
-                  #              "Punto de corte: Q-valor",
-                  #              value = 0.05,
-                  #              max = 1,
-                  #              min = 0,
-                  #              step = 0.05),
                   selectInput(inputId = "metodo_ajuste",
                               "Método de ajuste del p-valor",
                               choices = "Benjamini & Hochberg"),
@@ -474,14 +445,11 @@ incProgress(15/15)
                  detail = 'Suele tardar un rato...',
                  value = 0, {
                    incProgress(1/2)
-    # genes_data <- gene_atomization(pubmed_results())
-    # # Codify frequency of genes as numeric
-    # genes_table <- data.frame(genes_data,
-    #                           stringsAsFactors = FALSE)
-    # colnames(genes_table) <- c("Símbolo", "Nombre", "Frecuencia")
-    genes_table <- pubmed_results() %>% gene_atomization() %>%
-      data.frame(stringsAsFactors = FALSE) %>%
-      `colnames<-`(c("Símbolo", "Nombre", "Frecuencia"))
+    genes_data <- gene_atomization(pubmed_results())
+    # Codify frequency of genes as numeric
+    genes_table <- data.frame(genes_data,
+                              stringsAsFactors = FALSE)
+    colnames(genes_table) <- c("Símbolo", "Nombre", "Frecuencia")
     genes_table$Frecuencia <- as.integer(genes_table$Frecuencia)
     incProgress(2/2)
                  })
@@ -504,102 +472,15 @@ incProgress(15/15)
                  main = "Genes más frecuentes")
   })
   
-  ## GO-over-representation test
-  # GO enrichment analysis of the gene set
-  # Configure sample genes as entrezID
-  # keys <- reactive({
-  #   genes()[, "Símbolo"]
-  #   # load(file = "../intermediateData/genes.RData") # Temporal
-  #   # genes[, "Gene_symbol"]
-  # })
-
-  #  entrezID <- reactive({
-  #   entrez <- select(org.Hs.eg.db,
-  #          keys = genes()[, "Símbolo"],
-  #          columns = c("SYMBOL", "ENTREZID"),
-  #          keytype = "SYMBOL")
-  #   entrez[, "ENTREZID"]
-  # })
-  # # Compute enrichResult objects of each ontology aspect
-  # ego_cc <- eventReactive(input$GO_button,{
-  #   req(input$select_aspect == 'Componente celular')
-  #   withProgress(message = "Computing enriched GO terms", {
-  #     ego_function( genes = entrezID(),
-  #                 ontology = 'CC',
-  #                  padjust = adjust_methods[[input$metodo_ajuste]],
-  #                  pvalue = input$p_valor,
-  #                  qvalue = input$q_valor)
-  #     })
-  # })
-  # 
-  # ego_bp <- eventReactive(input$GO_button,{
-  #   req(input$select_aspect == 'Proceso biológico')
-  #   ego_function( genes = entrezID(),
-  #                 ontology = 'BP',
-  #                 padjust = adjust_methods[[input$metodo_ajuste]],
-  #                 pvalue = input$p_valor,
-  #                 qvalue = input$q_valor)
-  # })
-  # 
-  # ego_mf <- eventReactive(input$GO_button,{
-  #   req(input$select_aspect == 'Función molecular')
-  #   ego_function( genes = entrezID(),
-  #                 ontology = 'MF',
-  #                 padjust = adjust_methods[[input$metodo_ajuste]],
-  #                 pvalue = input$p_valor,
-  #                 qvalue = input$q_valor)
-  # })
-  # 
-  # # Selected ego results
-  # ego_object <- reactive(
-  #       if (input$select_aspect == 'Componente celular') {
-  #         withProgress(message = "Calculando términos GO enriquecidos \npara componentes celulares",
-  #         ego_cc())
-  #       } else if (input$select_aspect == 'Proceso biológico') {
-  #         withProgress(message = "Calculando términos GO enriquecidos \npara procesos biológicos",
-  #       ego_bp())
-  #       } else if (input$select_aspect == 'Función molecular') {
-  #         withProgress(message = "Calculando términos GO enriquecidos \npara funciones moleculares",
-  #       ego_mf())
-  #       }
-  #   )
-  # 
-  # # Compose data frame from eGO results
-  # ego_table <- eventReactive(
-  #   input$GO_button, {
-      # withProgress(message = "Computing enriched GO terms", {
-    #     if (input$select_aspect == 'Componente celular') {
-    #       ego_object <- ego_cc()
-    #     } else if (input$select_aspect == 'Proceso biológico') {
-    #       ego_object <- ego_bp()
-    #     } else if (input$select_aspect == 'Función molecular') {
-    #       ego_object <- ego_mf()
-    #     }
-
-        # incProgress(1/2)
-
-
-        # as.data.frame(ego_cc()[, c("ID", "Description", "GeneRatio", "BgRatio", "p.adjust")])
-      # })
-    # })
-
-  # Display results in table or barplot
+  
+  # Display results of GO enrichment as table or barplot
   observeEvent(input$select_display, {
     updateTabsetPanel(
       inputId = "tabla_grafico",
       selected = input$select_display)
   })
 
-  # GO terms table
-  # output$GOterms <- DT::renderDataTable({
-  #   datatable(ego_table(),
-  #             rownames = FALSE,
-  #             colnames = c("GO_ID", "Descripción", "GeneRatio", "BgRatio", "p-valor ajustado"),
-  #             selection = list(mode = 'single', selected = 1),
-  #             options = list(language = list(url = 'spanish.json'))) %>%
-  #     formatSignif('p.adjust', 2) %>%  # Significative digits for p.adjust column
-  #     formatStyle(columns = c("GeneRatio", "BgRatio", "p.adjust"), `text-align` = 'center') # Center columns
-  # })
+  
 
 # Compute enrichment of terms in gene set using enrichR
 # as an interface for the web tool Enrichr
@@ -708,38 +589,6 @@ incProgress(15/15)
     res = 96,
     alt = 'Gráfica de barras de términos GO enriquecidos'
   )
-  
-    # output$GO_barplot <- renderPlot(barplot(height = ego_object(),
-    #                      showCategory = input$go_categories,
-    #                      title = paste0("Términos GO enriquecidos \n(",
-    #                                     input$select_aspect,
-    #                                     ")")) + labs(y = "Número de genes en cada categoría"),
-    #                      # Plot size enough to display all chosen categories
-    #                      height = reactive(
-    #                        max(400, input$go_categories * 20)),
-    #                      res = 96,
-    #                      alt = 'Gráfica de barras')
-  
-  
-  # 
-  # output$ontologyCC <- renderPlot(height = ego_CC,
-  #                                 showCategory = 20,
-  #                                 title = "Título")
-  
-  # # Get human genes ID from pubtator contingency table
-  # universe_genes <- read.csv("PEC2/shinyapp/human_geneID_universe.csv",
-  #                            header = FALSE,
-  #                            # Store as vector instead of dataframe
-  #                            colClasses = "character")[,1]
-  # # Translate gene symbols to entrezId
-  # # Beware: the result is a dataframe
-  # entrez <- select(org.Hs.eg.db,
-  #                  keys = genes()$Symbol,
-  #                  columns = c("SYMBOL", "ENTREZID"),
-  #                  keytype = "SYMBOL") 
-
-
-  
 }
   
 
