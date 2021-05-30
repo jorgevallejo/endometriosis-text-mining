@@ -16,10 +16,10 @@ library(enrichR) # GO over-representation test, interfaze for Enrichr webtool
 
 # Starting value for data range
 # Five years (in days) before current date
-end_date <- Sys.Date()
-start_date <- end_date - (5 * 365.25)
-# end_date <- "2021-05-20" # Temporal - only for test purposes
-# start_date <- "2021-04-20" # Temporal - only for test purposes
+# end_date <- Sys.Date()
+# start_date <- end_date - (5 * 365.25)
+end_date <- "2021-05-20" # Temporal - only for test purposes
+start_date <- "2021-04-20" # Temporal - only for test purposes
 
 ### Custom functions ###
 
@@ -139,13 +139,26 @@ ui <- fluidPage(
   )),
   
   tabPanel(title = "Frecuencia de palabras",
-           h1("Frecuencia de palabras"),
+           # h1("Frecuencia de palabras"),
+           uiOutput("header_frecuencia_palabras"),
   fluidRow(
   # Table of words
+    column(4,
+           DT::dataTableOutput("palabras")
+    ),
     column(6,
-           plotOutput("words_barplot"),
-  tableOutput("palabras")
-    ))),
+           DT::dataTableOutput("palabras_2ario")
+           )),
+  fluidRow(
+    column(4,
+    # Hyperlink to selected publication
+    htmlOutput("HyperlinkPalabra")
+    ),
+    column(6,
+           # Abstract of selected publication
+           htmlOutput("abstractPalabra")
+           )
+  )),
   tabPanel(title = "Frecuencia de genes",
            h1("Frecuencia de genes"),
            fluidRow(
@@ -159,7 +172,8 @@ ui <- fluidPage(
   ),
   # Gráficas de frecuencia
   tabPanel(title = "Gráficas de frecuencia",
-           h1("Placeholder")),
+           h1("Gráficas de frecuencia"),
+           plotOutput("words_barplot")),
   # Caracterización de genes
   tabPanel(title = "Caracterización de genes",
            h1("Caracterización de genes por ontología génica"),
@@ -359,12 +373,89 @@ incProgress(15/15)
     words
                  })
     })
+  
+  ### Temporal for words in local
+  #words <- reactive(readRDS("words.RDS"))
+  ### Temporal for pubmed results in local
+  #pubmed_results_temporal <- reactive(readRDS("pubmed_results_temporal.RDS"))
+  
+  # Header for frequency of words section
+  output$header_frecuencia_palabras <- renderUI({
+    query_keywords <- input$keywords
+    if (is.null(query_keywords)) {h1("Frecuencia de palabras")}
+    else {
+      h1(
+        HTML(
+          paste0(
+            "Frecuencia de palabras en",
+            tags$br(),
+            "publicaciones sobre ", query_keywords)))}
+  })
+  
   # Table of words
-  output$palabras <- renderTable({
-    
-    tabla_palabras <- data.frame(words()[1:10,])
-    colnames(tabla_palabras) <- c("Palabra", "Frecuencia")
-    tabla_palabras
+  output$palabras <- DT::renderDataTable({
+    # Table content
+    tabla_palabras <- data.frame(words())
+    #tabla_palabras <- words() # Temporal mientras pruebo en local
+    datatable(tabla_palabras,
+              colnames = c("Palabra", "Frecuencia"),
+              rownames = FALSE,
+              caption = 'Haga click en las cabeceras de las columnas para cambiar el orden',
+              selection = list(mode = 'single', selected = 1),
+              options = list(language = list(url = 'spanish.json')))
+  })
+  
+  # Secondary corpus based on selected word
+  corpus_2ario <- reactive({
+    withProgress(message = "Generando corpus secundario...",
+                                 value = 0, {
+    corpus <- pubmed_results()
+    # corpus <- pubmed_results_temporal() # Temporal for testing in local
+    setProgress(1/4)
+    word_selected <- input$palabras_rows_selected
+    setProgress(2/4)
+    term <- words()[word_selected, 1] # Recover selected word from words dataframe
+    setProgress(3/4)
+    getabs(corpus, term, FALSE)
+  })
+  })
+
+  # Table for secondary corpus on words
+  output$palabras_2ario <- DT::renderDataTable({
+    # Table content
+    tabla_titulos_2ario <- data.frame(corpus_2ario()@PMID,
+                                      corpus_2ario()@Journal)
+    datatable(tabla_titulos_2ario,
+              colnames = c("PMID", "Publicación"),
+              rownames = FALSE,
+              caption = "Citas que contienen la palabra seleccionada",
+              selection = list(mode = 'single', selected = 1),
+              options = list(language = list(url = 'spanish.json')))
+  })
+  
+  ## Abstract of selected pmid for words
+  ### This should be re-factored into a function because I am using
+  ### the same code that in output$abstractText
+  output$abstractPalabra <- renderText({
+    row_selected <- input$palabras_2ario_rows_selected
+    abstracts <- corpus_2ario()@Abstract[row_selected]
+    abstractSentences <- tokenize_sentences(abstracts, simplify = TRUE)
+    to_print <- paste('<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', corpus_2ario()@Journal[row_selected],
+                      '</b></font>', '</h4></p>', '\n')
+    for (i in seq_along(abstractSentences)){
+      if (i < 3) {
+        to_print <- paste(to_print,
+                          '<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', abstractSentences[i],
+                          '</b></font>', '</h4></p>', '\n')
+      } else{
+        to_print <- paste(to_print,
+                          '<p><i>',abstractSentences[i],'</i></p>','\n')
+      }
+    }
+    to_print <- paste(paste0('<p><a href="https://www.ncbi.nlm.nih.gov/pubmed/',corpus_2ario()@PMID[row_selected],'" target=_blank>'
+                             , 'Visitar página de la cita en PubMed', '</a></p>','\n'),
+                      to_print)
+    to_print
   })
   
   # Barplot with frequency of words
