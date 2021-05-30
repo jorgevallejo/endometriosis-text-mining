@@ -445,14 +445,14 @@ incProgress(15/15)
                  detail = 'Suele tardar un rato...',
                  value = 0, {
                    incProgress(1/2)
-    # genes_data <- gene_atomization(pubmed_results())
-    # # Codify frequency of genes as numeric
-    # genes_table <- data.frame(genes_data,
-    #                           stringsAsFactors = FALSE)
-    # colnames(genes_table) <- c("Símbolo", "Nombre", "Frecuencia")
-    genes_table <- pubmed_results() %>% gene_atomization() %>%
-      data.frame(stringsAsFactors = FALSE) %>%
-      `colnames<-`(c("Símbolo", "Nombre", "Frecuencia"))
+    genes_data <- gene_atomization(pubmed_results())
+    # Codify frequency of genes as numeric
+    genes_table <- data.frame(genes_data,
+                              stringsAsFactors = FALSE)
+    colnames(genes_table) <- c("Símbolo", "Nombre", "Frecuencia")
+    # genes_table <- pubmed_results() %>% gene_atomization() %>%
+    #   data.frame(stringsAsFactors = FALSE) %>%
+    #   `colnames<-`(c("Símbolo", "Nombre", "Frecuencia"))
     genes_table$Frecuencia <- as.integer(genes_table$Frecuencia)
     incProgress(2/2)
                  })
