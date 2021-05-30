@@ -144,7 +144,10 @@ ui <- fluidPage(
   
   # Table of genes
   DT::dataTableOutput("genes_table")
-    )
+    ),
+  column(5,
+         # Secondary corpus of genes
+         DT::dataTableOutput("genes_cites_table"))
   )
   ),
   # Gráficas de frecuencia
@@ -399,7 +402,10 @@ server <- function(input, output, session){
     getabs(corpus, term, FALSE)
   })
   })
+  
 
+  
+  
   # Table for secondary corpus on words
   output$palabras_2ario <- DT::renderDataTable({
     # Table content
@@ -493,8 +499,32 @@ server <- function(input, output, session){
               options = list(language = list(url = 'spanish.json')))
   })
   
+  # Secondary corpus based on selected gene symbol
+  corpus_2ario_gene <- reactive({
+    withProgress(message = "Generando corpus secundario...",
+                 value = 0, {
+                   corpus <- pubmed_results()
+                   # corpus <- pubmed_results_temporal() # Temporal for testing in local
+                   setProgress(1/4)
+                   gene_selected <- input$genes_table_rows_selected
+                   setProgress(2/4)
+                   term <- genes()[gene_selected, 1] # Recover selected word from words dataframe
+                   setProgress(3/4)
+                   getabs(corpus, term, FALSE)
+                 })
+  })
   
-  
+  # Table with citations that include the gen
+  output$genes_cites_table <- DT::renderDataTable({
+    tabla_genes_2ario <- data.frame(corpus_2ario_gene()@PMID,
+                                    corpus_2ario_gene()@Journal)
+    datatable(tabla_genes_2ario,
+              rownames = FALSE,
+              colnames = c("PMID", "Publicación"),
+              caption = 'Publicaciones que contienen el gen seleccionado',
+              selection = list(mode = 'single', selected = 1),
+              options = list(language = list(url = 'spanish.json')))
+  })
   
   
   
