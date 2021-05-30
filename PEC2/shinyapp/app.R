@@ -5,6 +5,7 @@ library(easyPubMed)
 library(pubmed.mineR)
 library(DT)
 library(tokenizers)
+library(org.Hs.eg.db) # Obtaining EntrezID corresponding to gene symbol
 library(enrichR) # GO over-representation test, interfaze for Enrichr webtool
 
 ### Fixed variables ###
@@ -139,10 +140,10 @@ ui <- fluidPage(
   tabPanel(title = "Frecuencia de genes",
            h1("Frecuencia de genes"),
            fluidRow(
-  column(6,
+  column(5,
   
   # Table of genes
-  tableOutput("genes_table")
+  DT::dataTableOutput("genes_table")
     )
   )
   ),
@@ -474,9 +475,27 @@ server <- function(input, output, session){
   #   })
 
   # Table with frequency of genes
-  output$genes_table <- renderTable({
-    genes()
+  output$genes_table <- renderDataTable({
+    genes_table <- genes()
+    keys <- genes_table[, "Símbolo"]   # Char vector for looking up in database
+    entrez <- mapIds(org.Hs.eg.db, # vector with correspondence symbol-entrezid
+                     keys = keys,
+                     column = "ENTREZID",
+                     keytype = "SYMBOL",
+                     multiVals = 'first'
+    )
+    genes_table$Entrez_ID <- entrez  # Add new column to genes dataframe
+    genes_table <- genes_table[, c("Símbolo", "Entrez_ID", "Nombre", "Frecuencia")] # Rearrange columns
+    datatable(genes_table,
+              rownames = FALSE,
+              caption = 'Haga click en las cabeceras de las columnas para cambiar el orden',
+              selection = list(mode = 'single', selected = 1),
+              options = list(language = list(url = 'spanish.json')))
   })
+  
+  
+  
+  
   
   
   # Barplot with frequency of genes
