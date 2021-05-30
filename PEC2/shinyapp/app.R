@@ -169,16 +169,22 @@ ui <- fluidPage(
                                           "Proceso biológico",
                                           "Función molecular")),
                   numericInput(inputId = "p_valor",
-                               "Punto de corte: P-valor",
+                               "Nivel de significatividad (p-valor ajustado)",
                                value = 0.05,
                                max = 1,
                                min = 0,
                                step = 0.005),
-                  selectInput(inputId = "metodo_ajuste",
-                              "Método de ajuste del p-valor",
-                              choices = "Benjamini & Hochberg"),
                   actionButton(inputId = "GO_button",
-                               label = "GO test")
+                               label = "Caracterizar"),
+                  p(),
+                  p("El método de ajuste del p-valor en esta aplicación 
+                    (necesario para controlar la probabilidad de falsos positivos 
+                    en las comparaciones múltiples) es el conocido como de", 
+                    span("Benjamini & Hochberg", style = "font-style:italic"), "."), 
+                    p("El botón de descarga proporciona un archivo CSV con todos los 
+                    términos GO recuperados, junto con los p-valores originales;
+                    permitiendo al usuario calcular los p-valores por su cuenta
+                      si considera necesario usar un método diferente.")
                   ),
            column(6,
                   # Optional UI with tabsets
