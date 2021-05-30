@@ -5,21 +5,16 @@ library(easyPubMed)
 library(pubmed.mineR)
 library(DT)
 library(tokenizers)
-# library(BiocManager) # Necessary for building clusterProfiler into the app
-# options(repos = BiocManager::repositories()) # Necessary for building clusterProfiler into the app
-# library(org.Hs.eg.db) # GO over-representation test
-# library(clusterProfiler) # GO over-representation test
-# library(ggplot2) # For putting xlabel in GO enrichment barplot
 library(enrichR) # GO over-representation test, interfaze for Enrichr webtool
 
 ### Fixed variables ###
 
 # Starting value for data range
 # Five years (in days) before current date
-# end_date <- Sys.Date()
-# start_date <- end_date - (5 * 365.25)
-end_date <- "2021-05-20" # Temporal - only for test purposes
-start_date <- "2021-04-20" # Temporal - only for test purposes
+end_date <- Sys.Date()
+start_date <- end_date - (5 * 365.25)
+# end_date <- "2021-05-20" # Temporal - only for test purposes
+# start_date <- "2021-04-20" # Temporal - only for test purposes
 
 ### Custom functions ###
 
@@ -66,24 +61,6 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
                           "Componente celular" = "GO_Cellular_Component_2018",
                           "Proceso biológico" = "GO_Biological_Process_2018")
   
-  # adjust_methods <- list("Bonferroni" = "bonferroni",
-  #                        "Holm" = "holm",
-  #                        "Hommel" = "hommel",
-  #                        "Benjamini & Hochberg" = "BH",
-  #                        "Benjamini & Yekutieli" = "BY")
-  
-  # # General GO overrepresentation function
-  # ego_function <- function(genes, ontology, padjust, pvalue, qvalue) {
-  #   enrichGO(gene = genes,
-  #                          universe = universe_genes,
-  #                          OrgDb = org.Hs.eg.db,
-  #                          ont = ontology,
-  #                          pAdjustMethod = padjust,
-  #                          pvalueCutoff = pvalue,
-  #                          qvalueCutoff = qvalue,
-  #                          readable = FALSE)
-  # }
-
 ### User interface ###
 ui <- fluidPage(
   titlePanel("Endo-Mining",
@@ -197,12 +174,6 @@ ui <- fluidPage(
                                max = 1,
                                min = 0,
                                step = 0.005),
-                  # numericInput(inputId = "q_valor",
-                  #              "Punto de corte: Q-valor",
-                  #              value = 0.05,
-                  #              max = 1,
-                  #              min = 0,
-                  #              step = 0.05),
                   selectInput(inputId = "metodo_ajuste",
                               "Método de ajuste del p-valor",
                               choices = "Benjamini & Hochberg"),
