@@ -178,7 +178,7 @@ ui <- fluidPage(
                               "Método de ajuste del p-valor",
                               choices = "Benjamini & Hochberg"),
                   actionButton(inputId = "GO_button",
-                               label = "GO test")
+                               label = "Caracterizar")
                   ),
            column(6,
                   # Optional UI with tabsets
