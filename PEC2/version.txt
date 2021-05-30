@@ -1,15 +1,13 @@
 ## This document specifies current version of the web app and keeps the changelog
 
-Current version: 0.3.0
+Current version: 0.4.0
 
 == Changelog ==
-v.0.3.0 (2021/05/23)
-- Displays hyperlink to AmiGO webpage when the user selects a GO term.
-- Results of GO enrichment test presented as a table and as a barplot.
-- Performs GO enrichment test using Enrichr through enrichR interface.
-- Input controls for gene ontology characterization (Functional aspect, number of categories, pvalue cutoff)
-- Specific tab for gene ontology.
-- Write headers for each tab.
+v.0.4.0 (2021/05/30)
+- Section 'Frecuencia de palabras': displays another datatable with secondary corpus, the abstract of selected publication, and a hyperlink to the PubMed page for said publication.
+- Display datatable in section 'Frecuencia de palabras' with the most frequent words in the corpus.
+- The barplot of word frequencies has been translated to the section 'Gráficas de frecuencia'.
+- Change header dynamically in section 'Frecuencia de palabras' reflecting query keywords.
 
 ***Known issues***
 - There is no friendly error message when no gen is recovered.
@@ -17,6 +15,16 @@ v.0.3.0 (2021/05/23)
 - There is no friendly error message when Enrichr server is off-line.
 - IMPORTANT: Downloand button, for GO terms table, only works for Cellular Components results in the server
    (it works as expected in local, though).
+- Error messages in 'Frecuencia de palabras' section before displaying datatable of secondary corpus.
+- Error messages in 'Frecuencia de palabras' section before displaying hyperlink to PubMed database.
+
+v.0.3.0 (2021/05/23)
+- Displays hyperlink to AmiGO webpage when the user selects a GO term.
+- Results of GO enrichment test presented as a table and as a barplot.
+- Performs GO enrichment test using Enrichr through enrichR interface.
+- Input controls for gene ontology characterization (Functional aspect, number of categories, pvalue cutoff)
+- Specific tab for gene ontology.
+- Write headers for each tab.
 
 v.0.2.0 (2021/05/07)
 - Change layout to side menu and main body.

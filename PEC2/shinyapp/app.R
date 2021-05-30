@@ -5,11 +5,6 @@ library(easyPubMed)
 library(pubmed.mineR)
 library(DT)
 library(tokenizers)
-# library(BiocManager) # Necessary for building clusterProfiler into the app
-# options(repos = BiocManager::repositories()) # Necessary for building clusterProfiler into the app
-# library(org.Hs.eg.db) # GO over-representation test
-# library(clusterProfiler) # GO over-representation test
-# library(ggplot2) # For putting xlabel in GO enrichment barplot
 library(enrichR) # GO over-representation test, interfaze for Enrichr webtool
 
 ### Fixed variables ###
@@ -66,24 +61,6 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
                           "Componente celular" = "GO_Cellular_Component_2018",
                           "Proceso biológico" = "GO_Biological_Process_2018")
   
-  # adjust_methods <- list("Bonferroni" = "bonferroni",
-  #                        "Holm" = "holm",
-  #                        "Hommel" = "hommel",
-  #                        "Benjamini & Hochberg" = "BH",
-  #                        "Benjamini & Yekutieli" = "BY")
-  
-  # # General GO overrepresentation function
-  # ego_function <- function(genes, ontology, padjust, pvalue, qvalue) {
-  #   enrichGO(gene = genes,
-  #                          universe = universe_genes,
-  #                          OrgDb = org.Hs.eg.db,
-  #                          ont = ontology,
-  #                          pAdjustMethod = padjust,
-  #                          pvalueCutoff = pvalue,
-  #                          qvalueCutoff = qvalue,
-  #                          readable = FALSE)
-  # }
-
 ### User interface ###
 ui <- fluidPage(
   titlePanel("Endo-Mining",
@@ -139,13 +116,26 @@ ui <- fluidPage(
   )),
   
   tabPanel(title = "Frecuencia de palabras",
-           h1("Frecuencia de palabras"),
+           # h1("Frecuencia de palabras"),
+           uiOutput("header_frecuencia_palabras"),
   fluidRow(
   # Table of words
+    column(4,
+           DT::dataTableOutput("palabras")
+    ),
     column(6,
-           plotOutput("words_barplot"),
-  tableOutput("palabras")
-    ))),
+           DT::dataTableOutput("palabras_2ario")
+           )),
+  fluidRow(
+    column(4,
+    # Hyperlink to selected publication
+    htmlOutput("HyperlinkPalabra")
+    ),
+    column(6,
+           # Abstract of selected publication
+           htmlOutput("abstractPalabra")
+           )
+  )),
   tabPanel(title = "Frecuencia de genes",
            h1("Frecuencia de genes"),
            fluidRow(
@@ -159,7 +149,8 @@ ui <- fluidPage(
   ),
   # Gráficas de frecuencia
   tabPanel(title = "Gráficas de frecuencia",
-           h1("Placeholder")),
+           h1("Gráficas de frecuencia"),
+           plotOutput("words_barplot")),
   # Caracterización de genes
   tabPanel(title = "Caracterización de genes",
            h1("Caracterización de genes por ontología génica"),
@@ -183,12 +174,6 @@ ui <- fluidPage(
                                max = 1,
                                min = 0,
                                step = 0.005),
-                  # numericInput(inputId = "q_valor",
-                  #              "Punto de corte: Q-valor",
-                  #              value = 0.05,
-                  #              max = 1,
-                  #              min = 0,
-                  #              step = 0.05),
                   selectInput(inputId = "metodo_ajuste",
                               "Método de ajuste del p-valor",
                               choices = "Benjamini & Hochberg"),
@@ -359,12 +344,89 @@ incProgress(15/15)
     words
                  })
     })
+  
+  ### Temporal for words in local
+  #words <- reactive(readRDS("words.RDS"))
+  ### Temporal for pubmed results in local
+  #pubmed_results_temporal <- reactive(readRDS("pubmed_results_temporal.RDS"))
+  
+  # Header for frequency of words section
+  output$header_frecuencia_palabras <- renderUI({
+    query_keywords <- input$keywords
+    if (is.null(query_keywords)) {h1("Frecuencia de palabras")}
+    else {
+      h1(
+        HTML(
+          paste0(
+            "Frecuencia de palabras en",
+            tags$br(),
+            "publicaciones sobre ", query_keywords)))}
+  })
+  
   # Table of words
-  output$palabras <- renderTable({
-    
-    tabla_palabras <- data.frame(words()[1:10,])
-    colnames(tabla_palabras) <- c("Palabra", "Frecuencia")
-    tabla_palabras
+  output$palabras <- DT::renderDataTable({
+    # Table content
+    tabla_palabras <- data.frame(words())
+    #tabla_palabras <- words() # Temporal mientras pruebo en local
+    datatable(tabla_palabras,
+              colnames = c("Palabra", "Frecuencia"),
+              rownames = FALSE,
+              caption = 'Haga click en las cabeceras de las columnas para cambiar el orden',
+              selection = list(mode = 'single', selected = 1),
+              options = list(language = list(url = 'spanish.json')))
+  })
+  
+  # Secondary corpus based on selected word
+  corpus_2ario <- reactive({
+    withProgress(message = "Generando corpus secundario...",
+                                 value = 0, {
+    corpus <- pubmed_results()
+    # corpus <- pubmed_results_temporal() # Temporal for testing in local
+    setProgress(1/4)
+    word_selected <- input$palabras_rows_selected
+    setProgress(2/4)
+    term <- words()[word_selected, 1] # Recover selected word from words dataframe
+    setProgress(3/4)
+    getabs(corpus, term, FALSE)
+  })
+  })
+
+  # Table for secondary corpus on words
+  output$palabras_2ario <- DT::renderDataTable({
+    # Table content
+    tabla_titulos_2ario <- data.frame(corpus_2ario()@PMID,
+                                      corpus_2ario()@Journal)
+    datatable(tabla_titulos_2ario,
+              colnames = c("PMID", "Publicación"),
+              rownames = FALSE,
+              caption = "Citas que contienen la palabra seleccionada",
+              selection = list(mode = 'single', selected = 1),
+              options = list(language = list(url = 'spanish.json')))
+  })
+  
+  ## Abstract of selected pmid for words
+  ### This should be re-factored into a function because I am using
+  ### the same code that in output$abstractText
+  output$abstractPalabra <- renderText({
+    row_selected <- input$palabras_2ario_rows_selected
+    abstracts <- corpus_2ario()@Abstract[row_selected]
+    abstractSentences <- tokenize_sentences(abstracts, simplify = TRUE)
+    to_print <- paste('<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', corpus_2ario()@Journal[row_selected],
+                      '</b></font>', '</h4></p>', '\n')
+    for (i in seq_along(abstractSentences)){
+      if (i < 3) {
+        to_print <- paste(to_print,
+                          '<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', abstractSentences[i],
+                          '</b></font>', '</h4></p>', '\n')
+      } else{
+        to_print <- paste(to_print,
+                          '<p><i>',abstractSentences[i],'</i></p>','\n')
+      }
+    }
+    to_print <- paste(paste0('<p><a href="https://www.ncbi.nlm.nih.gov/pubmed/',corpus_2ario()@PMID[row_selected],'" target=_blank>'
+                             , 'Visitar página de la cita en PubMed', '</a></p>','\n'),
+                      to_print)
+    to_print
   })
   
   # Barplot with frequency of words
@@ -383,14 +445,11 @@ incProgress(15/15)
                  detail = 'Suele tardar un rato...',
                  value = 0, {
                    incProgress(1/2)
-    # genes_data <- gene_atomization(pubmed_results())
-    # # Codify frequency of genes as numeric
-    # genes_table <- data.frame(genes_data,
-    #                           stringsAsFactors = FALSE)
-    # colnames(genes_table) <- c("Símbolo", "Nombre", "Frecuencia")
-    genes_table <- pubmed_results() %>% gene_atomization() %>%
-      data.frame(stringsAsFactors = FALSE) %>%
-      `colnames<-`(c("Símbolo", "Nombre", "Frecuencia"))
+    genes_data <- gene_atomization(pubmed_results())
+    # Codify frequency of genes as numeric
+    genes_table <- data.frame(genes_data,
+                              stringsAsFactors = FALSE)
+    colnames(genes_table) <- c("Símbolo", "Nombre", "Frecuencia")
     genes_table$Frecuencia <- as.integer(genes_table$Frecuencia)
     incProgress(2/2)
                  })
@@ -413,102 +472,15 @@ incProgress(15/15)
                  main = "Genes más frecuentes")
   })
   
-  ## GO-over-representation test
-  # GO enrichment analysis of the gene set
-  # Configure sample genes as entrezID
-  # keys <- reactive({
-  #   genes()[, "Símbolo"]
-  #   # load(file = "../intermediateData/genes.RData") # Temporal
-  #   # genes[, "Gene_symbol"]
-  # })
-
-  #  entrezID <- reactive({
-  #   entrez <- select(org.Hs.eg.db,
-  #          keys = genes()[, "Símbolo"],
-  #          columns = c("SYMBOL", "ENTREZID"),
-  #          keytype = "SYMBOL")
-  #   entrez[, "ENTREZID"]
-  # })
-  # # Compute enrichResult objects of each ontology aspect
-  # ego_cc <- eventReactive(input$GO_button,{
-  #   req(input$select_aspect == 'Componente celular')
-  #   withProgress(message = "Computing enriched GO terms", {
-  #     ego_function( genes = entrezID(),
-  #                 ontology = 'CC',
-  #                  padjust = adjust_methods[[input$metodo_ajuste]],
-  #                  pvalue = input$p_valor,
-  #                  qvalue = input$q_valor)
-  #     })
-  # })
-  # 
-  # ego_bp <- eventReactive(input$GO_button,{
-  #   req(input$select_aspect == 'Proceso biológico')
-  #   ego_function( genes = entrezID(),
-  #                 ontology = 'BP',
-  #                 padjust = adjust_methods[[input$metodo_ajuste]],
-  #                 pvalue = input$p_valor,
-  #                 qvalue = input$q_valor)
-  # })
-  # 
-  # ego_mf <- eventReactive(input$GO_button,{
-  #   req(input$select_aspect == 'Función molecular')
-  #   ego_function( genes = entrezID(),
-  #                 ontology = 'MF',
-  #                 padjust = adjust_methods[[input$metodo_ajuste]],
-  #                 pvalue = input$p_valor,
-  #                 qvalue = input$q_valor)
-  # })
-  # 
-  # # Selected ego results
-  # ego_object <- reactive(
-  #       if (input$select_aspect == 'Componente celular') {
-  #         withProgress(message = "Calculando términos GO enriquecidos \npara componentes celulares",
-  #         ego_cc())
-  #       } else if (input$select_aspect == 'Proceso biológico') {
-  #         withProgress(message = "Calculando términos GO enriquecidos \npara procesos biológicos",
-  #       ego_bp())
-  #       } else if (input$select_aspect == 'Función molecular') {
-  #         withProgress(message = "Calculando términos GO enriquecidos \npara funciones moleculares",
-  #       ego_mf())
-  #       }
-  #   )
-  # 
-  # # Compose data frame from eGO results
-  # ego_table <- eventReactive(
-  #   input$GO_button, {
-      # withProgress(message = "Computing enriched GO terms", {
-    #     if (input$select_aspect == 'Componente celular') {
-    #       ego_object <- ego_cc()
-    #     } else if (input$select_aspect == 'Proceso biológico') {
-    #       ego_object <- ego_bp()
-    #     } else if (input$select_aspect == 'Función molecular') {
-    #       ego_object <- ego_mf()
-    #     }
-
-        # incProgress(1/2)
-
-
-        # as.data.frame(ego_cc()[, c("ID", "Description", "GeneRatio", "BgRatio", "p.adjust")])
-      # })
-    # })
-
-  # Display results in table or barplot
+  
+  # Display results of GO enrichment as table or barplot
   observeEvent(input$select_display, {
     updateTabsetPanel(
       inputId = "tabla_grafico",
       selected = input$select_display)
   })
 
-  # GO terms table
-  # output$GOterms <- DT::renderDataTable({
-  #   datatable(ego_table(),
-  #             rownames = FALSE,
-  #             colnames = c("GO_ID", "Descripción", "GeneRatio", "BgRatio", "p-valor ajustado"),
-  #             selection = list(mode = 'single', selected = 1),
-  #             options = list(language = list(url = 'spanish.json'))) %>%
-  #     formatSignif('p.adjust', 2) %>%  # Significative digits for p.adjust column
-  #     formatStyle(columns = c("GeneRatio", "BgRatio", "p.adjust"), `text-align` = 'center') # Center columns
-  # })
+  
 
 # Compute enrichment of terms in gene set using enrichR
 # as an interface for the web tool Enrichr
@@ -617,38 +589,6 @@ incProgress(15/15)
     res = 96,
     alt = 'Gráfica de barras de términos GO enriquecidos'
   )
-  
-    # output$GO_barplot <- renderPlot(barplot(height = ego_object(),
-    #                      showCategory = input$go_categories,
-    #                      title = paste0("Términos GO enriquecidos \n(",
-    #                                     input$select_aspect,
-    #                                     ")")) + labs(y = "Número de genes en cada categoría"),
-    #                      # Plot size enough to display all chosen categories
-    #                      height = reactive(
-    #                        max(400, input$go_categories * 20)),
-    #                      res = 96,
-    #                      alt = 'Gráfica de barras')
-  
-  
-  # 
-  # output$ontologyCC <- renderPlot(height = ego_CC,
-  #                                 showCategory = 20,
-  #                                 title = "Título")
-  
-  # # Get human genes ID from pubtator contingency table
-  # universe_genes <- read.csv("PEC2/shinyapp/human_geneID_universe.csv",
-  #                            header = FALSE,
-  #                            # Store as vector instead of dataframe
-  #                            colClasses = "character")[,1]
-  # # Translate gene symbols to entrezId
-  # # Beware: the result is a dataframe
-  # entrez <- select(org.Hs.eg.db,
-  #                  keys = genes()$Symbol,
-  #                  columns = c("SYMBOL", "ENTREZID"),
-  #                  keytype = "SYMBOL") 
-
-
-  
 }
   
 
