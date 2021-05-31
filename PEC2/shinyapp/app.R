@@ -150,7 +150,7 @@ ui <- fluidPage(
   ),
           fluidRow(
             column(5,
-                   p("Hyperlink")),
+                   htmlOutput("hyperlink_gene")),
             column(5,
                    # Abstract of selected publication by gene
                    htmlOutput("abstractGene"))
@@ -486,10 +486,10 @@ server <- function(input, output, session){
   #   genes_table
   #   })
 
-  # Table with frequency of genes
-  output$genes_table <- renderDataTable({
+  # Add EntrezID column into genes table
+  genes_plus_entrez <- reactive({
     genes_table <- genes()
-    keys <- genes_table[, "Símbolo"]   # Char vector for looking up in database
+    keys <- genes_table[, "Símbolo"] # Char vector for looking up in database
     entrez <- mapIds(org.Hs.eg.db, # vector with correspondence symbol-entrezid
                      keys = keys,
                      column = "ENTREZID",
@@ -498,7 +498,12 @@ server <- function(input, output, session){
     )
     genes_table$Entrez_ID <- entrez  # Add new column to genes dataframe
     genes_table <- genes_table[, c("Símbolo", "Entrez_ID", "Nombre", "Frecuencia")] # Rearrange columns
-    datatable(genes_table,
+  })
+  
+  # Table with frequency of genes
+  output$genes_table <- renderDataTable({
+    req(genes_plus_entrez())
+    datatable(genes_plus_entrez(),
               rownames = FALSE,
               caption = 'Haga click en las cabeceras de las columnas para cambiar el orden',
               selection = list(mode = 'single', selected = 1),
@@ -555,6 +560,18 @@ server <- function(input, output, session){
                              , 'Visitar página de la cita en PubMed', '</a></p>','\n'),
                       to_print)
     to_print
+  })
+  
+  # Hyperlink for Entrez ID
+  output$hyperlink_gene <- renderText({
+    req(genes())
+    row_selected <- input$genes_table_rows_selected
+    # isolate Entrez ID for composing hyperlink
+    gene_id <- genes_plus_entrez()[row_selected, c("Símbolo", "Entrez_ID")]
+    # Build hyperlink
+    paste0('<br /><br /><p><a href="https://www.ncbi.nlm.nih.gov/gene/', gene_id[1,2],'" target=_blank>',
+           'Abrir enlace a la página de información del gen ', gene_id[1,1],
+           ' en NCBI Gene', '</a></p>','\n')
   })
   
   # Barplot with frequency of genes
