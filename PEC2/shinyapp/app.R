@@ -5,6 +5,8 @@ library(easyPubMed)
 library(pubmed.mineR)
 library(DT)
 library(tokenizers)
+library(BiocManager) # Necessary for building org.Hs.eg.db into the app
+options(repos = BiocManager::repositories()) # Necessary for building org.Hs.eg.db into the app
 library(org.Hs.eg.db) # Obtaining EntrezID corresponding to gene symbol
 library(enrichR) # GO over-representation test, interfaze for Enrichr webtool
 
