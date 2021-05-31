@@ -166,7 +166,13 @@ ui <- fluidPage(
                     selectInput(inputId = "select_words_genes",
                                 "Seleccionar resultados de",
                                 choices = c("Palabras más frecuentes",
-                                            "Genes más frecuentes"))),
+                                            "Genes más frecuentes")),
+                    sliderInput(inputId = 'genes_words_max',
+                                label = "Máximo número de palabras/genes representados",
+                                min = 1,
+                                max = 20,
+                                value = 10,
+                                step = 1)),
              column(5,
                     # Optional UI with tabsets
                     # Will display results for words or genes
@@ -479,9 +485,17 @@ server <- function(input, output, session){
       selected = input$select_words_genes)
   })
   
+  # Update slider of min and max represented words/genes
+  observeEvent(input$select_words_genes,
+               updateSliderInput(
+                 inputId = 'genes_words_max',
+                 max = min(20, nrow(genes()))
+               ))
+  
+  
   # Barplot with frequency of words
   output$words_barplot <- renderPlot({
-    tabla_frecuencias <- data.frame(words()[1:10,])
+    tabla_frecuencias <- data.frame(words()[1:input$genes_words_max,])
     tabla_frecuencias$words2 <- factor(tabla_frecuencias$words, 
                                  levels = rev(factor(tabla_frecuencias$words)))
     freq_barplot(varcat = tabla_frecuencias$words2,
@@ -605,7 +619,7 @@ server <- function(input, output, session){
   
   # Barplot with frequency of genes
   output$genes_barplot <- renderPlot({
-    tabla_frecuencias <- genes()[1:10,]
+    tabla_frecuencias <- genes()[1:input$genes_words_max,]
     tabla_frecuencias$genes2 <- factor(tabla_frecuencias$Símbolo,
                                        levels = rev(factor(tabla_frecuencias$Símbolo)))
     freq_barplot(varcat = tabla_frecuencias$genes2,
