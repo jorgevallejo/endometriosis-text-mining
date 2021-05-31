@@ -489,7 +489,7 @@ server <- function(input, output, session){
   observeEvent(input$select_words_genes,
                updateSliderInput(
                  inputId = 'genes_words_max',
-                 max = min(20, nrow(genes()))
+                 max = min(100, nrow(genes()))
                ))
   
   
@@ -501,7 +501,10 @@ server <- function(input, output, session){
     freq_barplot(varcat = tabla_frecuencias$words2,
                  varnum = tabla_frecuencias$Freq,
                  main = "Palabras más frecuentes")
-  })
+  },
+  height = reactive(max(600, input$genes_words_max * 20)),
+  res = 96,
+  alt = 'Gráfica de barras de palabras más frecuentes')
 
   # Genes temporal
   genes <- reactive({genes_data <- readRDS("test_files/genes.RDS")
@@ -625,7 +628,10 @@ server <- function(input, output, session){
     freq_barplot(varcat = tabla_frecuencias$genes2,
                  varnum = tabla_frecuencias$Frecuencia,
                  main = "Genes más frecuentes")
-  })
+  },
+  height = reactive(max(600, input$genes_words_max * 20)),
+  res = 96,
+  alt = 'Gráfica de barras de genes más frecuentes')
   
   
   # Display results of GO enrichment as table or barplot
