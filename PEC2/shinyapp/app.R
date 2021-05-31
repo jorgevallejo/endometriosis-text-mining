@@ -162,7 +162,11 @@ ui <- fluidPage(
   tabPanel(title = "Gráficas de frecuencia",
            h1("Gráficas de frecuencia"),
            fluidRow(
-             column(5, "Inputs"),
+             column(5,
+                    selectInput(inputId = "select_words_genes",
+                                "Seleccionar resultados de",
+                                choices = c("Palabras más frecuentes",
+                                            "Genes más frecuentes"))),
              column(5,
                     # Optional UI with tabsets
                     # Will display results for words or genes
@@ -466,6 +470,13 @@ server <- function(input, output, session){
                              , 'Visitar página de la cita en PubMed', '</a></p>','\n'),
                       to_print)
     to_print
+  })
+  
+  # Display words or genes barplot
+  observeEvent(input$select_words_genes, {
+    updateTabsetPanel(
+      inputId = "graficas_frecuencia",
+      selected = input$select_words_genes)
   })
   
   # Barplot with frequency of words
