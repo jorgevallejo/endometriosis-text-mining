@@ -161,9 +161,25 @@ ui <- fluidPage(
   # Gráficas de frecuencia
   tabPanel(title = "Gráficas de frecuencia",
            h1("Gráficas de frecuencia"),
-           plotOutput("words_barplot"),
-           # Barplot of genes
-           plotOutput("genes_barplot")),
+           fluidRow(
+             column(5, "Inputs"),
+             column(5,
+                    # Optional UI with tabsets
+                    # Will display results for words or genes
+                    # according to user selection.
+                    tabsetPanel(
+                      id = 'graficas_frecuencia',
+                      type = 'hidden',
+                      tabPanelBody(
+                        "Palabras más frecuentes",
+                        # Barplot de palabras
+                        plotOutput("words_barplot")
+                      ),
+                      tabPanelBody(
+                        "Genes más frecuentes",
+                        # Barplot of genes
+                        plotOutput("genes_barplot"))
+                      )))),
   # Caracterización de genes
   tabPanel(title = "Caracterización de genes",
            h1("Caracterización de genes por ontología génica"),
