@@ -5,6 +5,9 @@ library(easyPubMed)
 library(pubmed.mineR)
 library(DT)
 library(tokenizers)
+library(BiocManager) # Necessary for building org.Hs.eg.db into the app
+options(repos = BiocManager::repositories()) # Necessary for building org.Hs.eg.db into the app
+library(org.Hs.eg.db) # Obtaining EntrezID corresponding to gene symbol
 library(enrichR) # GO over-representation test, interfaze for Enrichr webtool
 
 ### Fixed variables ###
@@ -139,18 +142,28 @@ ui <- fluidPage(
   tabPanel(title = "Frecuencia de genes",
            h1("Frecuencia de genes"),
            fluidRow(
-  column(6,
-  # Barplot of genes
-  plotOutput("genes_barplot"),
+  column(5,
   # Table of genes
-  tableOutput("genes_table")
-    )
-  )
+  DT::dataTableOutput("genes_table")
+    ),
+  column(5,
+         # Secondary corpus of genes
+         DT::dataTableOutput("genes_cites_table"))
+  ),
+          fluidRow(
+            column(5,
+                   htmlOutput("hyperlink_gene")),
+            column(5,
+                   # Abstract of selected publication by gene
+                   htmlOutput("abstractGene"))
+          )
   ),
   # Gráficas de frecuencia
   tabPanel(title = "Gráficas de frecuencia",
            h1("Gráficas de frecuencia"),
-           plotOutput("words_barplot")),
+           plotOutput("words_barplot"),
+           # Barplot of genes
+           plotOutput("genes_barplot")),
   # Caracterización de genes
   tabPanel(title = "Caracterización de genes",
            h1("Caracterización de genes por ontología génica"),
@@ -169,16 +182,22 @@ ui <- fluidPage(
                                           "Proceso biológico",
                                           "Función molecular")),
                   numericInput(inputId = "p_valor",
-                               "Punto de corte: P-valor",
+                               "Nivel de significatividad (p-valor ajustado)",
                                value = 0.05,
                                max = 1,
                                min = 0,
                                step = 0.005),
-                  selectInput(inputId = "metodo_ajuste",
-                              "Método de ajuste del p-valor",
-                              choices = "Benjamini & Hochberg"),
                   actionButton(inputId = "GO_button",
-                               label = "GO test")
+                               label = "Caracterizar"),
+                  p(),
+                  p("El método de ajuste del p-valor en esta aplicación 
+                    (necesario para controlar la probabilidad de falsos positivos 
+                    en las comparaciones múltiples) es el conocido como de", 
+                    span("Benjamini & Hochberg", style = "font-style:italic"), "."), 
+                    p("El botón de descarga proporciona un archivo CSV con todos los 
+                    términos GO recuperados, junto con los p-valores originales;
+                    permitiendo al usuario calcular los p-valores por su cuenta
+                      si considera necesario usar un método diferente.")
                   ),
            column(6,
                   # Optional UI with tabsets
@@ -253,8 +272,8 @@ server <- function(input, output, session){
                
   })
   
-  # Downloads search results
-  
+  # Downloads search results ## Temporal-comentado para tests en local
+
   pubmed_results <- eventReactive(input$search, {
     # Progress bar
     withProgress(message = "Descargando sumarios desde PubMed...",
@@ -266,7 +285,7 @@ server <- function(input, output, session){
       dest_file_prefix = "pubmed_",
       format = "abstract",
       batch_size = 5000)
-    
+
     ## Concatenate files
     # List of files to be added together
     files_list <- list.files(pattern = "pubmed_",
@@ -283,14 +302,15 @@ server <- function(input, output, session){
     close(out_file)
     # Generate object of class abstract
     abstracts <- readabs("todos_resultados.txt")
-    
+
     # Delete unnecesary text files
     files_to_delete <- list.files(pattern = "\\.txt$")
     file.remove(files_to_delete)
 incProgress(15/15)
 })
     abstracts
-  })
+   })
+  
   # Muestra la cantidad de citas recuperadas
   output$n_archivos <- renderText({
     paste0("Nº de citas recuperadas: ",
@@ -334,7 +354,7 @@ incProgress(15/15)
    })
   
   ## Preprocesado del corpus primario
-  # Word atomization
+  # Word atomization # Comentario temporal para tests
   words <- reactive({
     withProgress(message = "Recuperando palabras...",
                  value = 0, {
@@ -345,10 +365,10 @@ incProgress(15/15)
                  })
     })
   
-  ### Temporal for words in local
-  #words <- reactive(readRDS("words.RDS"))
-  ### Temporal for pubmed results in local
-  #pubmed_results_temporal <- reactive(readRDS("pubmed_results_temporal.RDS"))
+  ## Temporal for words in local
+  # words <- reactive(readRDS("test_files/words.RDS"))
+  ## Temporal for pubmed results in local
+  # pubmed_results <- reactive(readRDS("test_files/pubmed_results_temporal.RDS"))
   
   # Header for frequency of words section
   output$header_frecuencia_palabras <- renderUI({
@@ -367,7 +387,7 @@ incProgress(15/15)
   output$palabras <- DT::renderDataTable({
     # Table content
     tabla_palabras <- data.frame(words())
-    #tabla_palabras <- words() # Temporal mientras pruebo en local
+    # #tabla_palabras <- words() # Temporal mientras pruebo en local
     datatable(tabla_palabras,
               colnames = c("Palabra", "Frecuencia"),
               rownames = FALSE,
@@ -390,7 +410,10 @@ incProgress(15/15)
     getabs(corpus, term, FALSE)
   })
   })
+  
 
+  
+  
   # Table for secondary corpus on words
   output$palabras_2ario <- DT::renderDataTable({
     # Table content
@@ -406,7 +429,7 @@ incProgress(15/15)
   
   ## Abstract of selected pmid for words
   ### This should be re-factored into a function because I am using
-  ### the same code that in output$abstractText
+  ### the same code that in output$abstractText and output$abstractGene
   output$abstractPalabra <- renderText({
     row_selected <- input$palabras_2ario_rows_selected
     abstracts <- corpus_2ario()@Abstract[row_selected]
@@ -438,8 +461,17 @@ incProgress(15/15)
                  varnum = tabla_frecuencias$Freq,
                  main = "Palabras más frecuentes")
   })
-  
-  # Gene atomization
+
+  # Genes temporal
+  # genes <- reactive({genes_data <- readRDS("test_files/genes.RDS")
+  #                   genes_table <- data.frame(genes_data,
+  #                                                                         stringsAsFactors = FALSE)
+  #                                               colnames(genes_table) <- c("Símbolo", "Nombre", "Frecuencia")
+  #                                               genes_table$Frecuencia <- as.integer(genes_table$Frecuencia)
+  #                                               genes_table
+  #                   })
+    
+  # Gene atomization ## Temporal - comentado para tests en local
   genes <- reactive({
     withProgress(message = 'Recuperando genes...',
                  detail = 'Suele tardar un rato...',
@@ -456,11 +488,93 @@ incProgress(15/15)
     genes_table
     })
 
-  # Table with frequency of genes
-  output$genes_table <- renderTable({
-    genes()
+  # Add EntrezID column into genes table
+  genes_plus_entrez <- reactive({
+    genes_table <- genes()
+    keys <- genes_table[, "Símbolo"] # Char vector for looking up in database
+    entrez <- mapIds(org.Hs.eg.db, # vector with correspondence symbol-entrezid
+                     keys = keys,
+                     column = "ENTREZID",
+                     keytype = "SYMBOL",
+                     multiVals = 'first'
+    )
+    genes_table$Entrez_ID <- entrez  # Add new column to genes dataframe
+    genes_table <- genes_table[, c("Símbolo", "Entrez_ID", "Nombre", "Frecuencia")] # Rearrange columns
   })
   
+  # Table with frequency of genes
+  output$genes_table <- renderDataTable({
+    req(genes_plus_entrez())
+    datatable(genes_plus_entrez(),
+              rownames = FALSE,
+              caption = 'Haga click en las cabeceras de las columnas para cambiar el orden',
+              selection = list(mode = 'single', selected = 1),
+              options = list(language = list(url = 'spanish.json')))
+  })
+  
+  # Secondary corpus based on selected gene symbol
+  corpus_2ario_gene <- reactive({
+    withProgress(message = "Generando corpus secundario...",
+                 value = 0, {
+                   corpus <- pubmed_results()
+                   # corpus <- pubmed_results_temporal() # Temporal for testing in local
+                   setProgress(1/4)
+                   gene_selected <- input$genes_table_rows_selected
+                   setProgress(2/4)
+                   term <- genes()[gene_selected, 1] # Recover selected word from words dataframe
+                   setProgress(3/4)
+                   getabs(corpus, term, FALSE)
+                 })
+  })
+  
+  # Table with citations that include the gen
+  output$genes_cites_table <- DT::renderDataTable({
+    tabla_genes_2ario <- data.frame(corpus_2ario_gene()@PMID,
+                                    corpus_2ario_gene()@Journal)
+    datatable(tabla_genes_2ario,
+              rownames = FALSE,
+              colnames = c("PMID", "Publicación"),
+              caption = 'Publicaciones que contienen el gen seleccionado',
+              selection = list(mode = 'single', selected = 1),
+              options = list(language = list(url = 'spanish.json')))
+  })
+  
+  ## Abstract of selected pmid for gene
+  ### This should be re-factored into a function because I am using
+  ### the same code that in output$abstractText and output$abstractPalabra
+  output$abstractGene <- renderText({
+    row_selected <- input$genes_cites_table_rows_selected
+    abstracts <- corpus_2ario_gene()@Abstract[row_selected]
+    abstractSentences <- tokenize_sentences(abstracts, simplify = TRUE)
+    to_print <- paste('<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', corpus_2ario_gene()@Journal[row_selected],
+                      '</b></font>', '</h4></p>', '\n')
+    for (i in seq_along(abstractSentences)){
+      if (i < 3) {
+        to_print <- paste(to_print,
+                          '<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', abstractSentences[i],
+                          '</b></font>', '</h4></p>', '\n')
+      } else{
+        to_print <- paste(to_print,
+                          '<p><i>',abstractSentences[i],'</i></p>','\n')
+      }
+    }
+    to_print <- paste(paste0('<p><a href="https://www.ncbi.nlm.nih.gov/pubmed/',corpus_2ario_gene()@PMID[row_selected],'" target=_blank>'
+                             , 'Visitar página de la cita en PubMed', '</a></p>','\n'),
+                      to_print)
+    to_print
+  })
+  
+  # Hyperlink for Entrez ID
+  output$hyperlink_gene <- renderText({
+    req(genes())
+    row_selected <- input$genes_table_rows_selected
+    # isolate Entrez ID for composing hyperlink
+    gene_id <- genes_plus_entrez()[row_selected, c("Símbolo", "Entrez_ID")]
+    # Build hyperlink
+    paste0('<br /><br /><p><a href="https://www.ncbi.nlm.nih.gov/gene/', gene_id[1,2],'" target=_blank>',
+           'Abrir enlace a la página de información del gen ', gene_id[1,1],
+           ' en NCBI Gene', '</a></p>','\n')
+  })
   
   # Barplot with frequency of genes
   output$genes_barplot <- renderPlot({
