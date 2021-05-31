@@ -141,14 +141,20 @@ ui <- fluidPage(
            h1("Frecuencia de genes"),
            fluidRow(
   column(5,
-  
   # Table of genes
   DT::dataTableOutput("genes_table")
     ),
   column(5,
          # Secondary corpus of genes
          DT::dataTableOutput("genes_cites_table"))
-  )
+  ),
+          fluidRow(
+            column(5,
+                   p("Hyperlink")),
+            column(5,
+                   # Abstract of selected publication by gene
+                   htmlOutput("abstractGene"))
+          )
   ),
   # Gráficas de frecuencia
   tabPanel(title = "Gráficas de frecuencia",
@@ -421,7 +427,7 @@ server <- function(input, output, session){
   
   ## Abstract of selected pmid for words
   ### This should be re-factored into a function because I am using
-  ### the same code that in output$abstractText
+  ### the same code that in output$abstractText and output$abstractGene
   output$abstractPalabra <- renderText({
     row_selected <- input$palabras_2ario_rows_selected
     abstracts <- corpus_2ario()@Abstract[row_selected]
@@ -526,7 +532,30 @@ server <- function(input, output, session){
               options = list(language = list(url = 'spanish.json')))
   })
   
-  
+  ## Abstract of selected pmid for gene
+  ### This should be re-factored into a function because I am using
+  ### the same code that in output$abstractText and output$abstractPalabra
+  output$abstractGene <- renderText({
+    row_selected <- input$genes_cites_table_rows_selected
+    abstracts <- corpus_2ario_gene()@Abstract[row_selected]
+    abstractSentences <- tokenize_sentences(abstracts, simplify = TRUE)
+    to_print <- paste('<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', corpus_2ario_gene()@Journal[row_selected],
+                      '</b></font>', '</h4></p>', '\n')
+    for (i in seq_along(abstractSentences)){
+      if (i < 3) {
+        to_print <- paste(to_print,
+                          '<p>', '<h4>', '<font_color = \"#4B04F6\"><b>', abstractSentences[i],
+                          '</b></font>', '</h4></p>', '\n')
+      } else{
+        to_print <- paste(to_print,
+                          '<p><i>',abstractSentences[i],'</i></p>','\n')
+      }
+    }
+    to_print <- paste(paste0('<p><a href="https://www.ncbi.nlm.nih.gov/pubmed/',corpus_2ario_gene()@PMID[row_selected],'" target=_blank>'
+                             , 'Visitar página de la cita en PubMed', '</a></p>','\n'),
+                      to_print)
+    to_print
+  })
   
   # Barplot with frequency of genes
   output$genes_barplot <- renderPlot({
