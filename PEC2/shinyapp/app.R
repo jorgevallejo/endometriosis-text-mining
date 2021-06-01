@@ -41,7 +41,8 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
                ylab = "",
                xlab = "",
                xlim = c(0,max(varnum * 1.1)),
-               axes = FALSE
+               axes = FALSE,
+               col = colorRampPalette(c("blue", "red"))(varcat)
   )
   # Writes the frequency of each gen at the end of the bar
   text(rev(varnum),
