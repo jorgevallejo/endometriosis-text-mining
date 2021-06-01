@@ -187,14 +187,22 @@ ui <- fluidPage(
                       id = 'graficas_frecuencia',
                       type = 'hidden',
                       tabPanelBody(
-                        "Palabras más frecuentes",
+                        "Palabras más frecuentes - Gráfico de barras",
                         # Barplot de palabras
                         plotOutput("words_barplot")
                       ),
                       tabPanelBody(
-                        "Genes más frecuentes",
+                        "Genes más frecuentes - Gráfico de barras",
                         # Barplot of genes
-                        plotOutput("genes_barplot"))
+                        plotOutput("genes_barplot")),
+                      tabPanelBody(
+                        "Palabras más frecuentes - Nube de palabras",
+                        # Nube de palabras
+                        plotOutput("words_wordcloud")),
+                      tabPanelBody(
+                        "Genes más frecuentes - Nube de palabras",
+                        # Nube de genes
+                        plotOutput("genes_wordcloud"))
                       )))),
   # Caracterización de genes
   tabPanel(title = "Caracterización de genes",
@@ -485,10 +493,13 @@ server <- function(input, output, session){
   })
   
   # Display words or genes barplot
-  observeEvent(input$select_words_genes, {
+  observeEvent({input$select_words_genes
+                input$barplot_cloud}, {
     updateTabsetPanel(
       inputId = "graficas_frecuencia",
-      selected = input$select_words_genes)
+      selected = paste0(input$select_words_genes,
+                        " - ",
+                        input$barplot_cloud))
   })
   
   # Update slider of min and max represented words/genes
@@ -512,6 +523,20 @@ server <- function(input, output, session){
   res = 96,
   alt = 'Gráfica de barras de palabras más frecuentes')
 
+  # Wordcloud with frequency of words
+  output$words_wordcloud <- renderPlot({
+    tabla_frecuencias <- data.frame(words()[1:input$genes_words_max,])
+    tabla_frecuencias$words2 <- factor(tabla_frecuencias$words, 
+                                       levels = rev(factor(tabla_frecuencias$words)))
+    wordcloud::wordcloud(words = tabla_frecuencias$words2,
+                         freq = tabla_frecuencias$Freq,
+                         random.order = FALSE,
+                         colors = (colorRampPalette(c("blue", "red"))(100))) # Provisional
+  },
+  height = 600,
+  res = 96,
+  alt = 'Gráfica de barras de palabras más frecuentes')
+  
   # Genes temporal
   genes <- reactive({genes_data <- readRDS("test_files/genes.RDS")
                     genes_table <- data.frame(genes_data,
@@ -639,6 +664,20 @@ server <- function(input, output, session){
   res = 96,
   alt = 'Gráfica de barras de genes más frecuentes')
   
+  # Wordcloud with frequency of genes
+  output$genes_wordcloud <- renderPlot({
+    tabla_frecuencias <- genes()[1:input$genes_words_max,]
+    tabla_frecuencias$genes2 <- factor(tabla_frecuencias$Símbolo,
+                                       levels = rev(factor(tabla_frecuencias$Símbolo)))
+    wordcloud::wordcloud(words = tabla_frecuencias$genes2,
+                         freq = tabla_frecuencias$Frecuencia,
+                         random.order = FALSE,
+                         colors = (colorRampPalette(c("blue", "red"))(100)) # Provisional
+                         )
+  },
+  height = 600,
+  res = 96,
+  alt = 'Nube de palabras de los genes más frecuentes')
   
   # Display results of GO enrichment as table or barplot
   observeEvent(input$select_display, {
