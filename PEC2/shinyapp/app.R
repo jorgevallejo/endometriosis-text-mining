@@ -9,6 +9,7 @@ library(BiocManager) # Necessary for building org.Hs.eg.db into the app
 options(repos = BiocManager::repositories()) # Necessary for building org.Hs.eg.db into the app
 library(org.Hs.eg.db) # Obtaining EntrezID corresponding to gene symbol
 library(enrichR) # GO over-representation test, interfaze for Enrichr webtool
+library(wordcloud) # For wordcloud graphs
 
 ### Fixed variables ###
 
@@ -168,6 +169,10 @@ ui <- fluidPage(
                                 "Seleccionar resultados de",
                                 choices = c("Palabras más frecuentes",
                                             "Genes más frecuentes")),
+                    selectInput(inputId = "barplot_cloud",
+                                "Típo de gráfica",
+                                choices = c("Gráfico de barras",
+                                            "Nube de palabras")),
                     sliderInput(inputId = 'genes_words_max',
                                 label = "Máximo número de palabras/genes representados",
                                 min = 1,
