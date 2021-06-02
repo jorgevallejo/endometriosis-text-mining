@@ -1,4 +1,4 @@
-# library(profvis)
+# library(profvis) # Profiling the application
 
 library(shiny)
 library(easyPubMed)
@@ -9,6 +9,7 @@ library(BiocManager) # Necessary for building org.Hs.eg.db into the app
 options(repos = BiocManager::repositories()) # Necessary for building org.Hs.eg.db into the app
 library(org.Hs.eg.db) # Obtaining EntrezID corresponding to gene symbol
 library(enrichR) # GO over-representation test, interfaze for Enrichr webtool
+library(wordcloud) # For wordcloud graphs
 
 ### Fixed variables ###
 
@@ -41,7 +42,8 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
                ylab = "",
                xlab = "",
                xlim = c(0,max(varnum * 1.1)),
-               axes = FALSE
+               axes = FALSE,
+               col = colorRampPalette(c("blue", "red"))(varcat)
   )
   # Writes the frequency of each gen at the end of the bar
   text(rev(varnum),
@@ -161,9 +163,70 @@ ui <- fluidPage(
   # Gráficas de frecuencia
   tabPanel(title = "Gráficas de frecuencia",
            h1("Gráficas de frecuencia"),
-           plotOutput("words_barplot"),
-           # Barplot of genes
-           plotOutput("genes_barplot")),
+           fluidRow(
+             column(5,
+                    selectInput(inputId = "select_words_genes",
+                                "Seleccionar resultados de",
+                                choices = c("Palabras más frecuentes",
+                                            "Genes más frecuentes")),
+                    selectInput(inputId = "barplot_cloud",
+                                "Típo de gráfica",
+                                choices = c("Gráfico de barras",
+                                            "Nube de palabras")),
+                    # Optional UI with tabsets
+                    # Will display results controls for barplot or wordcloud
+                    # according to previous selection
+                    ## What is achieved at the moment is just changing the default number
+                    ## of categories/words displayed depending on barplot or wordcloud.
+                    ## That could have been arranged in a more simple way using updateSliderInput,
+                    ## but I have used a tabsetPanel because originally there where going
+                    ## to be more and different controls for each kind of graph. I have not
+                    ## had time to implement those, though.
+                    tabsetPanel(
+                      id = 'controles_barplot_wordcloud',
+                      type = 'hidden',
+                      tabPanelBody(
+                        "Gráfico de barras",
+                        sliderInput(inputId = 'genes_words_max',
+                                    label = "Categorías en el gráfico",
+                                    min = 1,
+                                    max = 100,
+                                    value = 20,
+                                    step = 1)),
+                      tabPanelBody(
+                        "Nube de palabras",
+                        sliderInput(inputId = 'words_cloud_max',
+                                    label = "Límite de palabras",
+                                    min = 1,
+                                    max = 1000,
+                                    value = 100,
+                                    step = 1))
+                        )),
+             column(5,
+                    # Optional UI with tabsets
+                    # Will display results for words or genes
+                    # according to user selection.
+                    tabsetPanel(
+                      id = 'graficas_frecuencia',
+                      type = 'hidden',
+                      tabPanelBody(
+                        "Palabras más frecuentes - Gráfico de barras",
+                        # Barplot de palabras
+                        plotOutput("words_barplot")
+                      ),
+                      tabPanelBody(
+                        "Genes más frecuentes - Gráfico de barras",
+                        # Barplot of genes
+                        plotOutput("genes_barplot")),
+                      tabPanelBody(
+                        "Palabras más frecuentes - Nube de palabras",
+                        # Nube de palabras
+                        plotOutput("words_wordcloud")),
+                      tabPanelBody(
+                        "Genes más frecuentes - Nube de palabras",
+                        # Nube de genes
+                        plotOutput("genes_wordcloud"))
+                      )))),
   # Caracterización de genes
   tabPanel(title = "Caracterización de genes",
            h1("Caracterización de genes por ontología génica"),
@@ -387,7 +450,7 @@ incProgress(15/15)
   output$palabras <- DT::renderDataTable({
     # Table content
     tabla_palabras <- data.frame(words())
-    # #tabla_palabras <- words() # Temporal mientras pruebo en local
+    # tabla_palabras <- words() # Temporal mientras pruebo en local
     datatable(tabla_palabras,
               colnames = c("Palabra", "Frecuencia"),
               rownames = FALSE,
@@ -452,16 +515,58 @@ incProgress(15/15)
     to_print
   })
   
+  # Display words or genes barplot
+  observeEvent({input$select_words_genes
+                input$barplot_cloud}, {
+    updateTabsetPanel(
+      inputId = "graficas_frecuencia",
+      selected = paste0(input$select_words_genes,
+                        " - ",
+                        input$barplot_cloud))
+  })
+  
+  # Display barplot or wordcloud controls
+  observeEvent(input$barplot_cloud, {
+      updateTabsetPanel(
+        inputId = "controles_barplot_wordcloud",
+        selected = input$barplot_cloud)
+    })
+  
+  # Update slider of min and max represented words/genes
+  observeEvent(input$select_words_genes,
+               updateSliderInput(
+                 inputId = 'genes_words_max',
+                 max = min(100, nrow(genes()))
+               ))
+  
+  
   # Barplot with frequency of words
   output$words_barplot <- renderPlot({
-    tabla_frecuencias <- data.frame(words()[1:10,])
+    tabla_frecuencias <- data.frame(words()[1:input$genes_words_max,])
     tabla_frecuencias$words2 <- factor(tabla_frecuencias$words, 
                                  levels = rev(factor(tabla_frecuencias$words)))
     freq_barplot(varcat = tabla_frecuencias$words2,
                  varnum = tabla_frecuencias$Freq,
                  main = "Palabras más frecuentes")
-  })
+  },
+  height = reactive(max(600, input$genes_words_max * 20)),
+  res = 96,
+  alt = 'Gráfica de barras de palabras más frecuentes')
 
+  # Wordcloud with frequency of words
+  output$words_wordcloud <- renderPlot({
+    tabla_frecuencias <- data.frame(words()[1:input$words_cloud_max,])
+    tabla_frecuencias$words2 <- factor(tabla_frecuencias$words, 
+                                       levels = rev(factor(tabla_frecuencias$words)))
+    wordcloud::wordcloud(words = tabla_frecuencias$words2,
+                         freq = tabla_frecuencias$Freq,
+                         random.order = FALSE,
+                         colors = (colorRampPalette(c("blue", "red"))(100))) # Provisional
+  },
+  height = 600,
+  res = 96,
+  alt = 'Gráfica de barras de palabras más frecuentes')
+  
   # Genes temporal
   # genes <- reactive({genes_data <- readRDS("test_files/genes.RDS")
   #                   genes_table <- data.frame(genes_data,
@@ -578,14 +683,31 @@ incProgress(15/15)
   
   # Barplot with frequency of genes
   output$genes_barplot <- renderPlot({
-    tabla_frecuencias <- genes()[1:10,]
+    tabla_frecuencias <- genes()[1:input$genes_words_max,]
     tabla_frecuencias$genes2 <- factor(tabla_frecuencias$Símbolo,
                                        levels = rev(factor(tabla_frecuencias$Símbolo)))
     freq_barplot(varcat = tabla_frecuencias$genes2,
                  varnum = tabla_frecuencias$Frecuencia,
                  main = "Genes más frecuentes")
-  })
+  },
+  height = reactive(max(600, input$genes_words_max * 20)),
+  res = 96,
+  alt = 'Gráfica de barras de genes más frecuentes')
   
+  # Wordcloud with frequency of genes
+  output$genes_wordcloud <- renderPlot({
+    tabla_frecuencias <- genes()[1:input$words_cloud_max,]
+    tabla_frecuencias$genes2 <- factor(tabla_frecuencias$Símbolo,
+                                       levels = rev(factor(tabla_frecuencias$Símbolo)))
+    wordcloud::wordcloud(words = tabla_frecuencias$genes2,
+                         freq = tabla_frecuencias$Frecuencia,
+                         random.order = FALSE,
+                         colors = (colorRampPalette(c("blue", "red"))(100)) # Provisional
+                         )
+  },
+  height = 600,
+  res = 96,
+  alt = 'Nube de palabras de los genes más frecuentes')
   
   # Display results of GO enrichment as table or barplot
   observeEvent(input$select_display, {
