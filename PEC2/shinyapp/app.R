@@ -1,4 +1,4 @@
-# library(profvis)
+# library(profvis) # Profiling the application
 
 library(shiny)
 library(easyPubMed)
@@ -15,10 +15,10 @@ library(wordcloud) # For wordcloud graphs
 
 # Starting value for data range
 # Five years (in days) before current date
-# end_date <- Sys.Date()
-# start_date <- end_date - (5 * 365.25)
-end_date <- "2021-05-20" # Temporal - only for test purposes
-start_date <- "2021-04-20" # Temporal - only for test purposes
+end_date <- Sys.Date()
+start_date <- end_date - (5 * 365.25)
+# end_date <- "2021-05-20" # Temporal - only for test purposes
+# start_date <- "2021-04-20" # Temporal - only for test purposes
 
 ### Custom functions ###
 
@@ -337,42 +337,42 @@ server <- function(input, output, session){
   
   # Downloads search results ## Temporal-comentado para tests en local
 
-#   pubmed_results <- eventReactive(input$search, {
-#     # Progress bar
-#     withProgress(message = "Descargando sumarios desde PubMed...",
-#                  detail = "Espere, por favor...",
-#                  value = 0, {
-#                    incProgress(7/15)
-#     resultados_busqueda <- batch_pubmed_download(
-#       pubmed_query_string = query(),
-#       dest_file_prefix = "pubmed_",
-#       format = "abstract",
-#       batch_size = 5000)
-# 
-#     ## Concatenate files
-#     # List of files to be added together
-#     files_list <- list.files(pattern = "pubmed_",
-#                              full.names = TRUE) # include path
-#     # Create new file
-#     out_file <- file(description = "todos_resultados.txt",
-#                      open = "w")
-#     # Read each downloaded file and write into final file
-#     for (i in files_list){
-#       x <- readLines(i)
-#       writeLines(x, out_file)
-#     }
-# 
-#     close(out_file)
-#     # Generate object of class abstract
-#     abstracts <- readabs("todos_resultados.txt")
-# 
-#     # Delete unnecesary text files
-#     files_to_delete <- list.files(pattern = "\\.txt$")
-#     file.remove(files_to_delete)
-# incProgress(15/15)
-# })
-#     abstracts
-#    })
+  pubmed_results <- eventReactive(input$search, {
+    # Progress bar
+    withProgress(message = "Descargando sumarios desde PubMed...",
+                 detail = "Espere, por favor...",
+                 value = 0, {
+                   incProgress(7/15)
+    resultados_busqueda <- batch_pubmed_download(
+      pubmed_query_string = query(),
+      dest_file_prefix = "pubmed_",
+      format = "abstract",
+      batch_size = 5000)
+
+    ## Concatenate files
+    # List of files to be added together
+    files_list <- list.files(pattern = "pubmed_",
+                             full.names = TRUE) # include path
+    # Create new file
+    out_file <- file(description = "todos_resultados.txt",
+                     open = "w")
+    # Read each downloaded file and write into final file
+    for (i in files_list){
+      x <- readLines(i)
+      writeLines(x, out_file)
+    }
+
+    close(out_file)
+    # Generate object of class abstract
+    abstracts <- readabs("todos_resultados.txt")
+
+    # Delete unnecesary text files
+    files_to_delete <- list.files(pattern = "\\.txt$")
+    file.remove(files_to_delete)
+incProgress(15/15)
+})
+    abstracts
+   })
   
   # Muestra la cantidad de citas recuperadas
   output$n_archivos <- renderText({
@@ -418,20 +418,20 @@ server <- function(input, output, session){
   
   ## Preprocesado del corpus primario
   # Word atomization # Comentario temporal para tests
-  # words <- reactive({
-  #   withProgress(message = "Recuperando palabras...",
-  #                value = 0, {
-  #                  incProgress(1/2)
-  #   words <- word_atomizations(pubmed_results())
-  #   incProgress(2/2)
-  #   words
-  #                })
-  #   })
+  words <- reactive({
+    withProgress(message = "Recuperando palabras...",
+                 value = 0, {
+                   incProgress(1/2)
+    words <- word_atomizations(pubmed_results())
+    incProgress(2/2)
+    words
+                 })
+    })
   
   ## Temporal for words in local
-  words <- reactive(readRDS("test_files/words.RDS"))
+  # words <- reactive(readRDS("test_files/words.RDS"))
   ## Temporal for pubmed results in local
-  pubmed_results <- reactive(readRDS("test_files/pubmed_results_temporal.RDS"))
+  # pubmed_results <- reactive(readRDS("test_files/pubmed_results_temporal.RDS"))
   
   # Header for frequency of words section
   output$header_frecuencia_palabras <- renderUI({
@@ -449,8 +449,8 @@ server <- function(input, output, session){
   # Table of words
   output$palabras <- DT::renderDataTable({
     # Table content
-    # tabla_palabras <- data.frame(words())
-    tabla_palabras <- words() # Temporal mientras pruebo en local
+    tabla_palabras <- data.frame(words())
+    # tabla_palabras <- words() # Temporal mientras pruebo en local
     datatable(tabla_palabras,
               colnames = c("Palabra", "Frecuencia"),
               rownames = FALSE,
@@ -463,8 +463,8 @@ server <- function(input, output, session){
   corpus_2ario <- reactive({
     withProgress(message = "Generando corpus secundario...",
                                  value = 0, {
-    # corpus <- pubmed_results()
-    corpus <- pubmed_results_temporal() # Temporal for testing in local
+    corpus <- pubmed_results()
+    # corpus <- pubmed_results_temporal() # Temporal for testing in local
     setProgress(1/4)
     word_selected <- input$palabras_rows_selected
     setProgress(2/4)
@@ -568,30 +568,30 @@ server <- function(input, output, session){
   alt = 'Gráfica de barras de palabras más frecuentes')
   
   # Genes temporal
-  genes <- reactive({genes_data <- readRDS("test_files/genes.RDS")
-                    genes_table <- data.frame(genes_data,
-                                                                          stringsAsFactors = FALSE)
-                                                colnames(genes_table) <- c("Símbolo", "Nombre", "Frecuencia")
-                                                genes_table$Frecuencia <- as.integer(genes_table$Frecuencia)
-                                                genes_table
-                    })
+  # genes <- reactive({genes_data <- readRDS("test_files/genes.RDS")
+  #                   genes_table <- data.frame(genes_data,
+  #                                                                         stringsAsFactors = FALSE)
+  #                                               colnames(genes_table) <- c("Símbolo", "Nombre", "Frecuencia")
+  #                                               genes_table$Frecuencia <- as.integer(genes_table$Frecuencia)
+  #                                               genes_table
+  #                   })
     
   # Gene atomization ## Temporal - comentado para tests en local
-  # genes <- reactive({
-  #   withProgress(message = 'Recuperando genes...',
-  #                detail = 'Suele tardar un rato...',
-  #                value = 0, {
-  #                  incProgress(1/2)
-  #   genes_data <- gene_atomization(pubmed_results())
-  #   # Codify frequency of genes as numeric
-  #   genes_table <- data.frame(genes_data,
-  #                             stringsAsFactors = FALSE)
-  #   colnames(genes_table) <- c("Símbolo", "Nombre", "Frecuencia")
-  #   genes_table$Frecuencia <- as.integer(genes_table$Frecuencia)
-  #   incProgress(2/2)
-  #                })
-  #   genes_table
-  #   })
+  genes <- reactive({
+    withProgress(message = 'Recuperando genes...',
+                 detail = 'Suele tardar un rato...',
+                 value = 0, {
+                   incProgress(1/2)
+    genes_data <- gene_atomization(pubmed_results())
+    # Codify frequency of genes as numeric
+    genes_table <- data.frame(genes_data,
+                              stringsAsFactors = FALSE)
+    colnames(genes_table) <- c("Símbolo", "Nombre", "Frecuencia")
+    genes_table$Frecuencia <- as.integer(genes_table$Frecuencia)
+    incProgress(2/2)
+                 })
+    genes_table
+    })
 
   # Add EntrezID column into genes table
   genes_plus_entrez <- reactive({
@@ -621,8 +621,8 @@ server <- function(input, output, session){
   corpus_2ario_gene <- reactive({
     withProgress(message = "Generando corpus secundario...",
                  value = 0, {
-                   # corpus <- pubmed_results()
-                   corpus <- pubmed_results_temporal() # Temporal for testing in local
+                   corpus <- pubmed_results()
+                   # corpus <- pubmed_results_temporal() # Temporal for testing in local
                    setProgress(1/4)
                    gene_selected <- input$genes_table_rows_selected
                    setProgress(2/4)
