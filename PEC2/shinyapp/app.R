@@ -291,17 +291,30 @@ ui <- fluidPage(
                   )),
   tabPanel(title = "Acerca de",
            h1("Acerca de Endo-Mining"),
-           p("Versión 0.6.0 (", a(href="version.txt"," visita el registro de cambios"), ")"),
-           p("Endo-Mining es una aplicación web diseñada para llevar a cabo análisis exploratorios
-             rápidos y ligeros de la información genética contenida en los sumarios de publicaciones
-             biomédicas almacenados en la base de datos PubMed."),
-           p("Diseñado por Jorge Vallejo Ortega como parte del Trabajo de Fin de Máster en el máster
-             Bioinformática y Bioestadística de la Universitat Oberta de Catalunya."),
-           p("Repositorio del proyecto en GitHub."),
+           fluidRow(
+             column(4,
+           
+           p("Versión 0.6.0 (", a(href="version.txt"," Consultar el registro de cambios", target = "_blank"), ")"),
+           p(tags$b("Endo-Mining"), "es una aplicación web diseñada para llevar a cabo", tags$b("análisis exploratorios"),
+             "rápidos y ligeros de la", tags$b(" información genética"), "contenida en los", tags$b(" sumarios de publicaciones
+             biomédicas"), "almacenados en la base de datos PubMed."),
+           p("Diseñado por Jorge Vallejo Ortega como parte del Trabajo de Fin de Máster en el", 
+a(href="https://estudios.uoc.edu/es/masters-universitarios/bioinformatica-bioestadistica/presentacion", tags$b("máster
+             de Bioinformática y Bioestadística"), target= "_blank"), "de la", tags$b("Universitat Oberta de Catalunya.")),
            p(),
-           p("Consultor: Romina Nebrij"),
-           p("Responsable de área: Antoni Pérez Navarro")
-    )
+           p(a(href="https://github.com/jorgevallejo/endometriosis-text-mining", 
+               "Repositorio del proyecto en GitHub.", target = "_blank")),
+           p(),
+           p("Alumno: ", a(href="https://es.linkedin.com/in/jorgevallejoortega", 
+                           "Jorge Vallejo Ortega", target = "_blank")),
+           p("Consultor: ", a(href="https://ar.linkedin.com/in/romina-astrid-rebrij-3bb490104", 
+                              "Romina Astrid Rebrij", target = "_blank")),
+           p("Responsable de área: ", a(href="https://www.researchgate.net/profile/Antoni-Perez-Navarro", 
+                                        "Antoni Pérez Navarro", target = "_blank"))),
+           column(6,
+                  img(src='uoc_masterbrand_vertical_positiu_2.png', align = "left",
+                      alt="Logotipo de la Universitat Oberta de Catalunya", width="230", height="330"))
+    ))
 ))
 
 
