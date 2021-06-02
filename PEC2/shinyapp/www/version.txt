@@ -1,15 +1,15 @@
 ## This document specifies current version of the web app and keeps the changelog
 
-Current version: 0.6.0
+Current version: 1.0.0
 
 == Changelog ==
-v.0.6.0 (2021/06/02) "Gráficas de frecuencia"
+v.1.0.0 (2021/06/02) "Acerca de"
 
-- Layout of section 'Graficas de frecuencia' divided into inputs (left) and graphs (right).
-- Height for word/gene barplots changes dynamically according to the number of categories displayed.
-- Color palette is similar for plotenrich barplot, other barplots and wordclouds (gradation from red to blue).
-- Display barplot or wordcloud as chosen by user. Type of graph and word/gene can be selected independently.
-- Default number of displayed categories made different for barplots and wordclouds in section 'Gráficas de frecuencia'.
+- Added section "Acerca de"
+- Version number updates automatically from the current version in file version.txt
+- Users can read Changelog from 'Acerca de' section.
+- Added links to GitHub repository, profesional pages of designer, advisor, and head
+of area; and link to official master's website.
 
 ***Known issues***
 - There is no friendly error message when no gen is recovered.
@@ -21,6 +21,14 @@ v.0.6.0 (2021/06/02) "Gráficas de frecuencia"
 - Error messages in 'Frecuencia de palabras' section before displaying hyperlink to PubMed database.
 - Numbers in the graphs don't have any big mark. Preferred mark is <space>.
 - Several text files created (many or all of which created by functions in pubmed.mineR package) remain in working directory (dataout.txt, table.txt, word_table.txt)
+
+v.0.6.0 (2021/06/02) "Gráficas de frecuencia"
+
+- Layout of section 'Graficas de frecuencia' divided into inputs (left) and graphs (right).
+- Height for word/gene barplots changes dynamically according to the number of categories displayed.
+- Color palette is similar for plotenrich barplot, other barplots and wordclouds (gradation from red to blue).
+- Display barplot or wordcloud as chosen by user. Type of graph and word/gene can be selected independently.
+- Default number of displayed categories made different for barplots and wordclouds in section 'Gráficas de frecuencia'.
 
 v.0.5.0 (2021/05/31) "Revamp of the section 'Frecuencia de genes'"
 
