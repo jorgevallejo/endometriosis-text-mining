@@ -1,16 +1,15 @@
 ## This document specifies current version of the web app and keeps the changelog
 
-Current version: 0.5.0
+Current version: 0.6.0
 
 == Changelog ==
-v.0.5.0 (2021/05/31) "Revamp of the section 'Frecuencia de genes'"
+v.0.6.0 (2021/06/02) "Gráficas de frecuencia"
 
-- Genes barplot have been moved to section 'Gráficas de frecuencia'.
-- Table of recovered genes now displays Entrez ID as well as gene symbol and name.
-- Table with the publications that contain the selected gene.
-- Abstract of publication selected from secondary corpus gene table and hyperlink to corresponding webpage in PubMed.
-- Hyperlink to the NCBI Gene webpage for the selected gene in section 'Frecuencia de genes'.
-
+- Layout of section 'Graficas de frecuencia' divided into inputs (left) and graphs (right).
+- Height for word/gene barplots changes dynamically according to the number of categories displayed.
+- Color palette is similar for plotenrich barplot, other barplots and wordclouds (gradation from red to blue).
+- Display barplot or wordcloud as chosen by user. Type of graph and word/gene can be selected independently.
+- Default number of displayed categories made different for barplots and wordclouds in section 'Gráficas de frecuencia'.
 
 ***Known issues***
 - There is no friendly error message when no gen is recovered.
@@ -21,6 +20,14 @@ v.0.5.0 (2021/05/31) "Revamp of the section 'Frecuencia de genes'"
 - Error messages in 'Frecuencia de palabras' section before displaying datatable of secondary corpus.
 - Error messages in 'Frecuencia de palabras' section before displaying hyperlink to PubMed database.
 - Numbers in the graphs don't have any big mark. Preferred mark is <space>.
+
+v.0.5.0 (2021/05/31) "Revamp of the section 'Frecuencia de genes'"
+
+- Genes barplot have been moved to section 'Gráficas de frecuencia'.
+- Table of recovered genes now displays Entrez ID as well as gene symbol and name.
+- Table with the publications that contain the selected gene.
+- Abstract of publication selected from secondary corpus gene table and hyperlink to corresponding webpage in PubMed.
+- Hyperlink to the NCBI Gene webpage for the selected gene in section 'Frecuencia de genes'.
 
 v.0.4.0 (2021/05/30)
 - Section 'Frecuencia de palabras': displays another datatable with secondary corpus, the abstract of selected publication, and a hyperlink to the PubMed page for said publication.
