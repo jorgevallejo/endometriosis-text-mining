@@ -173,12 +173,35 @@ ui <- fluidPage(
                                 "Típo de gráfica",
                                 choices = c("Gráfico de barras",
                                             "Nube de palabras")),
-                    sliderInput(inputId = 'genes_words_max',
-                                label = "Máximo número de palabras/genes representados",
-                                min = 1,
-                                max = 20,
-                                value = 10,
-                                step = 1)),
+                    # Optional UI with tabsets
+                    # Will display results controls for barplot or wordcloud
+                    # according to previous selection
+                    ## What is achieved at the moment is just changing the default number
+                    ## of categories/words displayed depending on barplot or wordcloud.
+                    ## That could have been arranged in a more simple way using updateSliderInput,
+                    ## but I have used a tabsetPanel because originally there where going
+                    ## to be more and different controls for each kind of graph. I have not
+                    ## had time to implement those, though.
+                    tabsetPanel(
+                      id = 'controles_barplot_wordcloud',
+                      type = 'hidden',
+                      tabPanelBody(
+                        "Gráfico de barras",
+                        sliderInput(inputId = 'genes_words_max',
+                                    label = "Categorías en el gráfico",
+                                    min = 1,
+                                    max = 100,
+                                    value = 20,
+                                    step = 1)),
+                      tabPanelBody(
+                        "Nube de palabras",
+                        sliderInput(inputId = 'words_cloud_max',
+                                    label = "Límite de palabras",
+                                    min = 1,
+                                    max = 1000,
+                                    value = 100,
+                                    step = 1))
+                        )),
              column(5,
                     # Optional UI with tabsets
                     # Will display results for words or genes
@@ -502,6 +525,13 @@ server <- function(input, output, session){
                         input$barplot_cloud))
   })
   
+  # Display barplot or wordcloud controls
+  observeEvent(input$barplot_cloud, {
+      updateTabsetPanel(
+        inputId = "controles_barplot_wordcloud",
+        selected = input$barplot_cloud)
+    })
+  
   # Update slider of min and max represented words/genes
   observeEvent(input$select_words_genes,
                updateSliderInput(
@@ -525,7 +555,7 @@ server <- function(input, output, session){
 
   # Wordcloud with frequency of words
   output$words_wordcloud <- renderPlot({
-    tabla_frecuencias <- data.frame(words()[1:input$genes_words_max,])
+    tabla_frecuencias <- data.frame(words()[1:input$words_cloud_max,])
     tabla_frecuencias$words2 <- factor(tabla_frecuencias$words, 
                                        levels = rev(factor(tabla_frecuencias$words)))
     wordcloud::wordcloud(words = tabla_frecuencias$words2,
@@ -666,7 +696,7 @@ server <- function(input, output, session){
   
   # Wordcloud with frequency of genes
   output$genes_wordcloud <- renderPlot({
-    tabla_frecuencias <- genes()[1:input$genes_words_max,]
+    tabla_frecuencias <- genes()[1:input$words_cloud_max,]
     tabla_frecuencias$genes2 <- factor(tabla_frecuencias$Símbolo,
                                        levels = rev(factor(tabla_frecuencias$Símbolo)))
     wordcloud::wordcloud(words = tabla_frecuencias$genes2,
