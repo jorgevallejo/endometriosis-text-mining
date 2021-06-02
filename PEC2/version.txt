@@ -20,6 +20,7 @@ v.0.6.0 (2021/06/02) "Gráficas de frecuencia"
 - Error messages in 'Frecuencia de palabras' section before displaying datatable of secondary corpus.
 - Error messages in 'Frecuencia de palabras' section before displaying hyperlink to PubMed database.
 - Numbers in the graphs don't have any big mark. Preferred mark is <space>.
+- Several text files created (many or all of which created by functions in pubmed.mineR package) remain in working directory (dataout.txt, table.txt, word_table.txt)
 
 v.0.5.0 (2021/05/31) "Revamp of the section 'Frecuencia de genes'"
 
