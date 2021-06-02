@@ -288,9 +288,21 @@ ui <- fluidPage(
                   
                   
                   
-                  ))
+                  )),
+  tabPanel(title = "Acerca de",
+           h1("Acerca de Endo-Mining"),
+           p("Versión 0.6.0 (", a(href="version.txt"," visita el registro de cambios"), ")"),
+           p("Endo-Mining es una aplicación web diseñada para llevar a cabo análisis exploratorios
+             rápidos y ligeros de la información genética contenida en los sumarios de publicaciones
+             biomédicas almacenados en la base de datos PubMed."),
+           p("Diseñado por Jorge Vallejo Ortega como parte del Trabajo de Fin de Máster en el máster
+             Bioinformática y Bioestadística de la Universitat Oberta de Catalunya."),
+           p("Repositorio del proyecto en GitHub."),
+           p(),
+           p("Consultor: Romina Nebrij"),
+           p("Responsable de área: Antoni Pérez Navarro")
     )
-)
+))
 
 
 
