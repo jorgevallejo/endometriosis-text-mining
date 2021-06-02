@@ -20,6 +20,26 @@ start_date <- end_date - (5 * 365.25)
 # end_date <- "2021-05-20" # Temporal - only for test purposes
 # start_date <- "2021-04-20" # Temporal - only for test purposes
 
+# Current version (from version.txt)
+  # Adapted from https://stackoverflow.com/a/35761217/10647267
+
+findVersion <- function(filepath = "www/version.txt",
+                         pattern = "Current version: "){
+  con <- file(filepath, "r")
+  while (TRUE) {
+    # The loop works because, while the connection is open,
+    # it is read from its current position
+    line <- readLines(con, n = 1)
+    # With isTRUE we avoid the error when grep is integer(0)
+    if (isTRUE(grep(pattern, line) == 1)) {
+      version <- sub(pattern, "", line)
+      break
+    }
+  }
+  close(con)
+  version
+}
+
 ### Custom functions ###
 
 # Function for frequency barplots
@@ -65,7 +85,7 @@ freq_barplot <- function(varcat, varnum, main = ""){ # Categorical variable and 
   ontology_aspect <- list("Función molecular" = "GO_Molecular_Function_2018",  
                           "Componente celular" = "GO_Cellular_Component_2018",
                           "Proceso biológico" = "GO_Biological_Process_2018")
-  
+
 ### User interface ###
 ui <- fluidPage(
   titlePanel("Endo-Mining",
@@ -294,7 +314,7 @@ ui <- fluidPage(
            fluidRow(
              column(4,
            
-           p("Versión 0.6.0 (", a(href="version.txt"," Consultar el registro de cambios", target = "_blank"), ")"),
+           p("Versión ", findVersion(), "(", a(href="version.txt"," Consultar el registro de cambios", target = "_blank"), ")"),
            p(tags$b("Endo-Mining"), "es una aplicación web diseñada para llevar a cabo", tags$b("análisis exploratorios"),
              "rápidos y ligeros de la", tags$b(" información genética"), "contenida en los", tags$b(" sumarios de publicaciones
              biomédicas"), "almacenados en la base de datos PubMed."),
