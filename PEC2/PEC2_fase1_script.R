@@ -180,6 +180,12 @@ ego_all <- enrichGO(gene = entrez$ENTREZID,
                    qvalueCutoff = 0.5,
                    readable = TRUE)
 
-# Generate BP results as a csv file
+# Generate results as a csv file
 write.csv(ego_all[ego_all@result$ONTOLOGY == "BP", ],
           file="PEC2/intermediateData/results/ego_BP.csv")
+
+write.csv(ego_all[ego_all@result$ONTOLOGY == "MF", ],
+          file="PEC2/intermediateData/results/ego_MF.csv")
+
+write.csv(ego_all[ego_all@result$ONTOLOGY == "CC", ],
+          file="PEC2/intermediateData/results/ego_CC.csv")
