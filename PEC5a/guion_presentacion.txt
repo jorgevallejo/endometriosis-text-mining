@@ -1,0 +1,18 @@
+1. Portada
+2. Endometriosis
+3. Minería de textos
+4. Antecedentes (Liu y Bouaziz)
+5. El producto final
+6. Script
+7. Aplicación web
+8. Esquema de funcionamiento
+9. Ejemplo de funcionamiento en video (ocupará varios minutos)
+10. Busqueda
+11. Frecuencia de palabras
+12. Frecuencia de genes
+13. Gráficas de frecuencia
+14. Caracterización génica
+15. Carencias
+16. Desarrollo futuro (filtro de genes, otras tareas, riegos no genéticos)
+17. Despedida
+
