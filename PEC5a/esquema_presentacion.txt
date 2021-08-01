@@ -1,0 +1,31 @@
+1. Portada
+	Título
+	Mi nombre
+	Logotipo UOC
+2. Resultado del proyecto
+	Breve referencia a los tres producto conseguidos:
+		Lista de genes potencialmente relacionados con la endometriosis
+			Ilustrado con nube de palabras de símbolos génicos.
+		Script que automatiza recolección y análisis de datos
+			¿Ilustrado con fragmento de código?
+		Aplicación web que implementa el script en forma interactiva
+			Ilustrado con pantalla de inicio de la aplicación web
+3. Antecedentes
+	Cómo se llegó a la idea del proyecto
+4. Endometriosis
+5. Minería de textos
+6. Antecedentes (Liu y Bouaziz)
+	Esquema de tareas en ambos artículos
+7. Esquema de funcionamiento para diseñar el script y la aplicación
+8. Herramientas: R y Shiny
+9. Script: Ejemplo de funcionamiento del script
+10. Aplicación: se ilustrará su funcionamiento con vídeo en lugar de diapositivas
+10. Busqueda
+11. Frecuencia de palabras
+12. Frecuencia de genes
+13. Gráficas de frecuencia
+14. Caracterización génica
+15. Carencias
+16. Desarrollo futuro (filtro de genes, otras tareas, riegos no genéticos)
+17. Despedida
+
