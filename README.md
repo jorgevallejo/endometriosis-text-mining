@@ -1,6 +1,6 @@
-Qué es este proyecto
+#Qué es este proyecto
 
-Endo-mining es el resultado de mi trabajo de fin de máster para el Máster de Bioinformática y Bioestadística de la Universitat Oberta de Catalunya.
+**Endo-mining** es el resultado de mi trabajo de fin de máster para el Máster de Bioinformática y Bioestadística de la Universitat Oberta de Catalunya.
 
 El trabajo perseguía tres objetivos:
 
@@ -10,6 +10,8 @@ El trabajo perseguía tres objetivos:
 
 3. Desarrollar una aplicación web implementando el script de minería de textos resultante del objetivo anterior.
 
+
+## Resultados del trabajo
 
 Como resultado del trabajo han quedado cuatro productos:
 
@@ -23,7 +25,7 @@ Como resultado del trabajo han quedado cuatro productos:
 
 
 
-Estructura del repositorio
+## Estructura del repositorio
 
 Cada una de las carpetas corresponde a una entrega parcial del trabajo.
 
@@ -42,13 +44,3 @@ PEC4: Memoria del proyecto.
 PEC5a: Esquema y guión de la presentación en vídeo.
 
 script/data: Archivos de datos necesarios para el funcionamiento del script.
-
-
-
-Archivos/enlaces más importantes
-
-Memoria del TFM (enlace a la memoria en la web de la UOC)
-
-Exposición (enlace al vídeo)
-
-Programa (enlace a la aplicación en shinyapps.io)
