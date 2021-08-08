@@ -1,4 +1,4 @@
-#Qué es este proyecto
+# Qué es este proyecto
 
 **Endo-mining** es el resultado de mi trabajo de fin de máster para el Máster de Bioinformática y Bioestadística de la Universitat Oberta de Catalunya.
 
@@ -29,18 +29,18 @@ Como resultado del trabajo han quedado cuatro productos:
 
 Cada una de las carpetas corresponde a una entrega parcial del trabajo.
 
-PEC0: Propuesta del trabajo de fin de máster
+- **PEC0:** Propuesta del trabajo de fin de máster
 
-PEC1: Plan de trabajo.
+- **PEC1:** Plan de trabajo.
 
-PEC2: Informe de seguimiento de mitad de proyecto.  \
-    Incluye el código de la aplicación web en la carpeta `shinyapp`.
+- **PEC2:** Informe de seguimiento de mitad de proyecto.  \
+    \Incluye el código de la aplicación web en la carpeta `shinyapp`.
 
-PEC3: Informe de seguimiento de tres cuartos de proyecto.  \
-    Incluye el archivo del script (`PEC3_fase2_script.R`).
+- **PEC3:** Informe de seguimiento de tres cuartos de proyecto.  \
+    \Incluye el archivo del script (`PEC3_fase2_script.R`).
 
-PEC4: Memoria del proyecto.
+- **PEC4:** Memoria del proyecto.
 
-PEC5a: Esquema y guión de la presentación en vídeo.
+- **PEC5a:** Esquema y guión de la presentación en vídeo.
 
-script/data: Archivos de datos necesarios para el funcionamiento del script.
+- **script/data:** Archivos de datos necesarios para el funcionamiento del script.
