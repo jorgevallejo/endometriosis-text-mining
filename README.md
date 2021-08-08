@@ -33,11 +33,13 @@ Cada una de las carpetas corresponde a una entrega parcial del trabajo.
 
 - **PEC1:** Plan de trabajo.
 
-- **PEC2:** Informe de seguimiento de mitad de proyecto.  \
-    \Incluye el código de la aplicación web en la carpeta `shinyapp`.
+- **PEC2:** Informe de seguimiento de mitad de proyecto.
 
-- **PEC3:** Informe de seguimiento de tres cuartos de proyecto.  \
-    \Incluye el archivo del script (`PEC3_fase2_script.R`).
+    Incluye el código de la aplicación web en la carpeta `shinyapp`.
+
+- **PEC3:** Informe de seguimiento de tres cuartos de proyecto.
+
+    Incluye el archivo del script (`PEC3_fase2_script.R`).
 
 - **PEC4:** Memoria del proyecto.
 
