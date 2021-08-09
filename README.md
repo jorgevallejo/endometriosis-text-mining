@@ -1,8 +1,6 @@
-<<<<<<< HEAD
 ![Screenshot of Endo-Mining - GO terms characterization](readme-endo-mining-screenshot-GO-terms.png)
 
 # Qué es este proyecto
->>>>>>> 25acfe3eed20f98b397bfce7a97df1a6a0db397b
 
 **Endo-mining** es el resultado de mi trabajo de fin de máster para el Máster de Bioinformática y Bioestadística de la Universitat Oberta de Catalunya.
 
