@@ -1,8 +1,10 @@
+<<<<<<< HEAD
 ![Screenshot of Endo-Mining - GO terms characterization](readme-endo-mining-screenshot-GO-terms.png)
 
-Qué es este proyecto
+# Qué es este proyecto
+>>>>>>> 25acfe3eed20f98b397bfce7a97df1a6a0db397b
 
-Endo-mining es el resultado de mi trabajo de fin de máster para el Máster de Bioinformática y Bioestadística de la Universitat Oberta de Catalunya.
+**Endo-mining** es el resultado de mi trabajo de fin de máster para el Máster de Bioinformática y Bioestadística de la Universitat Oberta de Catalunya.
 
 El trabajo perseguía tres objetivos:
 
@@ -12,6 +14,8 @@ El trabajo perseguía tres objetivos:
 
 3. Desarrollar una aplicación web implementando el script de minería de textos resultante del objetivo anterior.
 
+
+## Resultados del trabajo
 
 Como resultado del trabajo han quedado cuatro productos:
 
@@ -25,32 +29,24 @@ Como resultado del trabajo han quedado cuatro productos:
 
 
 
-Estructura del repositorio
+## Estructura del repositorio
 
 Cada una de las carpetas corresponde a una entrega parcial del trabajo.
 
-PEC0: Propuesta del trabajo de fin de máster
+- **PEC0:** Propuesta del trabajo de fin de máster
 
-PEC1: Plan de trabajo.
+- **PEC1:** Plan de trabajo.
 
-PEC2: Informe de seguimiento de mitad de proyecto.  \
+- **PEC2:** Informe de seguimiento de mitad de proyecto.
+
     Incluye el código de la aplicación web en la carpeta `shinyapp`.
 
-PEC3: Informe de seguimiento de tres cuartos de proyecto.  \
+- **PEC3:** Informe de seguimiento de tres cuartos de proyecto.
+
     Incluye el archivo del script (`PEC3_fase2_script.R`).
 
-PEC4: Memoria del proyecto.
+- **PEC4:** Memoria del proyecto.
 
-PEC5a: Esquema y guión de la presentación en vídeo.
+- **PEC5a:** Esquema y guión de la presentación en vídeo.
 
-script/data: Archivos de datos necesarios para el funcionamiento del script.
-
-
-
-Archivos/enlaces más importantes
-
-Memoria del TFM (enlace a la memoria en la web de la UOC)
-
-Exposición (enlace al vídeo)
-
-Programa (enlace a la aplicación en shinyapps.io)
+- **script/data:** Archivos de datos necesarios para el funcionamiento del script.
